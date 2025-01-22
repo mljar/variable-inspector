@@ -1,0 +1,8 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "title": "variable-inspector",
+  "description": "variable-inspector settings.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

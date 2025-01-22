@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.3.7
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: contact@mljar.com
+author_name: variable-inscpector
+has_binder: true
+has_settings: true
+kind: frontend
+labextension_name: variable-inspector
+project_short_description: Variable inspector for jupyter lab.
+python_name: variable_inspector
+repository: https://github.com/mljar/variable-inspector.git
+test: false
+
