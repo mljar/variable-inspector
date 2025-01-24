@@ -3,3 +3,64 @@
 
     https://jupyterlab.readthedocs.io/en/stable/developer/css.html
 */
+
+
+
+.mljar-variable-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mljar-variable-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  margin-right: 8px;
+  border-bottom: 2px solid #ddd;
+}
+
+.mljar-variable-header {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--jp-ui-font-color1);
+  text-align: left;
+  padding-bottom: 8px;
+  margin: 0;
+}
+
+
+.mljar-sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+
+.mljar-variable-header-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2rem;
+  align-items: center;
+  font-size: 0.85rem;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--jp-layout-color0);
+  background-color: #0099cc;
+  color: #fff;
+}
+
+
+.mljar-variable-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.package-list-container {
+  flex: 1;
+  overflow-y: hidden;
+  padding-right: 10px;
+}

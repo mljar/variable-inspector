@@ -1,10 +1,14 @@
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
+  ILabShell,
 } from '@jupyterlab/application';
 
+import { ICommandPalette } from '@jupyterlab/apputils';
+import { createEmptyVariableInspectorPanel } from './components/variableInspectorPanel';
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
+
 
 const leftTab: JupyterFrontEndPlugin<void> = {
   id: 'package-manager:plugin',
@@ -16,11 +20,29 @@ const leftTab: JupyterFrontEndPlugin<void> = {
 
     notebookWatcher.selectionChanged.connect((sender, selections) => {});
 
-    let widget = createVariableInspectorSidebar(notebookWatcher);
+    let widget = createVariableInspectorSidebar(notebookWatcher, app.commands);
 
     app.shell.add(widget, 'left',{rank: 1999});
   }
 };
 
-export default leftTab;
+
+const customVariableInspectorPlugin: JupyterFrontEndPlugin<void> = {
+  id: 'custom-variableinspector',
+  autoStart: true,
+  requires: [ICommandPalette, ILabShell],
+  activate: (app: JupyterFrontEnd, palette: ICommandPalette, labShell: ILabShell) => {
+    const command = 'custom:open-variable-inspector';
+    app.commands.addCommand(command, {
+      label: 'Open Custom Variable Inspector',
+      execute: () => {
+        createEmptyVariableInspectorPanel(labShell);
+      }
+    });
+
+    palette.addItem({ command, category: 'Custom Extensions' });
+  }
+};
+
+export default [customVariableInspectorPlugin, leftTab];
 
