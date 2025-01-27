@@ -5,6 +5,8 @@ import { NotebookWatcher } from '../watchers/notebookWatcher'
 import { NotebookPanelContextProvider } from '../context/notebookPanelContext';
 import { CommandRegistry } from '@lumino/commands';
 import { VariableListComponent } from './variableListComponent';
+import { NotebookKernelContextProvider } from '../context/notebookKernelContext';
+import { VariableContextProvider } from '../context/notebookVariableContext';
 
 
 class VariableInspectorSidebarWidget extends ReactWidget {
@@ -25,14 +27,18 @@ class VariableInspectorSidebarWidget extends ReactWidget {
       <div
         className='mljar-sidebar-container'
       >
-        <VariableListComponent/>
-        <button
-                  onClick={() => this.commands.execute('custom:open-variable-inspector')}
-        > 
-          Hello
-        </button>
-        
+
         <NotebookPanelContextProvider notebookWatcher={this.notebookWatcher}>
+          <NotebookKernelContextProvider notebookWatcher={this.notebookWatcher}>
+              <VariableContextProvider>
+            <VariableListComponent/>
+            <button
+            onClick={() => this.commands.execute('custom:open-variable-inspector')}
+            > 
+              Hello
+            </button> 
+            </VariableContextProvider>
+          </NotebookKernelContextProvider>
         </NotebookPanelContextProvider>
       </div>
     );

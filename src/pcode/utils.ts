@@ -239,4 +239,6 @@ def _jupyterlab_variableinspector_default(o):
 def _jupyterlab_variableinspector_deletevariable(x):
     exec("del %s" % x, globals())
 
+_jupyterlab_variableinspector_dict_list()
+
 `
