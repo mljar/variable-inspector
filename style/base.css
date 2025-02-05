@@ -1,10 +1,16 @@
+/* .mljar-plugin-sidebar-widget { */
+/*   background-color: #ffffff; */
+/*   padding: 10px; */
+/* } */
+/*  */
+/*  */
 
 .mljar-variable-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow-y: auto;
 }
-
 
 .mljar-variable-header-container {
   display: flex;
@@ -15,7 +21,6 @@
   border-bottom: 2px solid #ddd;
 }
 
-
 .mljar-variable-header {
   font-size: 0.85rem;
   font-weight: 700;
@@ -25,46 +30,35 @@
   margin: 0;
 }
 
-
 .mljar-sidebar-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow-y: auto;
 }
-
 
 .mljar-variable-header-list {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1rem;
   align-items: center;
   font-size: 0.85rem;
-  padding-left: 8px;
-  padding-right: 8px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 10px 8px;
   border-bottom: 2px solid var(--jp-layout-color0);
   background-color: #0099cc;
   color: #fff;
 }
 
-
 .mljar-variable-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  margin-right: 10px;
 }
 
-.package-list-container {
-  flex: 1;
-  overflow-y: hidden;
-  padding-right: 10px;
-}
 
 .mljar-search-bar-container {
   margin-bottom: 10px;
   background-color: lightblue;
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
 .mljar-search-bar-input {
@@ -77,34 +71,13 @@
 }
 
 
-
-.mljar-package-item.active .mljar-package-name,
-.mljar-package-item.active .mljar-package-version {
-  color: #fff;
-}
-
-
-.mljar-package-item:hover {
-  background-color: var(--jp-layout-color2);
-  cursor: pointer;
-}
-
-.mljar-package-item.active {
-  background-color: var(--jp-brand-color1);
-  color: var(--jp-ui-inverse-font-color1);
-}
-
 .mljar-variable-item {
-  flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr 2rem;
+  grid-template-columns: 1fr 1fr 1fr auto;
   align-items: center;
   column-gap: 1rem;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 0 8px;
   border: 1px solid var(--jp-border-color2);
-  margin-bottom: 0px;
-  margin-right: 0px;
   width: 100%;
   box-sizing: border-box;
   background-color: var(--jp-layout-color0);
@@ -112,12 +85,112 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.mljar-variable-item.active .mljar-variable-name,
+.mljar-variable-item.active .mljar-varialbe-version {
+  color: #fff;
+}
+
+
+.mljar-variable-item:hover {
+  background-color: var(--jp-layout-color2);
+  cursor: pointer;
+}
+
+.mljar-varable-item.active {
+  background-color: var(--jp-brand-color1);
+  color: var(--jp-ui-inverse-font-color1);
+}
 
 .mljar-variable-name,
-.mljar-variable-type
-.mljar-variable-shape{
+.mljar-variable-type,
+.mljar-variable-shape {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mljar-show-variable-button {
+  background: none;
+  position: relative;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc3545;
+  transition: color 0.3s ease;
+}
+
+.mljar-show-variable-button:hover {
+  color: #a71d2a;
+}
+
+.mljar-variable-detail-button-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.mljar-refresh-button
+ {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0099cc;
+  gap: 8px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 0px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.3s ease;
+}
+
+
+.mljar-refresh-button:disabled
+{
+  background-color: #a0c4e3;
+  cursor: not-allowed;
+}
+
+.mljar-refresh-button:hover:not(:disabled)
+ {
+  background-color: #005fa3;
+}
+
+.mljar-refresh-icon
+ {
+  display: flex;
+  align-items: center;
+  width: 15px;
+  height: 15px;
+}
+
+
+.mljar-actions-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.mljar-variable-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.mljar-variable-container::-webkit-scrollbar-track {
+  background: #d3d3d3;
+  border-radius: 8px;
+}
+
+.mljar-variable-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.6); 
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 

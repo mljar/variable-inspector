@@ -23,7 +23,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     this.commands = commands
     this.id = 'my-plugin::empty-sidebar'
     this.title.icon = pluginIcon
-    this.title.caption = 'My Plugin'
+    this.title.caption = 'Variable Inspector'
     this.addClass('mljar-plugin-sidebar-widget')
   }
 
@@ -47,6 +47,8 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
         this.update()
       }
     }
+
+  console.log(this.commands)
     return (
       <PluginVisibilityContext.Provider value={contextValue}>
         <NotebookPanelContextProvider notebookWatcher={this.notebookWatcher}>
@@ -54,10 +56,6 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
             <VariableContextProvider>
               <KernelIdleWatcherContextProvider>
               <VariableListComponent />
-                
-              <button onClick={() => this.commands.execute('custom:open-variable-inspector')}>
-                Hello
-              </button>
               </KernelIdleWatcherContextProvider>
             </VariableContextProvider>
           </NotebookKernelContextProvider>

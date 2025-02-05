@@ -11,7 +11,7 @@ import { NotebookWatcher } from './watchers/notebookWatcher';
 
 
 const leftTab: JupyterFrontEndPlugin<void> = {
-  id: 'package-manager:plugin',
+  id: 'variable-manager:plugin',
   description: 'A JupyterLab extension to list, remove and install python packages from pip.',
   autoStart: true,
   activate: async (app: JupyterFrontEnd) => {

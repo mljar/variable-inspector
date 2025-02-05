@@ -12,9 +12,6 @@ export const KernelIdleWatcherContextProvider: React.FC<{ children: React.ReactN
   const [hasRefreshed, setHasRefreshed] = useState(false)
   const { refreshVariables, isRefreshing } = useVariableContext()
 
-
-
-
   useEffect(() => {
     if (!notebookPanel || !notebookPanel.sessionContext) return
     const kernel = notebookPanel.sessionContext?.session?.kernel
@@ -27,8 +24,6 @@ export const KernelIdleWatcherContextProvider: React.FC<{ children: React.ReactN
       kernel.statusChanged.disconnect(onKernelStatusChange)
     }
   }, [notebookPanel?.sessionContext?.session?.kernel])
-
-
 
   // first idea to solve the problem, code might be unstable
   useEffect(() => {
@@ -69,7 +64,7 @@ export const KernelIdleWatcherContextProvider: React.FC<{ children: React.ReactN
         timerRef.current = null
       }
     }
-  }, [kernelStatus,notebookPanel,refreshVariables, hasRefreshed])
+  }, [kernelStatus,notebookPanel, refreshVariables, hasRefreshed])
 
   return (
     <KernelIdleWatcherContext.Provider value={{ kernelStatus }}>
