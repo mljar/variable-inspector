@@ -14,8 +14,8 @@ export const SearchBar: React.FC = () => {
         type="text"
         value={searchTerm}
         onChange={handleChange}
-        placeholder="Search Package..."
-        className='search-bar-input'
+        placeholder="Search Variable..."
+        className='mljar-search-bar-input'
       />
     </div>
   );

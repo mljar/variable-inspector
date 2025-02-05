@@ -10,9 +10,11 @@ export const VariableListComponent: React.FC = () => {
       <div className="mljar-variable-container">
         <div className="mljar-variable-header-container">
           <h3 className="mljar-variable-header">Variable Inspector</h3>
-            <SearchBar />
-          <VariableList/>
         </div>
+          <div>
+            <SearchBar />
+            <VariableList/>
+          </div>
       </div>
   );
 };
