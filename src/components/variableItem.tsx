@@ -1,5 +1,6 @@
 import React from 'react'
 import { detailIcon } from '../icons/detailIcon'
+import { CommandRegistry } from "@lumino/commands"
 
 interface VariableInfo {
   name: string
@@ -9,13 +10,16 @@ interface VariableInfo {
 
 interface VariableItemProps {
   vrb: VariableInfo
+  commands: CommandRegistry
 }
 
-const handleButtonClick = () => {
-  console.log("Click")
+
+const handleButtonClick = (command: CommandRegistry) => {
+  command.execute
 }
 
-export const VariableItem: React.FC<VariableItemProps> = ({ vrb }) => {
+
+export const VariableItem: React.FC<VariableItemProps> = ({ vrb,commands }) => {
   return (
     <li className='mljar-variable-item'>
       <span className='mljar-variable-name'>{vrb.name}</span>
@@ -23,11 +27,13 @@ export const VariableItem: React.FC<VariableItemProps> = ({ vrb }) => {
       <span className='mljar-variable-shape'>{vrb.shape}</span>
       <button
         className='mljar-show-variable-button'
-        onClick={handleButtonClick}
+        onClick={handleButtonClick(commands)}
         aria-label={`Show details for ${vrb.name}`}
       >
         <detailIcon.react className='mljar-variable-detail-button-icon' />
       </button>
     </li>
   )
+
+
 }

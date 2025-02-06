@@ -55,7 +55,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
           <NotebookKernelContextProvider notebookWatcher={this.notebookWatcher}>
             <VariableContextProvider>
               <KernelIdleWatcherContextProvider>
-              <VariableListComponent />
+              <VariableListComponent commands={this.commands} />
               </KernelIdleWatcherContextProvider>
             </VariableContextProvider>
           </NotebookKernelContextProvider>

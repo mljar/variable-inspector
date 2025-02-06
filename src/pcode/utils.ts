@@ -178,10 +178,7 @@ def _jupyterlab_variableinspector_dict_list():
     vardic = []
     for _v in values:
         if keep_cond(_v):
-            try:
-                _ev = eval(_v)
-            except Exception:
-                continue
+            _ev = eval(_v)
             vardic += [{
                 'varName': _v,
                 'varType': type(_ev).__name__, 
@@ -242,7 +239,6 @@ def _jupyterlab_variableinspector_default(o):
 def _jupyterlab_variableinspector_deletevariable(x):
     exec("del %s" % x, globals())
 
-
-
 _jupyterlab_variableinspector_dict_list()
+
 `

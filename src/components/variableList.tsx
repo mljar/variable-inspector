@@ -1,8 +1,13 @@
 import React from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
 import { VariableItem } from './variableItem';
+import { CommandRegistry } from '@lumino/commands'
 
-export const VariableList: React.FC = () => {
+interface VariableListProps{
+  commands: CommandRegistry;
+}
+
+export const VariableList: React.FC<VariableListProps> = ({commands}) => {
   const { variables, searchTerm } = useVariableContext();
 
 const filteredVariables = variables.filter(variable =>
@@ -25,6 +30,7 @@ const filteredVariables = variables.filter(variable =>
             type: variable.type,
             shape: variable.shape || 'N/A',
           }}
+          commands={commands}
         />
       ))}
     </ul>
