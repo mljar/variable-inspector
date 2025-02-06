@@ -14,8 +14,8 @@ interface VariableItemProps {
 }
 
 
-const handleButtonClick = (command: CommandRegistry) => {
-  command.execute
+const handleButtonClick = (command: CommandRegistry, variableName: string, variableType: string) => {
+  command.execute('custom:open-variable-inspector',{variableName, variableType})
 }
 
 
@@ -27,13 +27,14 @@ export const VariableItem: React.FC<VariableItemProps> = ({ vrb,commands }) => {
       <span className='mljar-variable-shape'>{vrb.shape}</span>
       <button
         className='mljar-show-variable-button'
-        onClick={handleButtonClick(commands)}
+        onClick={() => handleButtonClick(commands, vrb.name,vrb.type)}
         aria-label={`Show details for ${vrb.name}`}
       >
         <detailIcon.react className='mljar-variable-detail-button-icon' />
       </button>
     </li>
   )
+
 
 
 }

@@ -12,7 +12,7 @@ import { NotebookWatcher } from './watchers/notebookWatcher';
 
 const leftTab: JupyterFrontEndPlugin<void> = {
   id: 'variable-manager:plugin',
-  description: 'A JupyterLab extension to list, remove and install python packages from pip.',
+  description: 'A JupyterLab extension to easy manage variables.',
   autoStart: true,
   activate: async (app: JupyterFrontEnd) => {
 
@@ -35,8 +35,10 @@ const customVariableInspectorPlugin: JupyterFrontEndPlugin<void> = {
     const command = 'custom:open-variable-inspector';
     app.commands.addCommand(command, {
       label: 'Open Custom Variable Inspector',
-      execute: () => {
-        createEmptyVariableInspectorPanel(labShell);
+      execute: (args: any) => {
+        const variableName = args.variableName || 'Default Name';
+        const variableType = args.variableType || 'Deafult Type'
+        createEmptyVariableInspectorPanel(labShell, variableName, variableType);
       }
     });
 

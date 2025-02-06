@@ -1,29 +1,19 @@
-import { Widget } from '@lumino/widgets';
 import { ILabShell } from '@jupyterlab/application';
+import { VariablePanelWidget } from './variablePanelWidget';
 
 
-class VariableInspectorPanel extends Widget {
-  constructor() {
-    super();
-    this.addClass('jp-VarInspector');
+export function createEmptyVariableInspectorPanel(
+  labShell: ILabShell,
+  variableName: string,
+  variableType: string
+): void {
 
-    const hello = document.createElement('div');
-    hello.textContent = 'Hello World';
-    hello.style.padding = '10px';
-    hello.style.fontSize = '16px';
-    this.node.appendChild(hello);
-  }
-}
-
-export function createEmptyVariableInspectorPanel(labShell: ILabShell): void {
-  const panel = new VariableInspectorPanel();
+  const panel = new VariablePanelWidget({variableName, variableType});
 
   panel.id = 'custom-variableinspector';
-  panel.title.label = 'Custom Variable Inspector';
+  panel.title.label = `${variableType} ${variableName}`;
   panel.title.closable = true;
 
-
-  labShell.add(panel, 'main');
+  labShell.add(panel, 'main', { mode: 'split-right' });
   labShell.activateById(panel.id);
 }
-
