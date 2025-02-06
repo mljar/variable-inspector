@@ -2,10 +2,7 @@ import React from 'react';
 import { detailIcon } from '../icons/detailIcon';
 import { CommandRegistry } from '@lumino/commands';
 import { executeMatrixContent } from '../pcode/executeGetMatrix';
-import { useState } from 'react';
 import { useNotebookPanelContext } from '../context/notebookPanelContext';
-import { useNotebookKernelContext } from '../context/notebookKernelContext';
-
 
 interface VariableInfo {
   name: string;
@@ -24,24 +21,27 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
   commands
 }) => {
-  const [matrixContent, setMatrixContent] = useState<any>(null);
-    const notebookPanel = useNotebookPanelContext();
-    const kernel = useNotebookKernelContext();
+  const notebookPanel = useNotebookPanelContext();
 
   const handleButtonClick = async (
     command: CommandRegistry,
     variableName: string,
     variableType: string
   ) => {
+
+    // TO DO make it more safer
+    if(notebookPanel){
+    const result = await executeMatrixContent(variableName, notebookPanel);
+    const variableData = result.content
     command.execute('custom:open-variable-inspector', {
       variableName,
-      variableType
+      variableType,
+      variableData,
     });
-    setMatrixContent(null);
+    }
 
-    const result = await executeMatrixContent(variableName,kernel,notebookPanel);
-    setMatrixContent(result);
-    console.log(matrixContent);
+
+
   };
 
   return (

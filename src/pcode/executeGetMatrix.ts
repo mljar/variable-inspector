@@ -1,28 +1,26 @@
 import { KernelMessage } from '@jupyterlab/services';
 import { getMatrix } from './getMatrix';
-import { useNotebookPanelContext } from '../context/notebookPanelContext';
-import { useNotebookKernelContext } from '../context/notebookKernelContext';
+import { NotebookPanel } from '@jupyterlab/notebook';
 
-
-export const executeMatrixContent = async (varName: string, ): Promise<any> => {
-  console.log("AAAAAAAAA")
-  const notebookPanel = useNotebookPanelContext();
-
+export const executeMatrixContent = async (
+  varName: string,
+  notebookPanel: NotebookPanel
+): Promise<any> => {
   if (!notebookPanel) {
-    throw new Error("Kernel not available.");
+    throw new Error('Kernel not available.');
   }
 
   const code = getMatrix(varName);
 
   return new Promise((resolve, reject) => {
-    let outputData = "";
-    const future = notebookPanel.sessionContext?.session?.kernel?.requestExecute({
-      code,
-      store_history: false,
-    });
+    let outputData = '';
+    const future =
+      notebookPanel.sessionContext?.session?.kernel?.requestExecute({
+        code,
+        store_history: false
+      });
 
     if (future) {
-      console.log("future",future);
       future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
         const msgType = msg.header.msg_type;
         if (
@@ -31,26 +29,39 @@ export const executeMatrixContent = async (varName: string, ): Promise<any> => {
           msgType === 'display_data'
         ) {
           const content = msg.content as any;
-          if (content.text) {
-            outputData += content.text;
+          const textData = content.data['text/plain'];
+          console.log(textData);
+          if (textData) {
+            outputData += textData;
           }
         } else if (msgType === 'error') {
-          const errContent = msg.content;
-          console.log("ERROR",errContent);
+          console.log('ERROR');
         }
       };
 
       future.onReply = () => {
         try {
-          const parsed = JSON.parse(outputData);
+          let cleanedData = outputData.trim();
+
+          if (
+            (cleanedData.startsWith('"') && cleanedData.endsWith('"')) ||
+            (cleanedData.startsWith("'") && cleanedData.endsWith("'"))
+          ) {
+            cleanedData = cleanedData.substring(1, cleanedData.length - 1);
+          }
+
+          cleanedData = cleanedData.replace(/'/g, '"');
+
+          console.log('Cleaned JSON:', cleanedData);
+
+          const parsed = JSON.parse(cleanedData);
           resolve(parsed);
         } catch (err) {
-          reject(new Error("Failed to parse output from Python."));
+          reject(new Error('Failed to parse output from Python.'));
         }
       };
     } else {
-      reject(new Error("No future returned from kernel execution."));
+      reject(new Error('No future returned from kernel execution.'));
     }
   });
 };
-

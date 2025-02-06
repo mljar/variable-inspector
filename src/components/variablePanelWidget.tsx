@@ -1,4 +1,3 @@
-
 import { ReactWidget } from '@jupyterlab/apputils'
 import React from 'react'
 import { VariablePanel } from './variablePanel';
@@ -6,6 +5,7 @@ import { VariablePanel } from './variablePanel';
 interface VariablePanelWidgetProps {
   variableName: string;
   variableType: string;
+  variableData: any[];
 }
 
 export class VariablePanelWidget extends ReactWidget {
@@ -17,7 +17,8 @@ export class VariablePanelWidget extends ReactWidget {
   protected render(): JSX.Element {
     return (
       <VariablePanel variableName={this.props.variableName}
-        variableType={this.props.variableType} />
+        variableType={this.props.variableType}
+        variableData={this.props.variableData}/>
     )
   }
 

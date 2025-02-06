@@ -1,6 +1,12 @@
+//i need import Type to to check what i can import or not
+
 export const getMatrix = (varName: string):string =>
 `
-def __get_matrix_content(var_name=${varName}, max_rows=100, max_cols=100):
+import json
+import numpy as np
+import pandas as pd
+
+def __get_matrix_content(var_name="${varName}", max_rows=100, max_cols=100):
     if var_name not in globals():
         return json.dumps({"error": f"Variable '{var_name}' not found."})
     obj = globals()[var_name]
