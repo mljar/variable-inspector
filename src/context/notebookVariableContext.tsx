@@ -47,10 +47,8 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
         store_history: false
       })
       if (future) {
-        console.log("future", future);
         future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
           const msgType = msg.header.msg_type
-          console.log(msgType,"msgType");
           if (
             msgType === 'execute_result' ||
             msgType === 'display_data' ||
@@ -58,7 +56,6 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
             msgType === 'error'
           ) {
             const content = msg.content as any
-            console.log(content, "content");
             const jsonData = content.data['application/json']
             const textData = content.data['text/plain']
             if (jsonData) {
@@ -75,7 +72,6 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
                     type: item.varType,
                     shape: item.varShape || 'N/A'
                   }))
-                  console.log(mappedVariables);
                   setVariables(mappedVariables)
                 } else {
                   throw new Error('Error during parsing.')

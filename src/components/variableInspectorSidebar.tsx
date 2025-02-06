@@ -48,7 +48,6 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
       }
     }
 
-  console.log(this.commands)
     return (
       <PluginVisibilityContext.Provider value={contextValue}>
         <NotebookPanelContextProvider notebookWatcher={this.notebookWatcher}>
