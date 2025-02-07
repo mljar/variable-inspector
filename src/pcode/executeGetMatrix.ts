@@ -30,7 +30,6 @@ export const executeMatrixContent = async (
         ) {
           const content = msg.content as any;
           const textData = content.data['text/plain'];
-          console.log(textData);
           if (textData) {
             outputData += textData;
           }

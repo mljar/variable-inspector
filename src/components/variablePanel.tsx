@@ -14,12 +14,19 @@ interface VariablePanelProps {
 const AutoSizer = (RVAutoSizer as unknown) as React.ComponentType<any>;
 const MultiGrid = (RVMultiGrid as unknown) as React.ComponentType<any>;
 
+function transpose<T>(matrix: T[][]): T[][] {
+    return matrix[0].map((_, colIndex) => matrix.map((row: T[]) => row[colIndex]));
+}
+
+
+
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   variableType,
   variableData
 }) => {
   console.log(variableName, variableType);
+
 
 
  let data2D: any[][] = [];
@@ -30,20 +37,35 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   }
 
   let data: any[][] = data2D;
-  console.log(data);
   let fixedRowCount = 0;
   let fixedColumnCount = 0;
+  const variableTypes = ["ndarray","DataFrame"];
 
-  if (variableType === 'ndarray' && data2D.length > 0 && data2D.length > 0) {
-    console.log("ten warunek działa");
-    const headerRow = [''];
-    for (let j = 0; j < data2D[0].length; j++) {
+  if (variableTypes.includes(variableType) && data2D.length > 0 && data2D.length > 0) {
+    const headerRow = ['index'];
+
+    let length = (variableType === "DataFrame")? (data2D[0].length - 1) : data2D[0].length;
+
+    for (let j = 0; j < length; j++) {
       headerRow.push(j.toString());
     }
-    const newData = [headerRow];
+
+    let newData = [headerRow];
     for (let i = 0; i < data2D.length; i++) {
+      if(variableType == "DataFrame"){
+                 
+      newData.push([...data2D[i]]);
+      }
+      else{
       newData.push([i, ...data2D[i]]);
+      }
     }
+
+    if(variableType == 'DataFrame'){
+      newData = transpose(newData);
+    }
+    
+    data2D = transpose(data2D);
     data = newData;
     fixedRowCount = 1;    
     fixedColumnCount = 1;
@@ -68,7 +90,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       ...style,
       boxSizing: 'border-box',
       border: '1px solid #ddd',
-      padding: '4px'
+      fontSize: "0.65rem",
+      padding: '1px'
     };
 
     if (rowIndex === 0 || columnIndex === 0) {
@@ -76,7 +99,9 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
         ...cellStyle,
         background: '#e0e0e0',
         fontWeight: 'bold',
-        textAlign: 'center'
+        fontSize: "0.65rem",
+        textAlign: 'center',
+        padding: '1px'
       };
     } else {
       cellStyle.background = rowIndex % 2 === 0 ? '#fafafa' : '#fff';
@@ -98,10 +123,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
             fixedColumnCount={fixedColumnCount}
             cellRenderer={cellRenderer}
             columnCount={colCount}
-            columnWidth={100}
+            columnWidth={60}
+            rowHeight={20}
             height={height}
             rowCount={rowCount}
-            rowHeight={40}
             width={width}
             styleTopLeftGrid={{ background: '#e0e0e0' }}
             styleTopRightGrid={{ background: '#e0e0e0' }}

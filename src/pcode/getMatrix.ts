@@ -6,7 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 
-def __get_matrix_content(var_name="${varName}", max_rows=1000, max_cols=1000):
+def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
     if var_name not in globals():
         return json.dumps({"error": f"Variable '{var_name}' not found."})
     obj = globals()[var_name]
@@ -22,7 +22,11 @@ def __get_matrix_content(var_name="${varName}", max_rows=1000, max_cols=1000):
     
     if isinstance(obj, pd.DataFrame):
         sliced = obj.iloc[:max_rows, :max_cols]
-        return json.dumps({"variable": var_name, "content": sliced.to_json(orient="split")})
+        result = []
+        for col in sliced.columns:
+            col_values = [col] + sliced[col].tolist()
+            result.append(col_values)
+        return json.dumps({"variable": var_name, "content": result})
     
     if isinstance(obj, pd.Series):
         sliced = obj.iloc[:max_rows]

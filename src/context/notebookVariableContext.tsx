@@ -33,14 +33,16 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
 
   const executeCode = useCallback(async () => {
     setIsRefreshing(true)
-    setVariables([])
     setLoading(true)
     setError(null)
+
     if (!notebookPanel || !kernel) {
       setLoading(false)
       setIsRefreshing(false)
       return
     }
+    setVariables([])
+
     try {
       const future = notebookPanel.sessionContext?.session?.kernel?.requestExecute({
         code: variableDict,
@@ -70,7 +72,7 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
                   const mappedVariables: VariableInfo[] = parsedData.map((item: any) => ({
                     name: item.varName,
                     type: item.varType,
-                    shape: item.varShape || 'N/A'
+                    shape: item.varShape || 'None'
                   }))
                   setVariables(mappedVariables)
                 } else {
