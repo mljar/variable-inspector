@@ -6,7 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 
-def __get_matrix_content(var_name="${varName}", max_rows=100, max_cols=100):
+def __get_matrix_content(var_name="${varName}", max_rows=1000, max_cols=1000):
     if var_name not in globals():
         return json.dumps({"error": f"Variable '{var_name}' not found."})
     obj = globals()[var_name]

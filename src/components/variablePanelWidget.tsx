@@ -16,9 +16,11 @@ export class VariablePanelWidget extends ReactWidget {
 
   protected render(): JSX.Element {
     return (
+      <div style={{ height: '100%', width: '100%'}}>
       <VariablePanel variableName={this.props.variableName}
         variableType={this.props.variableType}
         variableData={this.props.variableData}/>
+      </div>
     )
   }
 

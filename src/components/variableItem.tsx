@@ -15,7 +15,7 @@ interface VariableItemProps {
   commands: CommandRegistry;
 }
 
-const allowedType = ['ndarray', 'dataframe'];
+const allowedType = ['ndarray', 'DataFrame'];
 
 export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
@@ -29,7 +29,6 @@ export const VariableItem: React.FC<VariableItemProps> = ({
     variableType: string
   ) => {
 
-    // TO DO make it more safer
     if(notebookPanel){
     const result = await executeMatrixContent(variableName, notebookPanel);
     const variableData = result.content
@@ -39,8 +38,6 @@ export const VariableItem: React.FC<VariableItemProps> = ({
       variableData,
     });
     }
-
-
 
   };
 
@@ -57,7 +54,9 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         >
           <detailIcon.react className="mljar-variable-detail-button-icon" />
         </button>
-      )}
+      )||  
+      (<span className='mljar-variable-blank'>&nbsp;</span>)
+      }
     </li>
   );
 };

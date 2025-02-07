@@ -20,7 +20,7 @@ const filteredVariables = variables.filter(variable =>
         <span className='mljar-variable-header-name'>Name</span>
         <span className='mljar-variable-header-version'>Type</span>
         <span className='mljar-variable-header-version'>Shape</span>
-        <span className='mljar-variable-header-blank'>&nbsp;</span>
+        <span className='mljar-variable-header-blank'>Value</span>
       </li>
       {filteredVariables.map((variable, index) => (
         <VariableItem
