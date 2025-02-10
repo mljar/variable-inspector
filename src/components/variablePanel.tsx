@@ -39,7 +39,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   let data: any[][] = data2D;
   let fixedRowCount = 0;
   let fixedColumnCount = 0;
-  const variableTypes = ["ndarray","DataFrame"];
+  const variableTypes = ["ndarray","DataFrame","list"];
 
   if (variableTypes.includes(variableType) && data2D.length > 0 && data2D.length > 0) {
     const headerRow = ['index'];

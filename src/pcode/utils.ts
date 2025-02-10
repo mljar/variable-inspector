@@ -182,16 +182,65 @@ def _jupyterlab_variableinspector_dict_list():
             vardic += [{
                 'varName': _v,
                 'varType': type(_ev).__name__, 
-#                'varSize': str(_jupyterlab_variableinspector_getsizeof(_ev)), 
-                'varShape': str(_jupyterlab_variableinspector_getshapeof(_ev)) if _jupyterlab_variableinspector_getshapeof(_ev) else '', 
-#                'varContent': "", # str(_jupyterlab_variableinspector_getcontentof(_ev)), 
-#                'isMatrix': _jupyterlab_variableinspector_is_matrix(_ev),
-#                'isWidget': _jupyterlab_variableinspector_is_widget(type(_ev)),
-#                'varColumns': _jupyterlab_variableinspector_getcolumnsof(_ev),
-#                'varColumnTypes': _jupyterlab_variableinspector_getcolumntypesof(_ev),
+                'varShape': str(_jupyterlab_variableinspector_getshapeof(_ev)) if _jupyterlab_variableinspector_getshapeof(_ev) else '',
+                'varDimension': _jupyterlab_variableinspector_getdim(_ev)
+                #'varSize': str(_jupyterlab_variableinspector_getsizeof(_ev)), 
+                #'varContent': "", # str(_jupyterlab_variableinspector_getcontentof(_ev)), 
+                #'isMatrix': _jupyterlab_variableinspector_is_matrix(_ev),
+                #'isWidget': _jupyterlab_variableinspector_is_widget(type(_ev)),
+                #'varColumns': _jupyterlab_variableinspector_getcolumnsof(_ev),
+                #'varColumnTypes': _jupyterlab_variableinspector_getcolumntypesof(_ev),
             }]
   
     return json.dumps(vardic, ensure_ascii=False)
+
+
+
+def _jupyterlab_variableinspector_getdim(x):
+    """
+    return dimension for object:
+      - For Data frame -> 2
+      - For Series -> 1
+      - For NDarray -> korzysta z atrybutu ndim
+      - For pyspark DataFrame -> 2
+      - For TensorFlow, PyTorch, xarray -> shape length
+      - For list -> nesting depth
+      - For sklar type (int, float, itp.) -> 1
+      - For other objects or dict -> 0
+    """
+    if __pd and isinstance(x, __pd.DataFrame):
+        return 2
+    if __pd and isinstance(x, __pd.Series):
+        return 1
+    if __np and isinstance(x, __np.ndarray):
+        return x.ndim
+    if __pyspark and isinstance(x, __pyspark.sql.DataFrame):
+        return 2
+    if __tf and (isinstance(x, __tf.Variable) or isinstance(x, __tf.Tensor)):
+        try:
+            return len(x.shape)
+        except Exception:
+            return 0
+    if __torch and isinstance(x, __torch.Tensor):
+        return len(x.shape)
+    if __xr and isinstance(x, __xr.DataArray):
+        return len(x.shape)
+    if isinstance(x, list):
+        def list_depth(lst):
+            if isinstance(lst, list) and lst:
+                subdepths = [list_depth(el) for el in lst if isinstance(el, list)]
+                if subdepths:
+                    return 1 + max(subdepths)
+                else:
+                    return 1
+            else:
+                return 0
+        return list_depth(x)
+    if isinstance(x, (int, float, complex, bool, str)):
+        return 1
+    if isinstance(x, dict):
+        return 0
+    return 0
 
 
 def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):

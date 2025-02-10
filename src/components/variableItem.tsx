@@ -8,6 +8,7 @@ interface VariableInfo {
   name: string;
   type: string;
   shape: string;
+  dimension: number;
 }
 
 interface VariableItemProps {
@@ -15,7 +16,7 @@ interface VariableItemProps {
   commands: CommandRegistry;
 }
 
-const allowedType = ['ndarray', 'DataFrame'];
+const allowedType = ['ndarray', 'DataFrame', 'list'];
 
 export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
@@ -45,7 +46,8 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         <span className="mljar-variable-name">{vrb.name}</span>
         <span className="mljar-variable-type">{vrb.type}</span>
         <span className="mljar-variable-shape">{vrb.shape}</span>
-        {(allowedType.includes(vrb.type) && (
+        {
+          ((allowedType.includes(vrb.type) && vrb.dimension <= 2) && (
           <button
             className="mljar-show-variable-button"
             onClick={() => handleButtonClick(commands, vrb.name, vrb.type)}

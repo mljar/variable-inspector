@@ -29,6 +29,7 @@ const filteredVariables = variables.filter(variable =>
             name: variable.name,
             type: variable.type,
             shape: variable.shape || 'N/A',
+            dimension: variable.dimension
           }}
           commands={commands}
         />

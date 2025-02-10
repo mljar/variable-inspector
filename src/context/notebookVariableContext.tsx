@@ -8,6 +8,7 @@ interface VariableInfo {
   name: string
   type: string
   shape: string
+  dimension: number
 }
 
 interface VariableContextProps {
@@ -72,7 +73,8 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
                   const mappedVariables: VariableInfo[] = parsedData.map((item: any) => ({
                     name: item.varName,
                     type: item.varType,
-                    shape: item.varShape || 'None'
+                    shape: item.varShape || 'None',
+                    dimension: item.varDimension
                   }))
                   setVariables(mappedVariables)
                 } else {
