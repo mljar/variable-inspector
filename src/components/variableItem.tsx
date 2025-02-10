@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { detailIcon } from '../icons/detailIcon';
 import { CommandRegistry } from '@lumino/commands';
-import { executeMatrixContent } from '../pcode/executeGetMatrix';
+import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useNotebookPanelContext } from '../context/notebookPanelContext';
+import { allowedTypes } from '../utils/allowedTypes';
 
 interface VariableInfo {
   name: string;
@@ -16,8 +17,6 @@ interface VariableItemProps {
   vrb: VariableInfo;
   commands: CommandRegistry;
 }
-
-const allowedType = ['ndarray', 'DataFrame', 'list', 'Series'];
 
 export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
@@ -33,7 +32,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   ) => {
     if (notebookPanel) {
       try{
-        setLoading(true);
+        setLoading(true)
       const result = await executeMatrixContent(variableName, notebookPanel);
       const variableData = result.content;
       if (variableData) {
@@ -63,7 +62,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         <span className="mljar-variable-type">{vrb.type}</span>
         <span className="mljar-variable-shape">{vrb.shape}</span>
         {
-          (allowedType.includes(vrb.type) && vrb.dimension <= 2) ? (
+          (allowedTypes.includes(vrb.type) && vrb.dimension <= 2) ? (
             <button
               className="mljar-variable-show-variable-button"
               onClick={() => handleButtonClick(commands, vrb.name, vrb.type)}

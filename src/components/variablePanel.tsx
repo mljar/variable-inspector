@@ -4,6 +4,7 @@ import {
   AutoSizer as RVAutoSizer
 } from 'react-virtualized';
 import 'react-virtualized/styles.css';
+import { allowedTypes } from '../utils/allowedTypes';
 
 interface VariablePanelProps {
   variableName: string;
@@ -11,13 +12,14 @@ interface VariablePanelProps {
   variableData: any[][];
 }
 
-const AutoSizer = (RVAutoSizer as unknown) as React.ComponentType<any>;
-const MultiGrid = (RVMultiGrid as unknown) as React.ComponentType<any>;
+const AutoSizer = RVAutoSizer as unknown as React.ComponentType<any>;
+const MultiGrid = RVMultiGrid as unknown as React.ComponentType<any>;
 
 function transpose<T>(matrix: T[][]): T[][] {
-    return matrix[0].map((_, colIndex) => matrix.map((row: T[]) => row[colIndex]));
+  return matrix[0].map((_, colIndex) =>
+    matrix.map((row: T[]) => row[colIndex])
+  );
 }
-
 
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
@@ -26,9 +28,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 }) => {
   console.log(variableName, variableType);
 
-
-
- let data2D: any[][] = [];
+  let data2D: any[][] = [];
   if (variableData.length > 0 && !Array.isArray(variableData[0])) {
     data2D = (variableData as any[]).map(item => [item]);
   } else {
@@ -38,12 +38,16 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   let data: any[][] = data2D;
   let fixedRowCount = 0;
   let fixedColumnCount = 0;
-  const variableTypes = ["ndarray","DataFrame","list","Series"];
 
-  if (variableTypes.includes(variableType) && data2D.length > 0 && data2D.length > 0) {
+  if (
+    allowedTypes.includes(variableType) &&
+    data2D.length > 0 &&
+    data2D.length > 0
+  ) {
     const headerRow = ['index'];
 
-    let length = (variableType === "DataFrame")? (data2D[0].length - 1) : data2D[0].length;
+    let length =
+      variableType === 'DataFrame' ? data2D[0].length - 1 : data2D[0].length;
 
     for (let j = 0; j < length; j++) {
       headerRow.push(j.toString());
@@ -51,27 +55,38 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 
     let newData = [headerRow];
     for (let i = 0; i < data2D.length; i++) {
-      if(variableType == "DataFrame"){
-                 
-      newData.push([...data2D[i]]);
-      }
-      else{
-      newData.push([i, ...data2D[i]]);
+      if (variableType == 'DataFrame') {
+        newData.push([...data2D[i]]);
+      } else {
+        newData.push([i, ...data2D[i]]);
       }
     }
 
-    if(variableType == 'DataFrame'){
+    if (variableType == 'DataFrame') {
       newData = transpose(newData);
     }
-    
+
     data2D = transpose(data2D);
     data = newData;
-    fixedRowCount = 1;    
+    fixedRowCount = 1;
     fixedColumnCount = 1;
   }
 
   const rowCount = data.length;
   const colCount = data[0]?.length || 0;
+
+  const columnWidths: number[] = [];
+  for (let col = 0; col < colCount; col++) {
+    let maxLength = 0;
+    for (let row = 0; row < rowCount; row++) {
+      const cell = data[row][col];
+      const cellStr = cell != null ? cell.toString() : '';
+      if (cellStr.length > maxLength) {
+        maxLength = cellStr.length;
+      }
+    }
+    columnWidths[col] = maxLength * 6 + 16;
+  }
 
   const cellRenderer = ({
     columnIndex,
@@ -89,7 +104,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       ...style,
       boxSizing: 'border-box',
       border: '1px solid #ddd',
-      fontSize: "0.65rem",
+      fontSize: '0.65rem',
       padding: '1px'
     };
 
@@ -98,7 +113,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
         ...cellStyle,
         background: '#e0e0e0',
         fontWeight: 'bold',
-        fontSize: "0.65rem",
+        fontSize: '0.65rem',
         textAlign: 'center',
         padding: '1px'
       };
@@ -122,7 +137,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
             fixedColumnCount={fixedColumnCount}
             cellRenderer={cellRenderer}
             columnCount={colCount}
-            columnWidth={60}
+            columnWidth={({ index }: { index: number }) => columnWidths[index]}
             rowHeight={20}
             height={height}
             rowCount={rowCount}
