@@ -20,7 +20,7 @@ const leftTab: JupyterFrontEndPlugin<void> = {
 
     let widget = createVariableInspectorSidebar(notebookWatcher, app.commands);
 
-    app.shell.add(widget, 'left', { rank: 1999 });
+    app.shell.add(widget, 'left', { rank: 1998 });
   }
 };
 

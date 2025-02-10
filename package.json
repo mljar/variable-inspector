@@ -11,9 +11,9 @@
     "bugs": {
         "url": "https://github.com/mljar/variable-inspector.git/issues"
     },
-    "license": "BSD-3-Clause",
+    "license": "SEE LICENSE IN LICENSE",
     "author": {
-        "name": "variable-inscpector",
+        "name": "MLJAR",
         "email": "contact@mljar.com"
     },
     "files": [
