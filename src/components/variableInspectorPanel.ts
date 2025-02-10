@@ -1,5 +1,6 @@
 import { ILabShell } from '@jupyterlab/application';
 import { VariablePanelWidget } from './variablePanelWidget';
+import { panelIcon } from '../icons/panelIcon';
 
 export function createEmptyVariableInspectorPanel(
   labShell: ILabShell,
@@ -16,6 +17,7 @@ export function createEmptyVariableInspectorPanel(
   panel.id = 'custom-variableinspector';
   panel.title.label = `${variableType} ${variableName}`;
   panel.title.closable = true;
+  panel.title.icon = panelIcon;
 
   labShell.add(panel, 'main', { mode: 'split-right' });
   labShell.activateById(panel.id);
