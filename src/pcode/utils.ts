@@ -39,20 +39,6 @@ def _check_imported():
     __xr = _attempt_import('xarray')
 
 
-def _jupyterlab_variableinspector_getsizeof(x):
-    if type(x).__name__ in ['ndarray', 'Series']:
-        return x.nbytes
-    elif __pyspark and isinstance(x, __pyspark.sql.DataFrame):
-        return "?"
-    elif __tf and isinstance(x, __tf.Variable):
-        return "?"
-    elif __torch and isinstance(x, __torch.Tensor):
-        return x.element_size() * x.nelement()
-    elif __pd and type(x).__name__ == 'DataFrame':
-        return x.memory_usage().sum()
-    else:
-        return sys.getsizeof(x)
-
 
 def _jupyterlab_variableinspector_getshapeof(x):
     if __pd and isinstance(x, __pd.DataFrame):
@@ -183,7 +169,8 @@ def _jupyterlab_variableinspector_dict_list():
                 'varName': _v,
                 'varType': type(_ev).__name__, 
                 'varShape': str(_jupyterlab_variableinspector_getshapeof(_ev)) if _jupyterlab_variableinspector_getshapeof(_ev) else '',
-                'varDimension': _jupyterlab_variableinspector_getdim(_ev)
+                'varDimension': _jupyterlab_variableinspector_getdim(_ev),
+                'varSize': _jupyterlab_variableinspector_get_size_mb(_ev),
                 #'varSize': str(_jupyterlab_variableinspector_getsizeof(_ev)), 
                 #'varContent': "", # str(_jupyterlab_variableinspector_getcontentof(_ev)), 
                 #'isMatrix': _jupyterlab_variableinspector_is_matrix(_ev),
@@ -193,6 +180,10 @@ def _jupyterlab_variableinspector_dict_list():
             }]
   
     return json.dumps(vardic, ensure_ascii=False)
+
+
+def _jupyterlab_variableinspector_get_size_mb(obj):
+    return sys.getsizeof(obj) / (1024 * 1024)
 
 
 

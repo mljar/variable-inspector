@@ -24,11 +24,6 @@
   margin: 0;
 }
 
-.mljar-sidebar-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
 
 .mljar-variable-header-list {
   display: grid;
@@ -57,7 +52,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.mljar-show-variable-button {
+.mljar-variable-show-variable-button {
   background: none;
   position: relative;
   border: none;
@@ -71,6 +66,11 @@
   transition: color 0.3s ease;
 }
 
+.mljar-variable-show-variable-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .mljar-variable-list {
   list-style: none;
   padding: 0;
@@ -79,13 +79,13 @@
 }
 
 
-.mljar-search-bar-container {
+.mljar-variable-search-bar-container {
   margin-bottom: 10px;
   background-color: lightblue;
   margin-right: 8px;
 }
 
-.mljar-search-bar-input {
+.mljar-variable-search-bar-input {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
@@ -121,7 +121,7 @@
 }
 
 
-.mljar-show-variable-button:hover {
+.mljar-variable-show-variable-button:hover {
   color: #a71d2a;
 }
 
@@ -130,7 +130,7 @@
   height: 16px;
 }
 
-.mljar-refresh-button
+.mljar-variable-refresh-button
  {
   flex: 1;
   display: flex;
@@ -148,18 +148,18 @@
 }
 
 
-.mljar-refresh-button:disabled
+.mljar-variable-refresh-button:disabled
 {
   background-color: #a0c4e3;
   cursor: not-allowed;
 }
 
-.mljar-refresh-button:hover:not(:disabled)
+.mljar-variable-refresh-button:hover:not(:disabled)
  {
   background-color: #005fa3;
 }
 
-.mljar-refresh-icon
+.mljar-variable-refresh-icon
  {
   display: flex;
   align-items: center;
@@ -167,7 +167,7 @@
   height: 15px;
 }
 
-.mljar-actions-container {
+.mljar-variable-actions-container {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
@@ -191,3 +191,17 @@
   background-clip: padding-box;
 }
 
+.mljar-variable-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border-left-color: #ffffff;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -9,6 +9,7 @@ interface VariableInfo {
   type: string
   shape: string
   dimension: number
+  size: number
 }
 
 interface VariableContextProps {
@@ -74,7 +75,8 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
                     name: item.varName,
                     type: item.varType,
                     shape: item.varShape || 'None',
-                    dimension: item.varDimension
+                    dimension: item.varDimension,
+                    size: item.varSize,
                   }))
                   setVariables(mappedVariables)
                 } else {
@@ -84,6 +86,7 @@ export const VariableContextProvider: React.FC<{ children: React.ReactNode }> = 
                 setIsRefreshing(false)
               } catch (err) {
                 setError('Error during export JSON.')
+                console.log(err);
                 setLoading(false)
                 setIsRefreshing(false)
               }

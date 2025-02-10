@@ -19,7 +19,6 @@ function transpose<T>(matrix: T[][]): T[][] {
 }
 
 
-
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   variableType,
@@ -39,7 +38,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   let data: any[][] = data2D;
   let fixedRowCount = 0;
   let fixedColumnCount = 0;
-  const variableTypes = ["ndarray","DataFrame","list"];
+  const variableTypes = ["ndarray","DataFrame","list","Series"];
 
   if (variableTypes.includes(variableType) && data2D.length > 0 && data2D.length > 0) {
     const headerRow = ['index'];

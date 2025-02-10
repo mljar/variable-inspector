@@ -2,12 +2,12 @@
 
 export const getMatrix = (varName: string): string =>
 `
-import json
 import importlib
+from IPython.display import JSON
 
 def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
     if var_name not in globals():
-        return json.dumps({"error": f"Variable '{var_name}' not found."})
+        return JSON({"error": f"Variable '{var_name}' not found."})
     obj = globals()[var_name]
     module_name = type(obj).__module__
 
@@ -15,41 +15,41 @@ def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
         try:
             np = importlib.import_module("numpy")
         except ImportError:
-            return json.dumps({"error": "Numpy is not installed."})
+            return JSON({"error": "Numpy is not installed."})
         if isinstance(obj, np.ndarray):
             if obj.ndim > 2:
-                return json.dumps({"error": "Numpy array has more than 2 dimensions."})
+                return JSON({"error": "Numpy array has more than 2 dimensions."})
             if obj.ndim == 1:
                 sliced = obj[:max_rows]
             else:
                 sliced = obj[:max_rows, :max_cols]
-            return json.dumps({"variable": var_name, "content": sliced.tolist()})
+            return JSON({"variable": var_name, "content": sliced.tolist()})
 
     if "pandas" in module_name:
         try:
             pd = importlib.import_module("pandas")
         except ImportError:
-            return json.dumps({"error": "Pandas is not installed."})
+            return JSON({"error": "Pandas is not installed."})
         if isinstance(obj, pd.DataFrame):
             sliced = obj.iloc[:max_rows, :max_cols]
             result = []
             for col in sliced.columns:
                 col_values = [col] + sliced[col].tolist()
                 result.append(col_values)
-            return json.dumps({"variable": var_name, "content": result})
+            return JSON({"variable": var_name, "content": result})
         elif isinstance(obj, pd.Series):
             sliced = obj.iloc[:max_rows]
-            return json.dumps({"variable": var_name, "content": sliced.to_json(orient="split")})
+            return JSON({"variable": var_name, "content": sliced.to_json(orient="split")})
 
     if isinstance(obj, list):
         if all(isinstance(el, list) for el in obj):
             sliced = [row[:max_cols] for row in obj[:max_rows]]
-            return json.dumps({"variable": var_name, "content": sliced})
+            return JSON({"variable": var_name, "content": sliced})
         else:
             sliced = obj[:max_rows]
-            return json.dumps({"variable": var_name, "content": sliced})
+            return JSON({"variable": var_name, "content": sliced})
 
-    return json.dumps({"error": f"Variable '{var_name}' is not a supported array type."})
+    return JSON({"error": f"Variable '{var_name}' is not a supported array type."})
 
 __get_matrix_content()
 `

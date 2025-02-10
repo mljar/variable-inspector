@@ -9,13 +9,13 @@ export const SearchBar: React.FC = () => {
   };
 
   return (
-    <div className="mljar-search-bar-container">
+    <div className="mljar-variable-search-bar-container">
       <input
         type="text"
         value={searchTerm}
         onChange={handleChange}
         placeholder="Search Variable..."
-        className='mljar-search-bar-input'
+        className='mljar-variable-search-bar-input'
       />
     </div>
   );

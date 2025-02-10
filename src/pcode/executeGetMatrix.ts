@@ -14,53 +14,47 @@ export const executeMatrixContent = async (
 
   return new Promise((resolve, reject) => {
     let outputData = '';
+    let resultResolved = false;
     const future =
       notebookPanel.sessionContext?.session?.kernel?.requestExecute({
         code,
         store_history: false
       });
 
-    if (future) {
-      future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
-        const msgType = msg.header.msg_type;
-        if (
-          msgType === 'stream' ||
-          msgType === 'execute_result' ||
-          msgType === 'display_data'
-        ) {
-          const content = msg.content as any;
-          const textData = content.data['text/plain'];
-          if (textData) {
-            outputData += textData;
-          }
-        } else if (msgType === 'error') {
-          console.log('ERROR');
+    if (!future) {
+      return reject(new Error('No future returned from kernel execution.'));
+    }
+
+    future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
+      const msgType = msg.header.msg_type;
+
+      if (msgType === 'execute_result' || msgType === 'display_data') {
+        const content = msg.content as any;
+        if (content.data && content.data['application/json']) {
+          resultResolved = true;
+          resolve(content.data['application/json']);
+        } else if (content.data && content.data['text/plain']) {
+          console.log("textplain")
+          outputData += content.data['text/plain'];
         }
-      };
+      } else if (msgType === 'stream') {
+        console.log("stream");
+      } else if (msgType === 'error') {
+        console.error('Python error:', msg.content);
+        reject(new Error('Error during Python execution.'));
+      }
+    };
 
-      future.onReply = () => {
+    future.done.then(() => {
+      if (!resultResolved) {
         try {
-          let cleanedData = outputData.trim();
-
-          if (
-            (cleanedData.startsWith('"') && cleanedData.endsWith('"')) ||
-            (cleanedData.startsWith("'") && cleanedData.endsWith("'"))
-          ) {
-            cleanedData = cleanedData.substring(1, cleanedData.length - 1);
-          }
-
-          cleanedData = cleanedData.replace(/'/g, '"');
-
-          console.log('Cleaned JSON:', cleanedData);
-
+          const cleanedData = outputData.trim();
           const parsed = JSON.parse(cleanedData);
           resolve(parsed);
         } catch (err) {
           reject(new Error('Failed to parse output from Python.'));
         }
-      };
-    } else {
-      reject(new Error('No future returned from kernel execution.'));
-    }
+      }
+    });
   });
 };

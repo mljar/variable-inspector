@@ -15,7 +15,7 @@ export const VariableListComponent: React.FC<VariableListComponentProps> = ({com
         <h3 className="mljar-variable-header">Variable Inspector</h3>
       </div>
       <div>
-        <div className="mljar-actions-container">
+        <div className="mljar-variable-actions-container">
           <RefreshButton />
         </div>
         <SearchBar />
