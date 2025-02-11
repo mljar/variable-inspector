@@ -14,11 +14,20 @@ export function createEmptyVariableInspectorPanel(
     variableData
   });
 
-  panel.id = 'custom-variableinspector';
+  panel.id = `${variableType}-${variableName}`;
   panel.title.label = `${variableType} ${variableName}`;
   panel.title.closable = true;
   panel.title.icon = panelIcon;
 
-  labShell.add(panel, 'main', { mode: 'split-right' });
+ const existingPanel = Array.from(labShell.widgets('main')).find(
+    widget => widget.id === panel.id
+  );
+
+    if(existingPanel){
+    labShell.add(panel, 'main', { mode: 'tab-after', ref: existingPanel.id });
+  } else {
+    labShell.add(panel, 'main', { mode: 'split-right' });
+  }
+
   labShell.activateById(panel.id);
 }

@@ -4,6 +4,7 @@ import { CommandRegistry } from '@lumino/commands';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useNotebookPanelContext } from '../context/notebookPanelContext';
 import { allowedTypes } from '../utils/allowedTypes';
+import { ILabShell } from '@jupyterlab/application';
 
 interface VariableInfo {
   name: string;
@@ -17,11 +18,13 @@ interface VariableInfo {
 interface VariableItemProps {
   vrb: VariableInfo;
   commands: CommandRegistry;
+  labShell: ILabShell;
 }
 
 export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
-  commands
+  commands,
+  labShell
 }) => {
   const notebookPanel = useNotebookPanelContext();
   const [loading, setLoading] = useState(false);
@@ -36,15 +39,21 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         setLoading(true);
         const result = await executeMatrixContent(variableName, notebookPanel);
         const variableData = result.content;
+        // let isOpen = false;
+        // for (const widget of labShell.widgets('main')) {
+        //   if (widget.id === `${variableType}-${variableName}`) {
+        //     isOpen = true;
+        //   }
+        // }
+        // //i dont really know to dont let user open same notebook
+
         if (variableData) {
-          console.log('execute');
+          console.log('hello');
           command.execute('custom:open-variable-inspector', {
             variableName,
             variableType,
             variableData
           });
-        } else {
-          console.error('No data.');
         }
       } catch (err) {
         console.error(err);

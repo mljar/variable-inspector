@@ -26,7 +26,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableType,
   variableData
 }) => {
-  console.log(variableName, variableType);
 
   let data2D: any[][] = [];
   if (variableData.length > 0 && !Array.isArray(variableData[0])) {

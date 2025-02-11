@@ -2,12 +2,14 @@ import React from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
 import { VariableItem } from './variableItem';
 import { CommandRegistry } from '@lumino/commands'
+import { ILabShell } from '@jupyterlab/application';
 
 interface VariableListProps{
   commands: CommandRegistry;
+  labShell: ILabShell;
 }
 
-export const VariableList: React.FC<VariableListProps> = ({commands}) => {
+export const VariableList: React.FC<VariableListProps> = ({commands, labShell}) => {
   const { variables, searchTerm, loading } = useVariableContext();
 
 const filteredVariables = variables.filter(variable =>
@@ -39,6 +41,7 @@ const filteredVariables = variables.filter(variable =>
             value: variable.value,
           }}
           commands={commands}
+          labShell={labShell}
         />
       ))}
     </ul>

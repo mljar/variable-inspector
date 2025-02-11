@@ -3,12 +3,16 @@ import { VariableList } from './variableList';
 import { SearchBar } from './searchBar';
 import { RefreshButton } from './variableRefreshButton';
 import { CommandRegistry } from '@lumino/commands';
+import { ILabShell  } from '@jupyterlab/application';
 
 interface VariableListComponentProps {
   commands: CommandRegistry;
+  labShell: ILabShell;
 }
 
-export const VariableListComponent: React.FC<VariableListComponentProps> = ({commands}) => {
+export const VariableListComponent: React.FC<VariableListComponentProps> = ({
+  commands,labShell
+}) => {
   return (
     <div className="mljar-variable-container">
       <div className="mljar-variable-header-container">
@@ -20,7 +24,7 @@ export const VariableListComponent: React.FC<VariableListComponentProps> = ({com
           <RefreshButton />
         </div> */}
         <SearchBar />
-        <VariableList commands={commands} />
+        <VariableList commands={commands} labShell={labShell} />
       </div>
     </div>
   );
