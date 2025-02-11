@@ -16,6 +16,7 @@ interface VariableInfo {
   shape: string;
   dimension: number;
   size: number;
+  value: string;
 }
 
 interface VariableContextProps {
@@ -88,7 +89,8 @@ export const VariableContextProvider: React.FC<{
                       type: item.varType,
                       shape: item.varShape || 'None',
                       dimension: item.varDimension,
-                      size: item.varSize
+                      size: item.varSize,
+                      value: item.varSimpleValue,
                     })
                   );
                   setVariables(mappedVariables);

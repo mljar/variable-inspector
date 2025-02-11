@@ -11,6 +11,7 @@ interface VariableInfo {
   shape: string;
   dimension: number;
   size: number;
+  value: string;
 }
 
 interface VariableItemProps {
@@ -31,28 +32,27 @@ export const VariableItem: React.FC<VariableItemProps> = ({
     variableType: string
   ) => {
     if (notebookPanel) {
-      try{
-        setLoading(true)
-      const result = await executeMatrixContent(variableName, notebookPanel);
-      const variableData = result.content;
-      if (variableData) {
-        console.log("execute");
-        command.execute('custom:open-variable-inspector', {
-          variableName,
-          variableType,
-          variableData
-        });
-      } else {
-        console.error('No data.');
-      }
-      }catch(err){
+      try {
+        setLoading(true);
+        const result = await executeMatrixContent(variableName, notebookPanel);
+        const variableData = result.content;
+        if (variableData) {
+          console.log('execute');
+          command.execute('custom:open-variable-inspector', {
+            variableName,
+            variableType,
+            variableData
+          });
+        } else {
+          console.error('No data.');
+        }
+      } catch (err) {
         console.error(err);
-      }finally{
+      } finally {
         setLoading(false);
       }
     }
   };
-
 
   return (
     <div>
@@ -60,27 +60,25 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         <span className="mljar-variable-name">{vrb.name}</span>
         <span className="mljar-variable-type">{vrb.type}</span>
         <span className="mljar-variable-shape">{vrb.shape}</span>
-        {
-          (allowedTypes.includes(vrb.type) && vrb.dimension <= 2) ? (
-            <button
-              className="mljar-variable-show-variable-button"
-              onClick={() => handleButtonClick(commands, vrb.name, vrb.type)}
-              aria-label={`Show details for ${vrb.name}`}
-              disabled={vrb.size > 100}
-              title={vrb.size > 100 ? "Variable is too big" : ""}
-            >
-              {loading ? (
-                <div className="mljar-variable-spinner-big" />
-                ):
-                (
-                <detailIcon.react className="mljar-variable-detail-button-icon" />
-                )
-              }
-            </button>
-          ) : (
-            <span className="mljar-variable-blank">&nbsp;</span>
-          )
-        }
+        {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
+          <button
+            className="mljar-variable-show-variable-button"
+            onClick={() => handleButtonClick(commands, vrb.name, vrb.type)}
+            aria-label={`Show details for ${vrb.name}`}
+            disabled={vrb.size > 10}
+            title={vrb.size > 10 ? 'Variable is too big' : ''}
+          >
+            {loading ? (
+              <div className="mljar-variable-spinner-big" />
+            ) : (
+              <detailIcon.react className="mljar-variable-detail-button-icon" />
+            )}
+          </button>
+        ) : (
+          <span className="mljar-variable-text-cell" title={vrb.value}>
+            {vrb.value}
+          </span>
+        )}
       </li>
     </div>
   );

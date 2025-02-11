@@ -127,6 +127,17 @@ def _jupyterlab_variableinspector_is_matrix(x):
 def _jupyterlab_variableinspector_is_widget(x):
     return __ipywidgets and issubclass(x, __ipywidgets.DOMWidget)
 
+def _jupyterlab_variableinspector_get_simple_value(x):
+    if isinstance(x, bytes):
+        return ""
+    if x is None:
+        return "None"
+    if __np is not None and __np.isscalar(x) and not isinstance(x, bytes):
+        return str(x)
+    if isinstance(x, (int, float, complex, bool, str)):
+        return str(x)
+    return ""
+
 
 def _jupyterlab_variableinspector_dict_list():
     _check_imported()
@@ -171,6 +182,7 @@ def _jupyterlab_variableinspector_dict_list():
                 'varShape': str(_jupyterlab_variableinspector_getshapeof(_ev)) if _jupyterlab_variableinspector_getshapeof(_ev) else '',
                 'varDimension': _jupyterlab_variableinspector_getdim(_ev),
                 'varSize': _jupyterlab_variableinspector_get_size_mb(_ev),
+                'varSimpleValue': _jupyterlab_variableinspector_get_simple_value(_ev),
                 #'varSize': str(_jupyterlab_variableinspector_getsizeof(_ev)), 
                 #'varContent': "", # str(_jupyterlab_variableinspector_getcontentof(_ev)), 
                 #'isMatrix': _jupyterlab_variableinspector_is_matrix(_ev),
