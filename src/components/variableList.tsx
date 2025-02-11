@@ -21,7 +21,7 @@ const filteredVariables = variables.filter(variable =>
     (<div>abc</div>):
     (
     <ul className='mljar-variable-list'>
-      <li className='mljar-variable-header-list'>
+      <li className='mljar-variable-inspector-header-list'>
         <span className='mljar-variable-header-name'>Name</span>
         <span className='mljar-variable-header-version'>Type</span>
         <span className='mljar-variable-header-version'>Shape</span>

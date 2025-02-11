@@ -5,16 +5,16 @@ import { useVariableContext } from '../context/notebookVariableContext'
 
 
 export const RefreshButton: React.FC = () => {
-  const { refreshVariables } = useVariableContext();
+  const { refreshVariables, loading } = useVariableContext();
 
   return (
     <button
-      className="mljar-variable-refresh-button"
+      className="mljar-variable-inspector-refresh-button"
       onClick={refreshVariables}
-      title="Refresh Packages"
+      disabled={loading}
+      title="Refresh Variables"
     >
       <refreshIcon.react className="mljar-variable-refresh-icon" />
-      {'Refresh'}
     </button>
   );
 };
