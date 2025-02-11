@@ -1,7 +1,7 @@
 //i need import Type to to check what i can import or not
 
 export const getMatrix = (varName: string): string =>
-`
+  `
 import importlib
 from IPython.display import JSON
 
@@ -39,7 +39,12 @@ def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
             return JSON({"variable": var_name, "content": result})
         elif isinstance(obj, pd.Series):
             sliced = obj.iloc[:max_rows]
-            return JSON({"variable": var_name, "content": sliced.to_json(orient="split")})
+            df = sliced.to_frame()  
+            result = []
+            for col in df.columns:
+                col_values = [col] + df[col].tolist()
+                result.append(col_values)
+            return JSON({"variable": var_name, "content": result})
 
     if isinstance(obj, list):
         if all(isinstance(el, list) for el in obj):
@@ -52,4 +57,4 @@ def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
     return JSON({"error": f"Variable '{var_name}' is not a supported array type."})
 
 __get_matrix_content()
-`
+`;

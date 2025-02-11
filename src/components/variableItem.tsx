@@ -53,7 +53,6 @@ export const VariableItem: React.FC<VariableItemProps> = ({
     }
   };
 
-  console.log(vrb.size, "size");
 
   return (
     <div>
@@ -69,10 +68,9 @@ export const VariableItem: React.FC<VariableItemProps> = ({
               aria-label={`Show details for ${vrb.name}`}
               disabled={vrb.size > 100}
               title={vrb.size > 100 ? "Variable is too big" : ""}
-
             >
               {loading ? (
-                <div className="mljar-variable-spinner" />
+                <div className="mljar-variable-spinner-big" />
                 ):
                 (
                 <detailIcon.react className="mljar-variable-detail-button-icon" />

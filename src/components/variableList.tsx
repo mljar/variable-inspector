@@ -8,13 +8,18 @@ interface VariableListProps{
 }
 
 export const VariableList: React.FC<VariableListProps> = ({commands}) => {
-  const { variables, searchTerm } = useVariableContext();
+  const { variables, searchTerm, loading } = useVariableContext();
 
 const filteredVariables = variables.filter(variable =>
     variable.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
+    <div>
+    {
+    (loading)? 
+    (<div>abc</div>):
+    (
     <ul className='mljar-variable-list'>
       <li className='mljar-variable-header-list'>
         <span className='mljar-variable-header-name'>Name</span>
@@ -36,5 +41,8 @@ const filteredVariables = variables.filter(variable =>
         />
       ))}
     </ul>
+    )
+  }
+  </div>
   );
 };

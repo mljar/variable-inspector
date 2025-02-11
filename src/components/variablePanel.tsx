@@ -62,7 +62,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       }
     }
 
-    if (variableType == 'DataFrame') {
+    if (variableType == 'DataFrame' || variableType == 'Series') {
       newData = transpose(newData);
     }
 
