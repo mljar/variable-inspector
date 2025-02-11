@@ -14,7 +14,7 @@ export const RefreshButton: React.FC = () => {
       disabled={loading}
       title="Refresh Variables"
     >
-      <refreshIcon.react className="mljar-variable-refresh-icon" />
+      <refreshIcon.react className="mljar-variable-inspector-refresh-icon" />
     </button>
   );
 };

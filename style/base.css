@@ -16,6 +16,7 @@
 }
 
 .mljar-variable-header {
+  flex: 4;
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--jp-ui-font-color1);
@@ -133,7 +134,7 @@
   width: 16px;
   height: 16px;
 }
-
+.mljar-variable-inspector-settings-button,
 .mljar-variable-inspector-refresh-button {
   width: 30px;
   display: flex;
@@ -149,22 +150,84 @@
   font-size: 0.75rem;
   transition: background-color 0.3s ease;
 }
-
+.mljar-variable-inspector-settings-button:disabled,
 .mljar-variable-inspector-refresh-button:disabled {
   cursor: not-allowed;
 }
-
+.mljar-variable-inspector-settings-button:hover:not(:disabled),
 .mljar-variable-inspector-refresh-button:hover:not(:disabled) {
   background-color: #0099cc;
   color: #ffffff;
 }
 
-.mljar-variable-refresh-icon {
+.mljar-variable-inspector-settings-button.active {
+  background-color: #0099cc;
+  color: #ffffff;
+}
+.mljar-variable-inspector-settings-icon,
+.mljar-variable-inspector-refresh-icon {
   display: flex;
   align-items: center;
   width: 15px;
   height: 15px;
 }
+
+/* settings menu start */
+
+.mljar-variable-inspector-settings-container {
+  position: relative;
+  display: inline-block;
+}
+
+.mljar-variable-inspector-settings-menu {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 200px;
+  background-color: var(--jp-layout-color0);
+  border: 1px solid var(--jp-layout-color3);
+  box-shadow: 0px 2px 24px 0px var(--jp-layout-color2);
+  border-radius: 5px;
+  z-index: 100;
+}
+
+/* Styl dla listy w menu */
+.mljar-variable-inspector-settings-menu-list {
+  list-style: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+
+.mljar-variable-inspector-settings-menu-item {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  padding: 5px 10px; /* Dodanie paddingu po prawej stronie */
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.3s ease;
+  display: flex;
+  justify-content: space-between; /* Rozstawienie tekstu i ikony */
+  align-items: center;
+}
+
+.mljar-variable-inspector-settings-menu-item.first {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+} 
+
+.mljar-variable-inspector-settings-menu-item.last {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+} 
+
+.mljar-variable-inspector-settings-menu-item:hover {
+  background-color: var(--jp-layout-color2);
+  cursor: pointer;
+}
+
+/* settings menu end */
 
 .mljar-variable-actions-container {
   display: flex;

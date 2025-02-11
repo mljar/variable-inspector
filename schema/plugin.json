@@ -3,6 +3,11 @@
   "title": "variable-inspector",
   "description": "variable-inspector settings.",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "autoRefresh": {
+      "type": "boolean",
+      "default": false
+    }
+  },
   "additionalProperties": false
 }
