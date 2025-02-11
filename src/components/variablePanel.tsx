@@ -26,6 +26,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableType,
   variableData
 }) => {
+  console.log(variableName, variableType);
 
   let data2D: any[][] = [];
   if (variableData.length > 0 && !Array.isArray(variableData[0])) {
@@ -43,6 +44,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     data2D.length > 0 &&
     data2D.length > 0
   ) {
+
     const headerRow = ['index'];
 
     let length =

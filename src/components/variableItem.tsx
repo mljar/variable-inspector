@@ -36,19 +36,18 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   ) => {
     if (notebookPanel) {
       try {
-        setLoading(true);
         const result = await executeMatrixContent(variableName, notebookPanel);
         const variableData = result.content;
-        // let isOpen = false;
-        // for (const widget of labShell.widgets('main')) {
-        //   if (widget.id === `${variableType}-${variableName}`) {
-        //     isOpen = true;
-        //   }
-        // }
+        let isOpen = false;
+        for (const widget of labShell.widgets('main')) {
+          if (widget.id === `${variableType}-${variableName}`) {
+            isOpen = true;
+          }
+        }
         // //i dont really know to dont let user open same notebook
 
-        if (variableData) {
-          console.log('hello');
+        if (variableData && !isOpen) {
+           setLoading(true);
           command.execute('custom:open-variable-inspector', {
             variableName,
             variableType,
