@@ -1,23 +1,13 @@
 import { settingsIcon } from '../icons/settingsIcon';
 import { checkIcon } from '../icons/checkIcon';
-import React, { useState, useEffect } from 'react';
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import React, { useState } from 'react';
 
-export const SettingsButton: React.FC<{ settings: ISettingRegistry.ISettings }> = ({ settings }) => {
+export const SettingsButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  useEffect(() => {
-    setAutoRefresh(settings.get('autoRefresh').composite as boolean);
-  }, [settings]);
-
   const showSettings = () => {
     setIsOpen(!isOpen);
-  };
-
-  const toggleAutoRefresh = (value: boolean) => {
-    setAutoRefresh(value);
-    settings.set('autoRefresh', value);
   };
 
   return (
@@ -35,7 +25,7 @@ export const SettingsButton: React.FC<{ settings: ISettingRegistry.ISettings }> 
           <ul className="mljar-variable-inspector-settings-menu-list">
             <button
               className="mljar-variable-inspector-settings-menu-item first"
-              onClick={() => toggleAutoRefresh(true)}
+              onClick={() => setAutoRefresh(true)}
             >
               Automatically refresh
               {autoRefresh && (
@@ -44,7 +34,7 @@ export const SettingsButton: React.FC<{ settings: ISettingRegistry.ISettings }> 
             </button>
             <button
               className="mljar-variable-inspector-settings-menu-item"
-              onClick={() => toggleAutoRefresh(false)}
+              onClick={() => setAutoRefresh(false)}
             >
               Manually refresh
               {!autoRefresh && (

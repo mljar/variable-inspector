@@ -5,6 +5,7 @@ import {
 } from '@jupyterlab/application';
 
 import { ICommandPalette } from '@jupyterlab/apputils';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { createEmptyVariableInspectorPanel } from './components/variableInspectorPanel';
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
@@ -13,15 +14,21 @@ const leftTab: JupyterFrontEndPlugin<void> = {
   id: 'variable-manager:plugin',
   description: 'A JupyterLab extension to easy manage variables.',
   autoStart: true,
-  requires: [ILabShell],
-  activate: async (app: JupyterFrontEnd,
-    labShell: ILabShell
-) => {
+  requires: [ILabShell, ISettingRegistry],
+  activate: async (
+    app: JupyterFrontEnd,
+    labShell: ILabShell,
+    settingregistry: ISettingRegistry
+  ) => {
     const notebookWatcher = new NotebookWatcher(app.shell);
 
-    notebookWatcher.selectionChanged.connect((sender, selections) => { });
+    notebookWatcher.selectionChanged.connect((sender, selections) => {});
 
-    let widget = createVariableInspectorSidebar(notebookWatcher, app.commands, labShell);
+    let widget = createVariableInspectorSidebar(
+      notebookWatcher,
+      app.commands,
+      labShell
+    );
 
     app.shell.add(widget, 'left', { rank: 1998 });
   }

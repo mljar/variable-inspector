@@ -4,6 +4,7 @@ import { SearchBar } from './searchBar';
 import { RefreshButton } from './variableRefreshButton';
 import { CommandRegistry } from '@lumino/commands';
 import { ILabShell  } from '@jupyterlab/application';
+import { SettingsButton } from './variableSettingsButton';
 
 interface VariableListComponentProps {
   commands: CommandRegistry;
