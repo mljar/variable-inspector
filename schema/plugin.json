@@ -8,7 +8,7 @@
       "type": "boolean",
       "title": "variableInspectorAutoRefresh",
       "description": "Enable Auto Refresh",
-      "default": true
+      "default": false
     }
   },
   "additionalProperties": false

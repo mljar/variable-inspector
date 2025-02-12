@@ -17,9 +17,19 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
     setIsOpen(!isOpen);
   };
 
-  // const saveAutoRefresh = (newValue: boolean) => {
-  //   console.log('save');
-  // };
+  const saveAutoRefresh = (newValue: boolean) => {
+    console.log('save');
+    if (settingRegistry) {
+      settingRegistry
+        .load(VARIABLE_INSPECTOR_ID)
+        .then(settings => {
+          settings.set('variableInspectorAutoRefresh', newValue);
+        })
+        .catch(reason => {
+          console.error('Failed', reason);
+        });
+    }
+  };
 
   const loadAutoRefresh = () => {
     if (settingRegistry) {
@@ -30,6 +40,7 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
             const variableInspectorAutoRefresh = settings.get(
               'variableInspectorAutoRefresh'
             ).composite as boolean;
+            setAutoRefresh(variableInspectorAutoRefresh);
             console.log(variableInspectorAutoRefresh);
           };
           updateSettings();
@@ -64,7 +75,7 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
           <ul className="mljar-variable-inspector-settings-menu-list">
             <button
               className="mljar-variable-inspector-settings-menu-item first"
-              onClick={() => setAutoRefresh(true)}
+              onClick={() => saveAutoRefresh(true)}
             >
               Automatically refresh
               {autoRefresh && (
@@ -73,7 +84,7 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
             </button>
             <button
               className="mljar-variable-inspector-settings-menu-item"
-              onClick={() => setAutoRefresh(false)}
+              onClick={() => saveAutoRefresh(false)}
             >
               Manually refresh
               {!autoRefresh && (
