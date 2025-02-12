@@ -54,11 +54,13 @@ const customVariableInspectorPlugin: JupyterFrontEndPlugin<void> = {
         const variableName = args.variableName || 'Default Name';
         const variableType = args.variableType || 'Deafult Type';
         const variableData = args.variableData || 'No Data';
+        const notebookPanel = args.notebookPanel || null;
         createEmptyVariableInspectorPanel(
           labShell,
           variableName,
           variableType,
-          variableData
+          variableData,
+          notebookPanel
         );
       }
     });

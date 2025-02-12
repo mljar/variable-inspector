@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   MultiGrid as RVMultiGrid,
   AutoSizer as RVAutoSizer
 } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import { allowedTypes } from '../utils/allowedTypes';
+import { NotebookPanel } from '@jupyterlab/notebook';
+import { executeMatrixContent } from '../utils/executeGetMatrix';
 
 interface VariablePanelProps {
   variableName: string;
   variableType: string;
   variableData: any[][];
+  notebookPanel: NotebookPanel;
 }
 
 const AutoSizer = RVAutoSizer as unknown as React.ComponentType<any>;
@@ -24,7 +27,8 @@ function transpose<T>(matrix: T[][]): T[][] {
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   variableType,
-  variableData
+  variableData,
+  notebookPanel
 }) => {
   console.log(variableName, variableType);
 
@@ -44,7 +48,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     data2D.length > 0 &&
     data2D.length > 0
   ) {
-
     const headerRow = ['index'];
 
     let length =
@@ -108,6 +111,22 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       fontSize: '0.65rem',
       padding: '1px'
     };
+
+    useEffect(() => {
+      async function fetchData() {
+        try {
+          const result = await executeMatrixContent(
+            variableName,
+            notebookPanel
+          );
+          variableData = result.content;
+        } catch (error) {
+          console.error('Error fetching matrix content:', error);
+        }
+      }
+
+      fetchData();
+    }, []);
 
     if (rowIndex === 0 || columnIndex === 0) {
       cellStyle = {

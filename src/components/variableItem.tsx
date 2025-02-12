@@ -51,7 +51,8 @@ export const VariableItem: React.FC<VariableItemProps> = ({
           command.execute('custom:open-variable-inspector', {
             variableName,
             variableType,
-            variableData
+            variableData,
+            notebookPanel
           });
         }
       } catch (err) {

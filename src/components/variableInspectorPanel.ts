@@ -1,17 +1,20 @@
 import { ILabShell } from '@jupyterlab/application';
 import { VariablePanelWidget } from './variablePanelWidget';
 import { panelIcon } from '../icons/panelIcon';
+import { NotebookPanel } from '@jupyterlab/notebook';
 
 export function createEmptyVariableInspectorPanel(
   labShell: ILabShell,
   variableName: string,
   variableType: string,
-  variableData: any[]
+  variableData: any[],
+  notebookPanel: NotebookPanel
 ): void {
   const panel = new VariablePanelWidget({
     variableName,
     variableType,
-    variableData
+    variableData,
+    notebookPanel
   });
 
   panel.id = `${variableType}-${variableName}`;
