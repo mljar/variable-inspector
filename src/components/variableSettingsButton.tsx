@@ -1,14 +1,53 @@
 import { settingsIcon } from '../icons/settingsIcon';
 import { checkIcon } from '../icons/checkIcon';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-export const SettingsButton: React.FC = () => {
+import { VARIABLE_INSPECTOR_ID } from '../index';
+
+interface IProps {
+  settingRegistry: ISettingRegistry | null;
+}
+
+export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const showSettings = () => {
     setIsOpen(!isOpen);
   };
+
+  // const saveAutoRefresh = (newValue: boolean) => {
+  //   console.log('save');
+  // };
+
+  const loadAutoRefresh = () => {
+    if (settingRegistry) {
+      settingRegistry
+        .load(VARIABLE_INSPECTOR_ID)
+        .then(settings => {
+          const updateSettings = (): void => {
+            const variableInspectorAutoRefresh = settings.get(
+              'variableInspectorAutoRefresh'
+            ).composite as boolean;
+            console.log(variableInspectorAutoRefresh);
+          };
+          updateSettings();
+          settings.changed.connect(updateSettings);
+        })
+        .catch(reason => {
+          console.error(
+            'Failed to load settings for variableinspector',
+            reason
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    console.log('load auto refresh');
+    loadAutoRefresh();
+  }, []);
 
   return (
     <div className="mljar-variable-inspector-settings-container">

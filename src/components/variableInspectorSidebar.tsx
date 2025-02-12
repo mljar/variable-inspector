@@ -15,17 +15,20 @@ import {
 } from '../context/pluginVisibilityContext';
 import { KernelIdleWatcherContextProvider } from '../context/kernelStatusContext';
 import { ILabShell } from '@jupyterlab/application';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 export class VariableInspectorSidebarWidget extends ReactWidget {
   private notebookWatcher: NotebookWatcher;
   private commands: CommandRegistry;
   private isOpen = false;
   private labShell: ILabShell;
+  private settingRegistry: ISettingRegistry | null = null;
 
   constructor(
     notebookWatcher: NotebookWatcher,
     commands: CommandRegistry,
-    labShell: ILabShell
+    labShell: ILabShell,
+    settingRegistry: ISettingRegistry | null
   ) {
     super();
     this.notebookWatcher = notebookWatcher;
@@ -35,6 +38,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     this.title.caption = 'Variable Inspector';
     this.addClass('mljar-plugin-sidebar-widget');
     this.labShell = labShell;
+    this.settingRegistry = settingRegistry;
   }
 
   protected onAfterShow(msg: Message): void {
@@ -67,6 +71,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
                 <VariableListComponent
                   commands={this.commands}
                   labShell={this.labShell}
+                  settingRegistry={this.settingRegistry}
                 />
               </KernelIdleWatcherContextProvider>
             </VariableContextProvider>
@@ -80,7 +85,13 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
 export function createVariableInspectorSidebar(
   notebookWatcher: NotebookWatcher,
   commands: CommandRegistry,
-  labShell: ILabShell
+  labShell: ILabShell,
+  settingRegistry: ISettingRegistry | null
 ): VariableInspectorSidebarWidget {
-  return new VariableInspectorSidebarWidget(notebookWatcher, commands, labShell);
+  return new VariableInspectorSidebarWidget(
+    notebookWatcher,
+    commands,
+    labShell,
+    settingRegistry
+  );
 }

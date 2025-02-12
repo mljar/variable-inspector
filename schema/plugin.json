@@ -4,9 +4,11 @@
   "description": "variable-inspector settings.",
   "type": "object",
   "properties": {
-    "autoRefresh": {
+    "variableInspectorAutoRefresh": {
       "type": "boolean",
-      "default": false
+      "title": "variableInspectorAutoRefresh",
+      "description": "Enable Auto Refresh",
+      "default": true
     }
   },
   "additionalProperties": false

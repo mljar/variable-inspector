@@ -10,24 +10,27 @@ import { createEmptyVariableInspectorPanel } from './components/variableInspecto
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
 
+export const VARIABLE_INSPECTOR_ID = 'variable-inspector:plugin';
+
 const leftTab: JupyterFrontEndPlugin<void> = {
-  id: 'variable-manager:plugin',
+  id: VARIABLE_INSPECTOR_ID,
   description: 'A JupyterLab extension to easy manage variables.',
   autoStart: true,
   requires: [ILabShell, ISettingRegistry],
   activate: async (
     app: JupyterFrontEnd,
     labShell: ILabShell,
-    settingregistry: ISettingRegistry
+    settingregistry: ISettingRegistry | null
   ) => {
     const notebookWatcher = new NotebookWatcher(app.shell);
 
-    notebookWatcher.selectionChanged.connect((sender, selections) => {});
+    // notebookWatcher.selectionChanged.connect((sender, selections) => { });
 
-    let widget = createVariableInspectorSidebar(
+    const widget = createVariableInspectorSidebar(
       notebookWatcher,
       app.commands,
-      labShell
+      labShell,
+      settingregistry
     );
 
     app.shell.add(widget, 'left', { rank: 1998 });
