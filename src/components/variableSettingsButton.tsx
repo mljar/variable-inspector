@@ -9,39 +9,56 @@ interface IProps {
   settingRegistry: ISettingRegistry | null;
 }
 
+const autoRefreshProperty = 'variableInspectorAutoRefresh';
+const showTypeProperty = 'variableInspectorShowType';
+const showShapeProperty = 'variableInspectorShowShape';
+const showSizeProperty = 'variableInspectorShowSize';
+
 export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [showType, setShowType] = useState(false);
+  const [showShape, setShowShape] = useState(false);
+  const [showSize, setShowSize] = useState(false);
 
   const showSettings = () => {
     setIsOpen(!isOpen);
   };
 
-  const saveAutoRefresh = (newValue: boolean) => {
-    console.log('save');
+  const savePropertyValue = (propertyName: string, newValue: boolean) => {
     if (settingRegistry) {
       settingRegistry
         .load(VARIABLE_INSPECTOR_ID)
         .then(settings => {
-          settings.set('variableInspectorAutoRefresh', newValue);
+          settings.set(propertyName, newValue);
         })
         .catch(reason => {
-          console.error('Failed', reason);
+          console.error(`Faild to save ${propertyName}: `, reason);
         });
     }
   };
 
-  const loadAutoRefresh = () => {
+  const loadPropertiesValues = () => {
     if (settingRegistry) {
       settingRegistry
         .load(VARIABLE_INSPECTOR_ID)
         .then(settings => {
           const updateSettings = (): void => {
-            const variableInspectorAutoRefresh = settings.get(
-              'variableInspectorAutoRefresh'
-            ).composite as boolean;
-            setAutoRefresh(variableInspectorAutoRefresh);
-            console.log(variableInspectorAutoRefresh);
+            const loadAutoRefresh = settings.get(autoRefreshProperty)
+              .composite as boolean;
+            setAutoRefresh(loadAutoRefresh);
+
+            const loadShowType = settings.get(showTypeProperty)
+              .composite as boolean;
+            setShowType(loadShowType);
+
+            const loadShowShape = settings.get(showShapeProperty)
+              .composite as boolean;
+            setShowShape(loadShowShape);
+
+            const loadShowSize = settings.get(showSizeProperty)
+              .composite as boolean;
+            setShowSize(loadShowSize);
           };
           updateSettings();
           settings.changed.connect(updateSettings);
@@ -56,8 +73,7 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
   };
 
   useEffect(() => {
-    console.log('load auto refresh');
-    loadAutoRefresh();
+    loadPropertiesValues();
   }, []);
 
   return (
@@ -75,7 +91,9 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
           <ul className="mljar-variable-inspector-settings-menu-list">
             <button
               className="mljar-variable-inspector-settings-menu-item first"
-              onClick={() => saveAutoRefresh(true)}
+              onClick={() => {
+                if (!autoRefresh) savePropertyValue(autoRefreshProperty, true);
+              }}
             >
               Automatically refresh
               {autoRefresh && (
@@ -84,16 +102,43 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
             </button>
             <button
               className="mljar-variable-inspector-settings-menu-item"
-              onClick={() => saveAutoRefresh(false)}
+              onClick={() => {
+                if (autoRefresh) savePropertyValue(autoRefreshProperty, false);
+              }}
             >
               Manually refresh
               {!autoRefresh && (
                 <checkIcon.react className="mljar-variable-inspector-settings-icon" />
               )}
             </button>
-            <li className="mljar-variable-inspector-settings-menu-item last">
-              Language
-            </li>
+            <hr />
+            <button
+              className="mljar-variable-inspector-settings-menu-item"
+              onClick={() => savePropertyValue(showTypeProperty, !showType)}
+            >
+              Show type
+              {showType && (
+                <checkIcon.react className="mljar-variable-inspector-settings-icon" />
+              )}
+            </button>
+            <button
+              className="mljar-variable-inspector-settings-menu-item"
+              onClick={() => savePropertyValue(showShapeProperty, !showShape)}
+            >
+              Show shape
+              {showShape && (
+                <checkIcon.react className="mljar-variable-inspector-settings-icon" />
+              )}
+            </button>
+            <button
+              className="mljar-variable-inspector-settings-menu-item last"
+              onClick={() => savePropertyValue(showSizeProperty, !showSize)}
+            >
+              Show size
+              {showSize && (
+                <checkIcon.react className="mljar-variable-inspector-settings-icon" />
+              )}
+            </button>
           </ul>
         </div>
       )}

@@ -8,6 +8,24 @@
       "type": "boolean",
       "title": "variableInspectorAutoRefresh",
       "description": "Enable Auto Refresh",
+      "default": true
+    },
+    "variableInspectorShowType": {
+      "type": "boolean",
+      "title": "variableInspectorShowType",
+      "description": "Show Type Column",
+      "default": false
+    },
+    "variableInspectorShowShape": {
+      "type": "boolean",
+      "title": "variableInspectorShowShape",
+      "description": "Show Shape Column",
+      "default": false
+    },
+    "variableInspectorShowSize": {
+      "type": "boolean",
+      "title": "variableInspectorShowSize",
+      "description": "Show Size Column",
       "default": false
     }
   },
