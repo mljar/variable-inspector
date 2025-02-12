@@ -1,41 +1,85 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { Kernel } from '@jupyterlab/services'
-import { useNotebookPanelContext } from './notebookPanelContext'
-import { useVariableContext } from './notebookVariableContext'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
+import { Kernel } from '@jupyterlab/services';
+import { useNotebookPanelContext } from './notebookPanelContext';
+import { useVariableContext } from './notebookVariableContext';
 
-const KernelIdleWatcherContext = createContext({})
+import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-export const KernelIdleWatcherContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const notebookPanel = useNotebookPanelContext()
-  const [kernelStatus, setKernelStatus] = useState<Kernel.Status>('unknown')
-  const timerRef = useRef<number | null>(null)
-  const [hasRefreshed, setHasRefreshed] = useState(false)
-  const { refreshVariables, isRefreshing } = useVariableContext()
+interface IProps {
+  settingRegistry: ISettingRegistry | null;
+  children: React.ReactNode;
+}
+
+const KernelIdleWatcherContext = createContext({});
+
+export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
+  settingRegistry,
+  children
+}) => {
+  const notebookPanel = useNotebookPanelContext();
+  const [kernelStatus, setKernelStatus] = useState<Kernel.Status>('unknown');
+  const timerRef = useRef<number | null>(null);
+  const [hasRefreshed, setHasRefreshed] = useState(false);
+  const { refreshVariables, isRefreshing } = useVariableContext();
+  const [autoRefresh, setAutoRefresh] = useState(true);
+
+  const loadAutoRefresh = () => {
+    if (settingRegistry) {
+      settingRegistry
+        .load(VARIABLE_INSPECTOR_ID)
+        .then(settings => {
+          const updateSettings = (): void => {
+            const loadAutoRefresh = settings.get(autoRefreshProperty)
+              .composite as boolean;
+            setAutoRefresh(loadAutoRefresh);
+          };
+          updateSettings();
+          settings.changed.connect(updateSettings);
+        })
+        .catch(reason => {
+          console.error(
+            'Failed to load settings for Variable Inspector',
+            reason
+          );
+        });
+    }
+  };
 
   useEffect(() => {
-    if (!notebookPanel || !notebookPanel.sessionContext) return
-    const kernel = notebookPanel.sessionContext?.session?.kernel
-    if (!kernel) return
+    loadAutoRefresh();
+  }, []);
+
+  useEffect(() => {
+    if (!notebookPanel || !notebookPanel.sessionContext) return;
+    const kernel = notebookPanel.sessionContext?.session?.kernel;
+    if (!kernel) return;
     const onKernelStatusChange = () => {
-      setKernelStatus(kernel.status)
-    }
-    kernel.statusChanged.connect(onKernelStatusChange)
+      setKernelStatus(kernel.status);
+    };
+    kernel.statusChanged.connect(onKernelStatusChange);
     return () => {
-      kernel.statusChanged.disconnect(onKernelStatusChange)
-    }
-  }, [notebookPanel?.sessionContext?.session?.kernel])
+      kernel.statusChanged.disconnect(onKernelStatusChange);
+    };
+  }, [notebookPanel?.sessionContext?.session?.kernel]);
 
   // first idea to solve the problem, code might be unstable
   useEffect(() => {
     //clearing timeout
     if (isRefreshing) {
       if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
-      return
+      return;
     }
-    if (kernelStatus === 'idle') {
+    if (kernelStatus === 'idle' && autoRefresh) {
       if (!hasRefreshed) {
         timerRef.current = window.setTimeout(() => {
           if (
@@ -43,34 +87,41 @@ export const KernelIdleWatcherContextProvider: React.FC<{ children: React.ReactN
             notebookPanel.sessionContext?.session?.kernel?.status === 'idle' &&
             !isRefreshing
           ) {
-            refreshVariables()
-            setHasRefreshed(true)
+            refreshVariables();
+            setHasRefreshed(true);
           }
-        }, 2000)
+        }, 2000);
       }
     } else {
       if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
-      if(!isRefreshing && notebookPanel){
-      setHasRefreshed(false)
+      if (!isRefreshing && notebookPanel) {
+        setHasRefreshed(false);
       }
     }
     //clearing timeout
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
-    }
-  }, [kernelStatus,notebookPanel, refreshVariables, hasRefreshed])
+    };
+  }, [
+    kernelStatus,
+    notebookPanel,
+    refreshVariables,
+    hasRefreshed,
+    autoRefresh
+  ]);
 
   return (
     <KernelIdleWatcherContext.Provider value={{ kernelStatus }}>
       {children}
     </KernelIdleWatcherContext.Provider>
-  )
-}
+  );
+};
 
-export const useKernelIdleWatcherContext = () => useContext(KernelIdleWatcherContext)
+export const useKernelIdleWatcherContext = () =>
+  useContext(KernelIdleWatcherContext);

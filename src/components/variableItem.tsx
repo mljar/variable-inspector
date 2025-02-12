@@ -65,7 +65,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   return (
     <div>
       <li className="mljar-variable-item">
-        <span className="mljar-variable-name">{vrb.name}</span>
+        <span className="mljar-variable-inspector-variable-name">{vrb.name}</span>
         <span className="mljar-variable-type">{vrb.type}</span>
         <span className="mljar-variable-shape">{vrb.shape}</span>
         {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (

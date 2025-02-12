@@ -11,6 +11,10 @@ import { createVariableInspectorSidebar } from './components/variableInspectorSi
 import { NotebookWatcher } from './watchers/notebookWatcher';
 
 export const VARIABLE_INSPECTOR_ID = 'variable-inspector:plugin';
+export const autoRefreshProperty = 'variableInspectorAutoRefresh';
+export const showTypeProperty = 'variableInspectorShowType';
+export const showShapeProperty = 'variableInspectorShowShape';
+export const showSizeProperty = 'variableInspectorShowSize';
 
 const leftTab: JupyterFrontEndPlugin<void> = {
   id: VARIABLE_INSPECTOR_ID,
@@ -23,9 +27,6 @@ const leftTab: JupyterFrontEndPlugin<void> = {
     settingregistry: ISettingRegistry | null
   ) => {
     const notebookWatcher = new NotebookWatcher(app.shell);
-
-    // notebookWatcher.selectionChanged.connect((sender, selections) => { });
-
     const widget = createVariableInspectorSidebar(
       notebookWatcher,
       app.commands,

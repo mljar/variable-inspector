@@ -19,10 +19,10 @@ export const VariableListComponent: React.FC<IVariableListComponentProps> = ({
   settingRegistry
 }) => {
   return (
-    <div className="mljar-variable-container">
+    <div className="mljar-variable-inspector-container">
       <div className="mljar-variable-header-container">
         <h3 className="mljar-variable-header">Variable Inspector</h3>
-        <RefreshButton />
+        <RefreshButton settingRegistry={settingRegistry} />
         <SettingsButton settingRegistry={settingRegistry} />
       </div>
       <div>

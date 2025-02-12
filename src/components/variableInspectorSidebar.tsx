@@ -36,7 +36,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     this.id = 'my-plugin::empty-sidebar';
     this.title.icon = pluginIcon;
     this.title.caption = 'Variable Inspector';
-    this.addClass('mljar-plugin-sidebar-widget');
+    this.addClass('mljar-variable-inspector-sidebar-widget');
     this.labShell = labShell;
     this.settingRegistry = settingRegistry;
   }
@@ -63,21 +63,27 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     };
 
     return (
-      <PluginVisibilityContext.Provider value={contextValue}>
-        <NotebookPanelContextProvider notebookWatcher={this.notebookWatcher}>
-          <NotebookKernelContextProvider notebookWatcher={this.notebookWatcher}>
-            <VariableContextProvider>
-              <KernelIdleWatcherContextProvider>
-                <VariableListComponent
-                  commands={this.commands}
-                  labShell={this.labShell}
+      <div className="mljar-variable-inspector-sidebar-container">
+        <PluginVisibilityContext.Provider value={contextValue}>
+          <NotebookPanelContextProvider notebookWatcher={this.notebookWatcher}>
+            <NotebookKernelContextProvider
+              notebookWatcher={this.notebookWatcher}
+            >
+              <VariableContextProvider>
+                <KernelIdleWatcherContextProvider
                   settingRegistry={this.settingRegistry}
-                />
-              </KernelIdleWatcherContextProvider>
-            </VariableContextProvider>
-          </NotebookKernelContextProvider>
-        </NotebookPanelContextProvider>
-      </PluginVisibilityContext.Provider>
+                >
+                  <VariableListComponent
+                    commands={this.commands}
+                    labShell={this.labShell}
+                    settingRegistry={this.settingRegistry}
+                  />
+                </KernelIdleWatcherContextProvider>
+              </VariableContextProvider>
+            </NotebookKernelContextProvider>
+          </NotebookPanelContextProvider>
+        </PluginVisibilityContext.Provider>
+      </div>
     );
   }
 }

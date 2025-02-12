@@ -3,16 +3,11 @@ import { checkIcon } from '../icons/checkIcon';
 import React, { useEffect, useState } from 'react';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-import { VARIABLE_INSPECTOR_ID } from '../index';
+import { VARIABLE_INSPECTOR_ID, autoRefreshProperty, showTypeProperty, showShapeProperty, showSizeProperty } from '../index';
 
 interface IProps {
   settingRegistry: ISettingRegistry | null;
 }
-
-const autoRefreshProperty = 'variableInspectorAutoRefresh';
-const showTypeProperty = 'variableInspectorShowType';
-const showShapeProperty = 'variableInspectorShowShape';
-const showSizeProperty = 'variableInspectorShowSize';
 
 export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +60,7 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
         })
         .catch(reason => {
           console.error(
-            'Failed to load settings for variableinspector',
+            'Failed to load settings for Variable Inspector',
             reason
           );
         });
