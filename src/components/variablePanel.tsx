@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   MultiGrid as RVMultiGrid,
   AutoSizer as RVAutoSizer
@@ -12,7 +12,7 @@ interface VariablePanelProps {
   variableName: string;
   variableType: string;
   variableData: any[][];
-  notebookPanel: NotebookPanel;
+  notebookPanel?: NotebookPanel | null;
 }
 
 const AutoSizer = RVAutoSizer as unknown as React.ComponentType<any>;
@@ -28,15 +28,35 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   variableType,
   variableData,
-  notebookPanel
+  notebookPanel,
 }) => {
-  console.log(variableName, variableType);
+
+  const [matrixData, setMatrixData] = useState<any[][]>(variableData);
+
+    useEffect(() => {
+      async function fetchData() {
+        try {
+          if (!notebookPanel) {
+            return;
+          }
+          const result = await executeMatrixContent(
+            variableName,
+            notebookPanel
+          );
+        setMatrixData(result.content);
+        } catch (error) {
+          console.error('Error fetching matrix content:', error);
+        }
+      }
+
+      fetchData();
+    }, );
 
   let data2D: any[][] = [];
-  if (variableData.length > 0 && !Array.isArray(variableData[0])) {
-    data2D = (variableData as any[]).map(item => [item]);
+  if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
+    data2D = (matrixData as any[]).map(item => [item]);
   } else {
-    data2D = variableData as any[][];
+    data2D = matrixData as any[][];
   }
 
   let data: any[][] = data2D;
@@ -112,21 +132,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       padding: '1px'
     };
 
-    useEffect(() => {
-      async function fetchData() {
-        try {
-          const result = await executeMatrixContent(
-            variableName,
-            notebookPanel
-          );
-          variableData = result.content;
-        } catch (error) {
-          console.error('Error fetching matrix content:', error);
-        }
-      }
-
-      fetchData();
-    }, []);
 
     if (rowIndex === 0 || columnIndex === 0) {
       cellStyle = {

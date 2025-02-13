@@ -27,6 +27,7 @@ interface VariableContextProps {
   setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
   refreshVariables: () => void;
   isRefreshing: boolean;
+  refreshCount: number;
 }
 
 const VariableContext = createContext<VariableContextProps | undefined>(
@@ -43,6 +44,7 @@ export const VariableContextProvider: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+const [refreshCount, setRefreshCount] = useState<number>(0);
 
   const executeCode = useCallback(async () => {
     setIsRefreshing(true);
@@ -77,6 +79,7 @@ export const VariableContextProvider: React.FC<{
             if (jsonData) {
               setLoading(false);
               setIsRefreshing(false);
+              setRefreshCount(prev => prev + 1);
             } else if (textData) {
               try {
                 const cleanedData = textData.replace(/^['"]|['"]$/g, '');
@@ -99,6 +102,7 @@ export const VariableContextProvider: React.FC<{
                 }
                 setLoading(false);
                 setIsRefreshing(false);
+              setRefreshCount(prev => prev + 1);
               } catch (err) {
                 setError('Error during export JSON.');
                 console.log(err);
@@ -129,7 +133,8 @@ export const VariableContextProvider: React.FC<{
         searchTerm,
         setSearchTerm,
         refreshVariables: executeCode,
-        isRefreshing
+        isRefreshing,
+        refreshCount,
       }}
     >
       {children}

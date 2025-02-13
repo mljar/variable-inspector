@@ -3,18 +3,20 @@ import React from 'react'
 import { VariablePanel } from './variablePanel';
 import { NotebookPanel } from '@jupyterlab/notebook';
 
-interface VariablePanelWidgetProps {
+export interface VariablePanelWidgetProps {
   variableName: string;
   variableType: string;
   variableData: any[];
-  notebookPanel: NotebookPanel;
+  notebookPanel?: NotebookPanel | null;
 }
 
 export class VariablePanelWidget extends ReactWidget {
+
   constructor(private props: VariablePanelWidgetProps) {
     super();
     this.update();
   }
+
 
   protected render(): JSX.Element {
     return (

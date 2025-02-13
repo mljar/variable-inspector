@@ -5,6 +5,7 @@ import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useNotebookPanelContext } from '../context/notebookPanelContext';
 import { allowedTypes } from '../utils/allowedTypes';
 import { ILabShell } from '@jupyterlab/application';
+import { createEmptyVariableInspectorPanel } from '../components/variableInspectorPanel';
 
 interface VariableInfo {
   name: string;
@@ -30,7 +31,6 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   const [loading, setLoading] = useState(false);
 
   const handleButtonClick = async (
-    command: CommandRegistry,
     variableName: string,
     variableType: string
   ) => {
@@ -44,16 +44,18 @@ export const VariableItem: React.FC<VariableItemProps> = ({
             isOpen = true;
           }
         }
-        // //i dont really know to dont let user open same notebook
 
         if (variableData && !isOpen) {
            setLoading(true);
-          command.execute('custom:open-variable-inspector', {
-            variableName,
-            variableType,
-            variableData,
-            notebookPanel
-          });
+
+        createEmptyVariableInspectorPanel(
+          labShell,
+          variableName,
+          variableType,
+          variableData,
+          notebookPanel,
+        );
+
         }
       } catch (err) {
         console.error(err);
@@ -72,7 +74,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
           <button
             className="mljar-variable-show-variable-button"
-            onClick={() => handleButtonClick(commands, vrb.name, vrb.type)}
+            onClick={() => handleButtonClick(vrb.name, vrb.type)}
             aria-label={`Show details for ${vrb.name}`}
             disabled={vrb.size > 10}
             title={vrb.size > 10 ? 'Variable is too big' : ''}

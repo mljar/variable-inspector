@@ -8,7 +8,7 @@ export function createEmptyVariableInspectorPanel(
   variableName: string,
   variableType: string,
   variableData: any[],
-  notebookPanel: NotebookPanel
+  notebookPanel?: NotebookPanel | null,
 ): void {
   const panel = new VariablePanelWidget({
     variableName,

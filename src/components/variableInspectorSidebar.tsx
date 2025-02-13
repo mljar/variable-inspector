@@ -33,7 +33,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     super();
     this.notebookWatcher = notebookWatcher;
     this.commands = commands;
-    this.id = 'my-plugin::empty-sidebar';
+    this.id = 'mljar-variable-inspector::mljar-left-sidebar';
     this.title.icon = pluginIcon;
     this.title.caption = 'Variable Inspector';
     this.addClass('mljar-variable-inspector-sidebar-widget');
