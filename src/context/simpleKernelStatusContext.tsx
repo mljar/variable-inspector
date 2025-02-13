@@ -1,75 +1,73 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
-import { useNotebookPanelContext } from './notebookPanelContext';
+import { NotebookPanel } from '@jupyterlab/notebook';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
-interface KernelIdleWatcherContextValue {
-  isIdle: boolean;
+interface SimpleKernelIdleWatcherContextValue {
+  refreshCount: number;
+  withIgnoredKernelUpdates: <T>(fn: () => Promise<T>) => Promise<T>;
 }
 
-const KernelIdleWatcherContext = createContext<KernelIdleWatcherContextValue>({
-  isIdle: false
+const SimpleKernelIdleWatcherContext = createContext<SimpleKernelIdleWatcherContextValue>({
+  refreshCount: 0,
+  withIgnoredKernelUpdates: async (fn) => fn(),
 });
 
-export const SimpleKernelIdleWatcherContextProvider: React.FC<{
+interface SimpleKernelIdleWatcherContextProviderProps {
   children: React.ReactNode;
-}> = ({ children }) => {
-  const notebookPanel = useNotebookPanelContext();
-  const [isIdle, setIsIdle] = useState<boolean>(false);
-  const timerRef = useRef<number | null>(null);
+  notebookPanel?: NotebookPanel | null; 
+}
+
+export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWatcherContextProviderProps> = ({
+  children,
+  notebookPanel
+}) => {
+  const [refreshCount, setRefreshCount] = useState<number>(0);
+  const prevStatus = useRef<string | null>(null);
+  const ignoreKernelUpdatesRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!notebookPanel) {
-      console.log('no notebook');
-      return;
-    }
-    const kernel = notebookPanel.sessionContext.session?.kernel;
-    if (!kernel) {
-      console.log('nokernel');
+      console.log('Brak notebookPanel');
       return;
     }
 
-    const onKernelStatusChange = () => {
-      if (kernel.status === 'idle') {
-        if (timerRef.current === null) {
-          timerRef.current = window.setTimeout(() => {
-            if (kernel.status === 'idle') {
-              setIsIdle(true);
-            }
-            timerRef.current = null;
-          }, 300);
-        }
-      } else {
-        if (timerRef.current !== null) {
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }
-        setIsIdle(false);
+    const kernel = notebookPanel.sessionContext.session?.kernel;
+    if (!kernel) {
+      console.log('Brak kernel');
+      return;
+    }
+
+    const onKernelStatusChange = (_sender: any, status: string) => {
+      if (ignoreKernelUpdatesRef.current) {
+        return;
       }
+      if (status === 'idle' && prevStatus.current !== 'idle') {
+        setRefreshCount(prev => prev + 1);
+      }
+      prevStatus.current = status;
     };
 
     kernel.statusChanged.connect(onKernelStatusChange);
-    onKernelStatusChange();
 
     return () => {
       kernel.statusChanged.disconnect(onKernelStatusChange);
-      if (timerRef.current !== null) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
     };
   }, [notebookPanel?.sessionContext?.session?.kernel, notebookPanel]);
 
+  const withIgnoredKernelUpdates = async <T,>(fn: () => Promise<T>): Promise<T> => {
+    ignoreKernelUpdatesRef.current = true;
+    try {
+      return await fn();
+    } finally {
+      ignoreKernelUpdatesRef.current = false;
+    }
+  };
+
   return (
-    <KernelIdleWatcherContext.Provider value={{ isIdle }}>
+    <SimpleKernelIdleWatcherContext.Provider value={{ refreshCount, withIgnoredKernelUpdates }}>
       {children}
-    </KernelIdleWatcherContext.Provider>
+    </SimpleKernelIdleWatcherContext.Provider>
   );
 };
 
 export const useSimpleKernelIdleWatcherContext = () =>
-  useContext(KernelIdleWatcherContext);
+  useContext(SimpleKernelIdleWatcherContext);

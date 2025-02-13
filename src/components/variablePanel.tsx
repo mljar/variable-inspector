@@ -7,6 +7,7 @@ import 'react-virtualized/styles.css';
 import { allowedTypes } from '../utils/allowedTypes';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
+import { useSimpleKernelIdleWatcherContext } from '../context/simpleKernelStatusContext';
 
 interface VariablePanelProps {
   variableName: string;
@@ -32,18 +33,19 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 }) => {
 
   const [matrixData, setMatrixData] = useState<any[][]>(variableData);
+  const {refreshCount, withIgnoredKernelUpdates} = useSimpleKernelIdleWatcherContext();
 
     useEffect(() => {
+    console.log("refresh");
       async function fetchData() {
         try {
           if (!notebookPanel) {
             return;
           }
-          const result = await executeMatrixContent(
+          const result = await withIgnoredKernelUpdates(() => executeMatrixContent(
             variableName,
             notebookPanel
-          );
-        console.log("aha32")
+          ));
         setMatrixData(result.content);
         } catch (error) {
           console.error('Error fetching matrix content:', error);
@@ -51,7 +53,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       }
 
       fetchData();
-    }, [notebookPanel?.sessionContext.session?.kernel?.status]);
+    }, [refreshCount]);
 
   let data2D: any[][] = [];
   if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {

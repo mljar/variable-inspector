@@ -53,10 +53,12 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
   };
 
   useEffect(() => {
+    console.log("refreshing useEffect variables kernel status 1");
     loadAutoRefresh();
   }, []);
 
   useEffect(() => {
+    console.log("refresh 2");
     if (!notebookPanel || !notebookPanel.sessionContext) return;
     const kernel = notebookPanel.sessionContext?.session?.kernel;
     if (!kernel) return;
@@ -71,7 +73,7 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
 
   // first idea to solve the problem, code might be unstable
   useEffect(() => {
-    //clearing timeout
+    console.log("refreshing useEffect variables kernel status 2");
     if (isRefreshing) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -90,9 +92,10 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
             refreshVariables();
             setHasRefreshed(true);
           }
-        }, 2000);
+        }, 300);
       }
     } else {
+    console.log("refreshing useEffect variables kernel status 3");
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -101,9 +104,10 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
         setHasRefreshed(false);
       }
     }
-    //clearing timeout
+
     return () => {
       if (timerRef.current) {
+    console.log("refreshing useEffect variables kernel status 4");
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
