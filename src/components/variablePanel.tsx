@@ -43,6 +43,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
             variableName,
             notebookPanel
           );
+        console.log("aha32")
         setMatrixData(result.content);
         } catch (error) {
           console.error('Error fetching matrix content:', error);
@@ -50,7 +51,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       }
 
       fetchData();
-    }, );
+    }, [notebookPanel?.sessionContext.session?.kernel?.status]);
 
   let data2D: any[][] = [];
   if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
