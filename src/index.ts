@@ -10,6 +10,7 @@ import { NotebookWatcher } from './watchers/notebookWatcher';
 
 //import { createEmptyVariableInspectorPanel } from './components/variableInspectorPanel';
 //import { ICommandPalette } from '@jupyterlab/apputils';
+//
 
 export const VARIABLE_INSPECTOR_ID = 'variable-inspector:plugin';
 export const autoRefreshProperty = 'variableInspectorAutoRefresh';

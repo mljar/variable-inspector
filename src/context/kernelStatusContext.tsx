@@ -8,6 +8,7 @@ import React, {
 import { Kernel } from '@jupyterlab/services';
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useVariableContext } from './notebookVariableContext';
+import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
 
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
@@ -29,6 +30,8 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
   const [hasRefreshed, setHasRefreshed] = useState(false);
   const { refreshVariables, isRefreshing } = useVariableContext();
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [inOperation, setInOperation] = useState(kernelOperationNotifier.inProgress);
+  void isRefreshing;
 
   const loadAutoRefresh = () => {
     if (settingRegistry) {
@@ -57,6 +60,14 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
     loadAutoRefresh();
   }, []);
 
+useEffect(() => {
+    const callback = () => setInOperation(kernelOperationNotifier.inProgress);
+    kernelOperationNotifier.operationChanged.connect(callback);
+    return () => {
+      kernelOperationNotifier.operationChanged.disconnect(callback);
+    };
+  }, []);
+
   useEffect(() => {
     console.log("refresh 2");
     if (!notebookPanel || !notebookPanel.sessionContext) return;
@@ -73,8 +84,7 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
 
   // first idea to solve the problem, code might be unstable
   useEffect(() => {
-    console.log("refreshing useEffect variables kernel status 2");
-    if (isRefreshing) {
+    if (inOperation) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -87,7 +97,7 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
           if (
             notebookPanel &&
             notebookPanel.sessionContext?.session?.kernel?.status === 'idle' &&
-            !isRefreshing
+            !inOperation
           ) {
             refreshVariables();
             setHasRefreshed(true);
@@ -100,7 +110,7 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
-      if (!isRefreshing && notebookPanel) {
+      if (inOperation && notebookPanel) {
         setHasRefreshed(false);
       }
     }
@@ -117,7 +127,8 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
     notebookPanel,
     refreshVariables,
     hasRefreshed,
-    autoRefresh
+    autoRefresh,
+    inOperation
   ]);
 
   return (

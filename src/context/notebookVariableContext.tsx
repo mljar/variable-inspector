@@ -9,6 +9,8 @@ import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
 import { KernelMessage } from '@jupyterlab/services';
 import { variableDict } from '../pcode/utils';
+import { withIgnoredKernelUpdates } from '../utils/kernelOperationNotifier';
+
 
 interface VariableInfo {
   name: string;
@@ -47,6 +49,7 @@ export const VariableContextProvider: React.FC<{
 const [refreshCount, setRefreshCount] = useState<number>(0);
 
   const executeCode = useCallback(async () => {
+    await withIgnoredKernelUpdates(async () => {
     setIsRefreshing(true);
     setLoading(true);
     setError(null);
@@ -118,6 +121,7 @@ const [refreshCount, setRefreshCount] = useState<number>(0);
       setLoading(false);
       setIsRefreshing(false);
     }
+  });
   }, [notebookPanel, kernel]);
 
   useEffect(() => {

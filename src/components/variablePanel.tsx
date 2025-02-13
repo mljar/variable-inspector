@@ -8,6 +8,7 @@ import { allowedTypes } from '../utils/allowedTypes';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useSimpleKernelIdleWatcherContext } from '../context/simpleKernelStatusContext';
+import { withIgnoredKernelUpdates } from '../utils/kernelOperationNotifier';
 
 interface VariablePanelProps {
   variableName: string;
@@ -33,10 +34,9 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 }) => {
 
   const [matrixData, setMatrixData] = useState<any[][]>(variableData);
-  const {refreshCount, withIgnoredKernelUpdates} = useSimpleKernelIdleWatcherContext();
+  const {refreshCount} = useSimpleKernelIdleWatcherContext();
 
     useEffect(() => {
-    console.log("refresh");
       async function fetchData() {
         try {
           if (!notebookPanel) {

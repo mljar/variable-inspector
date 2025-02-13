@@ -1,14 +1,13 @@
 import { NotebookPanel } from '@jupyterlab/notebook';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
 
 interface SimpleKernelIdleWatcherContextValue {
   refreshCount: number;
-  withIgnoredKernelUpdates: <T>(fn: () => Promise<T>) => Promise<T>;
 }
 
 const SimpleKernelIdleWatcherContext = createContext<SimpleKernelIdleWatcherContextValue>({
   refreshCount: 0,
-  withIgnoredKernelUpdates: async (fn) => fn(),
 });
 
 interface SimpleKernelIdleWatcherContextProviderProps {
@@ -22,22 +21,21 @@ export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWa
 }) => {
   const [refreshCount, setRefreshCount] = useState<number>(0);
   const prevStatus = useRef<string | null>(null);
-  const ignoreKernelUpdatesRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (!notebookPanel) {
-      console.log('Brak notebookPanel');
+      console.log('No notebookPanel');
       return;
     }
 
     const kernel = notebookPanel.sessionContext.session?.kernel;
     if (!kernel) {
-      console.log('Brak kernel');
+      console.log('No kernel');
       return;
     }
 
     const onKernelStatusChange = (_sender: any, status: string) => {
-      if (ignoreKernelUpdatesRef.current) {
+      if (kernelOperationNotifier.inProgress) {
         return;
       }
       if (status === 'idle' && prevStatus.current !== 'idle') {
@@ -51,19 +49,19 @@ export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWa
     return () => {
       kernel.statusChanged.disconnect(onKernelStatusChange);
     };
-  }, [notebookPanel?.sessionContext?.session?.kernel, notebookPanel]);
+  }, [notebookPanel]);
 
-  const withIgnoredKernelUpdates = async <T,>(fn: () => Promise<T>): Promise<T> => {
-    ignoreKernelUpdatesRef.current = true;
-    try {
-      return await fn();
-    } finally {
-      ignoreKernelUpdatesRef.current = false;
-    }
-  };
+  // const withIgnoredKernelUpdates = async <T,>(fn: () => Promise<T>): Promise<T> => {
+  //   ignoreKernelUpdatesRef.current = true;
+  //   try {
+  //     return await fn();
+  //   } finally {
+  //     ignoreKernelUpdatesRef.current = false;
+  //   }
+  // };
 
   return (
-    <SimpleKernelIdleWatcherContext.Provider value={{ refreshCount, withIgnoredKernelUpdates }}>
+    <SimpleKernelIdleWatcherContext.Provider value={{ refreshCount }}>
       {children}
     </SimpleKernelIdleWatcherContext.Provider>
   );
