@@ -1,6 +1,7 @@
 import { NotebookPanel } from '@jupyterlab/notebook';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
+import { getLastIdleTimestamp, setLastIdleTimestamp } from '../utils/globalKernelTimeStamp';
 
 interface SimpleKernelIdleWatcherContextValue {
   refreshCount: number;
@@ -38,8 +39,15 @@ export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWa
       if (kernelOperationNotifier.inProgress) {
         return;
       }
-      if (status === 'idle' && prevStatus.current !== 'idle') {
+      const now = Date.now();
+      const lastIdle = getLastIdleTimestamp();
+      if (
+        status === 'idle' &&
+        prevStatus.current !== 'idle' &&
+        (lastIdle === null || now - lastIdle > 500)
+      ) {
         setRefreshCount(prev => prev + 1);
+        setLastIdleTimestamp(now);
       }
       prevStatus.current = status;
     };
