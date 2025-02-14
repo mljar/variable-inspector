@@ -55,7 +55,7 @@ const [refreshCount, setRefreshCount] = useState<number>(0);
     setError(null);
 
 
-    if (!notebookPanel || !kernel) {
+    if (!notebookPanel) {
       setLoading(false);
       setIsRefreshing(false);
       return;
@@ -100,6 +100,7 @@ const [refreshCount, setRefreshCount] = useState<number>(0);
                       value: item.varSimpleValue,
                     })
                   );
+                  console.log(mappedVariables);
                   setVariables(mappedVariables);
                 } else {
                   throw new Error('Error during parsing.');

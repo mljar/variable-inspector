@@ -86,7 +86,7 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
       if (
         status === 'idle' &&
         prevStatus.current !== 'idle' &&
-        (lastIdle === null || now - lastIdle > 250)
+        (lastIdle === null || now - lastIdle > 300)
       ) {
         console.log("Refresh");
       refreshVariables();
