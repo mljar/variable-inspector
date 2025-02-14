@@ -5,11 +5,11 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty, showTypeProperty, showShapeProperty, showSizeProperty } from '../index';
 
-interface IProps {
+interface ISettingsButtonProps {
   settingRegistry: ISettingRegistry | null;
 }
 
-export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
+export const SettingsButton: React.FC<ISettingsButtonProps> = ({ settingRegistry }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [showType, setShowType] = useState(false);
@@ -64,7 +64,7 @@ export const SettingsButton: React.FC<IProps> = ({ settingRegistry }) => {
             reason
           );
         });
-    }
+    };
   };
 
   useEffect(() => {

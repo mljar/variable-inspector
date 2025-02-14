@@ -39,7 +39,7 @@
 
 .mljar-variable-inspector-header-list {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   align-items: center;
   font-size: 0.85rem;
   padding: 10px 8px;
@@ -51,9 +51,9 @@
   font-weight: 800;
 }
 
-.mljar-variable-item {
+.mljar-variable-inspector-item {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   align-items: center;
   min-height: 36px;
   column-gap: 1rem;
@@ -115,8 +115,8 @@
   color: var(--jp-ui-font-color2);
 }
 
-.mljar-variable-item.active .mljar-variable-inspector-variable-name,
-.mljar-variable-item.active .mljar-varialbe-version {
+.mljar-variable-inspector-item.active .mljar-variable-inspector-variable-name,
+.mljar-variable-inspector-item.active .mljar-varialbe-version {
   color: #fff;
 }
 
@@ -124,7 +124,7 @@
   font-weight: 600;
 }
 
-.mljar-variable-item:hover {
+.mljar-variable-inspector-item:hover {
   background-color: var(--jp-layout-color2);
   cursor: pointer;
 }
@@ -136,6 +136,7 @@
 
 .mljar-variable-inspector-variable-name,
 .mljar-variable-type,
+.mljar-variable-inspector-variable-size,
 .mljar-variable-shape {
   overflow: hidden;
   text-overflow: ellipsis;

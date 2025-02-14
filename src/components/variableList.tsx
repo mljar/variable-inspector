@@ -1,23 +1,69 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
 import { VariableItem } from './variableItem';
 import { CommandRegistry } from '@lumino/commands';
 import { ILabShell } from '@jupyterlab/application';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
+import {
+  VARIABLE_INSPECTOR_ID,
+  showTypeProperty,
+  showShapeProperty,
+  showSizeProperty
+} from '../index';
 
 interface VariableListProps {
   commands: CommandRegistry;
   labShell: ILabShell;
+  settingRegistry: ISettingRegistry | null;
 }
 
 export const VariableList: React.FC<VariableListProps> = ({
   commands,
-  labShell
+  labShell,
+  settingRegistry
 }) => {
   const { variables, searchTerm, loading } = useVariableContext();
 
   const filteredVariables = variables.filter(variable =>
     variable.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const [showType, setShowType] = useState(false);
+  const [showShape, setShowShape] = useState(false);
+  const [showSize, setShowSize] = useState(false);
+
+  const loadPropertiesValues = () => {
+    if (settingRegistry) {
+      settingRegistry
+        .load(VARIABLE_INSPECTOR_ID)
+        .then(settings => {
+          const updateSettings = (): void => {
+            const loadShowType = settings.get(showTypeProperty)
+              .composite as boolean;
+            setShowType(loadShowType);
+            const loadShowShape = settings.get(showShapeProperty)
+              .composite as boolean;
+            setShowShape(loadShowShape);
+            const loadShowSize = settings.get(showSizeProperty)
+              .composite as boolean;
+            setShowSize(loadShowSize);
+          };
+          updateSettings();
+          settings.changed.connect(updateSettings);
+        })
+        .catch(reason => {
+          console.error(
+            'Failed to load settings for Variable Inspector',
+            reason
+          );
+        });
+    }
+  };
+
+  useEffect(() => {
+    loadPropertiesValues();
+  }, []);
 
   return (
     <div>
@@ -28,10 +74,17 @@ export const VariableList: React.FC<VariableListProps> = ({
       ) : (
         <ul className="mljar-variable-list">
           <li className="mljar-variable-inspector-header-list">
-            <span className="mljar-variable-header-name">Name</span>
-            <span className="mljar-variable-header-version">Type</span>
-            <span className="mljar-variable-header-version">Shape</span>
-            <span className="mljar-variable-header-blank">Value</span>
+            <span>Name</span>
+            {showType && (
+              <span>Type</span>
+            )}
+            <span>Value</span>
+            {showShape && (
+              <span>Shape</span>
+            )}
+            {showSize && (
+              <span>Size</span>
+            )}
           </li>
           {filteredVariables.map((variable, index) => (
             <VariableItem
@@ -39,13 +92,16 @@ export const VariableList: React.FC<VariableListProps> = ({
               vrb={{
                 name: variable.name,
                 type: variable.type,
-                shape: variable.shape || 'N/A',
+                shape: variable.shape,
                 dimension: variable.dimension,
                 size: variable.size,
                 value: variable.value
               }}
               commands={commands}
               labShell={labShell}
+              showType={showType}
+              showShape={showShape}
+              showSize={showSize}
             />
           ))}
         </ul>

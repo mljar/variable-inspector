@@ -27,7 +27,7 @@ export const VariableListComponent: React.FC<IVariableListComponentProps> = ({
       </div>
       <div>
         <SearchBar />
-        <VariableList commands={commands} labShell={labShell} />
+        <VariableList commands={commands} labShell={labShell} settingRegistry={settingRegistry} />
       </div>
     </div>
   );

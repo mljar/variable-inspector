@@ -20,12 +20,18 @@ interface VariableItemProps {
   vrb: VariableInfo;
   commands: CommandRegistry;
   labShell: ILabShell;
+  showType: boolean;
+  showShape: boolean;
+  showSize: boolean;
 }
 
 export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
   commands,
-  labShell
+  labShell,
+  showType,
+  showShape,
+  showSize
 }) => {
   const notebookPanel = useNotebookPanelContext();
   const [loading, setLoading] = useState(false);
@@ -64,13 +70,11 @@ export const VariableItem: React.FC<VariableItemProps> = ({
       }
     }
   };
-
   return (
     <div>
-      <li className="mljar-variable-item">
+      <li className="mljar-variable-inspector-item">
         <span className="mljar-variable-inspector-variable-name">{vrb.name}</span>
-        <span className="mljar-variable-type">{vrb.type}</span>
-        <span className="mljar-variable-shape">{vrb.shape}</span>
+        {showType && (<span className="mljar-variable-type">{vrb.type}</span>)}
         {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
           <button
             className="mljar-variable-show-variable-button"
@@ -90,6 +94,8 @@ export const VariableItem: React.FC<VariableItemProps> = ({
             {vrb.value}
           </span>
         )}
+        {showShape && (<span className="mljar-variable-shape">{vrb.shape !== 'None' ? vrb.shape : ''}</span>)}
+        {showSize && (<span className='mljar-variable-inspector-variable-size'>{vrb.size}</span>)}
       </li>
     </div>
   );
