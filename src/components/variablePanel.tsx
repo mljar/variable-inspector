@@ -8,7 +8,7 @@ import { allowedTypes } from '../utils/allowedTypes';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useSimpleKernelIdleWatcherContext } from '../context/simpleKernelStatusContext';
-import { withIgnoredKernelUpdates } from '../utils/kernelOperationNotifier';
+import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
 
 interface VariablePanelProps {
   variableName: string;
@@ -42,7 +42,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
           if (!notebookPanel) {
             return;
           }
-          const result = await withIgnoredKernelUpdates(() => executeMatrixContent(
+          const result = await withIgnoredPanelKernelUpdates(() => executeMatrixContent(
             variableName,
             notebookPanel
           ));

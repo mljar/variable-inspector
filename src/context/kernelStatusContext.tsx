@@ -5,13 +5,16 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { Kernel } from '@jupyterlab/services';
 import { useNotebookPanelContext } from './notebookPanelContext';
-import { useVariableContext } from './notebookVariableContext';
 import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
 
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { useVariableContext } from './notebookVariableContext';
+import {
+  getLastIdleTimestamp,
+  setLastIdleTimestamp
+} from '../utils/globalKernelTimeStamp';
 
 interface IProps {
   settingRegistry: ISettingRegistry | null;
@@ -25,13 +28,10 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
   children
 }) => {
   const notebookPanel = useNotebookPanelContext();
-  const [kernelStatus, setKernelStatus] = useState<Kernel.Status>('unknown');
-  const timerRef = useRef<number | null>(null);
-  const [hasRefreshed, setHasRefreshed] = useState(false);
-  const { refreshVariables, isRefreshing } = useVariableContext();
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [inOperation, setInOperation] = useState(kernelOperationNotifier.inProgress);
-  void isRefreshing;
+  const { refreshVariables } = useVariableContext();
+  const prevStatus = useRef<string | null>(null);
+  void autoRefresh;
 
   const loadAutoRefresh = () => {
     if (settingRegistry) {
@@ -56,83 +56,55 @@ export const KernelIdleWatcherContextProvider: React.FC<IProps> = ({
   };
 
   useEffect(() => {
-    console.log("refreshing useEffect variables kernel status 1");
     loadAutoRefresh();
   }, []);
 
-useEffect(() => {
-    const callback = () => setInOperation(kernelOperationNotifier.inProgress);
-    kernelOperationNotifier.operationChanged.connect(callback);
-    return () => {
-      kernelOperationNotifier.operationChanged.disconnect(callback);
-    };
-  }, []);
-
   useEffect(() => {
-    console.log("refresh 2");
-    if (!notebookPanel || !notebookPanel.sessionContext) return;
-    const kernel = notebookPanel.sessionContext?.session?.kernel;
-    if (!kernel) return;
-    const onKernelStatusChange = () => {
-      setKernelStatus(kernel.status);
+    if (!notebookPanel) {
+      console.log('No notebookPanel');
+      return;
+    }
+    else{
+      console.log("NotebookPanel exist");
+    }
+
+    const kernel = notebookPanel.sessionContext.session?.kernel
+    console.log(kernel);
+    if (!kernel) {
+      console.log('No kernel');
+      return;
+    }
+    else{
+    }
+
+    const onKernelStatusChange = (_sender: any, status: string) => {
+      if (kernelOperationNotifier.inProgressPanel || kernelOperationNotifier.inProgressSidebar) {
+        return;
+      }
+      const now = Date.now();
+      const lastIdle = getLastIdleTimestamp();
+      if (
+        status === 'idle' &&
+        prevStatus.current !== 'idle' &&
+        (lastIdle === null || now - lastIdle > 250)
+      ) {
+        console.log("Refresh");
+      refreshVariables();
+      setLastIdleTimestamp(now);
+
+      }
+      prevStatus.current = status;
     };
+
     kernel.statusChanged.connect(onKernelStatusChange);
+
     return () => {
       kernel.statusChanged.disconnect(onKernelStatusChange);
     };
-  }, [notebookPanel?.sessionContext?.session?.kernel]);
-
-  // first idea to solve the problem, code might be unstable
-  useEffect(() => {
-    if (inOperation) {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      return;
-    }
-    if (kernelStatus === 'idle' && autoRefresh) {
-      if (!hasRefreshed) {
-        timerRef.current = window.setTimeout(() => {
-          if (
-            notebookPanel &&
-            notebookPanel.sessionContext?.session?.kernel?.status === 'idle' &&
-            !inOperation
-          ) {
-            refreshVariables();
-            setHasRefreshed(true);
-          }
-        }, 300);
-      }
-    } else {
-    console.log("refreshing useEffect variables kernel status 3");
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-      if (inOperation && notebookPanel) {
-        setHasRefreshed(false);
-      }
-    }
-
-    return () => {
-      if (timerRef.current) {
-    console.log("refreshing useEffect variables kernel status 4");
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [
-    kernelStatus,
-    notebookPanel,
-    refreshVariables,
-    hasRefreshed,
-    autoRefresh,
-    inOperation
-  ]);
+  }, [notebookPanel,notebookPanel?.sessionContext.session?.kernel]);
 
   return (
-    <KernelIdleWatcherContext.Provider value={{ kernelStatus }}>
+    <KernelIdleWatcherContext.Provider value={{  prevStatus }}>
       {children}
     </KernelIdleWatcherContext.Provider>
   );

@@ -1,28 +1,49 @@
 import { Signal } from '@lumino/signaling';
 
 export class KernelOperationNotifier {
-  private _inProgress = false;
-  readonly operationChanged = new Signal<this, boolean>(this);
+  private _inProgressSidebar = false;
+  private _inProgressPanel = false;
 
-  set inProgress(value: boolean) {
-    if (this._inProgress !== value) {
-      this._inProgress = value;
-      this.operationChanged.emit(value);
+  readonly sidebarOperationChanged = new Signal<this, boolean>(this);
+  readonly panelOperationChanged = new Signal<this, boolean>(this);
+
+  set inProgressSidebar(value: boolean) {
+    if (this._inProgressSidebar !== value) {
+      this._inProgressSidebar = value;
+      this.sidebarOperationChanged.emit(value);
     }
   }
+  get inProgressSidebar(): boolean {
+    return this._inProgressSidebar;
+  }
 
-  get inProgress(): boolean {
-    return this._inProgress;
+  set inProgressPanel(value: boolean) {
+    if (this._inProgressPanel !== value) {
+      this._inProgressPanel = value;
+      this.panelOperationChanged.emit(value);
+    }
+  }
+  get inProgressPanel(): boolean {
+    return this._inProgressPanel;
   }
 }
 
 export const kernelOperationNotifier = new KernelOperationNotifier();
 
-export async function withIgnoredKernelUpdates<T>(fn: () => Promise<T>): Promise<T> {
-  kernelOperationNotifier.inProgress = true;
+export async function withIgnoredSidebarKernelUpdates<T>(fn: () => Promise<T>): Promise<T> {
+  kernelOperationNotifier.inProgressSidebar = true;
   try {
     return await fn();
   } finally {
-    kernelOperationNotifier.inProgress = false;
+    kernelOperationNotifier.inProgressSidebar = false;
+  }
+}
+
+export async function withIgnoredPanelKernelUpdates<T>(fn: () => Promise<T>): Promise<T> {
+  kernelOperationNotifier.inProgressPanel = true;
+  try {
+    return await fn();
+  } finally {
+    kernelOperationNotifier.inProgressPanel = false;
   }
 }

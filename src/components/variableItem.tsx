@@ -64,7 +64,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
 
         }
       } catch (err) {
-        console.error(err);
+        console.error("uknown error", err);
       } finally {
         setLoading(false);
       }

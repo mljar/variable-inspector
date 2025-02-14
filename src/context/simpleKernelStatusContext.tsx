@@ -1,7 +1,6 @@
 import { NotebookPanel } from '@jupyterlab/notebook';
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
-import { getLastIdleTimestamp, setLastIdleTimestamp } from '../utils/globalKernelTimeStamp';
 
 interface SimpleKernelIdleWatcherContextValue {
   refreshCount: number;
@@ -21,7 +20,6 @@ export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWa
   notebookPanel
 }) => {
   const [refreshCount, setRefreshCount] = useState<number>(0);
-  const prevStatus = useRef<string | null>(null);
 
   useEffect(() => {
     if (!notebookPanel) {
@@ -35,27 +33,19 @@ export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWa
       return;
     }
 
-    const onKernelStatusChange = (_sender: any, status: string) => {
-      if (kernelOperationNotifier.inProgress) {
-        return;
-      }
-      const now = Date.now();
-      const lastIdle = getLastIdleTimestamp();
+    const onSidebarStatusChange = (_sender: any, inProgress: boolean) => {
+    
       if (
-        status === 'idle' &&
-        prevStatus.current !== 'idle' &&
-        (lastIdle === null || now - lastIdle > 500)
+        inProgress === true
       ) {
         setRefreshCount(prev => prev + 1);
-        setLastIdleTimestamp(now);
       }
-      prevStatus.current = status;
     };
 
-    kernel.statusChanged.connect(onKernelStatusChange);
+    kernelOperationNotifier.sidebarOperationChanged.connect(onSidebarStatusChange);
 
     return () => {
-      kernel.statusChanged.disconnect(onKernelStatusChange);
+      kernelOperationNotifier.sidebarOperationChanged.disconnect(onSidebarStatusChange);
     };
   }, [notebookPanel]);
 
