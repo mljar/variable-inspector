@@ -71,13 +71,14 @@ export const VariableItem: React.FC<VariableItemProps> = ({
     }
   };
   return (
-    <div>
-      <li className="mljar-variable-inspector-item">
+      <li className={`mljar-variable-inspector-item ${allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? `` : `small-value`}`}>
         <span className="mljar-variable-inspector-variable-name">{vrb.name}</span>
         {showType && (<span className="mljar-variable-type">{vrb.type}</span>)}
+        {showShape && (<span className="mljar-variable-shape">{vrb.shape !== 'None' ? vrb.shape : ''}</span>)}
+        {showSize && (<span className='mljar-variable-inspector-variable-size'>{vrb.size}</span>)}
         {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
           <button
-            className="mljar-variable-show-variable-button"
+            className="mljar-variable-inspector-show-variable-button"
             onClick={() => handleButtonClick(vrb.name, vrb.type)}
             aria-label={`Show details for ${vrb.name}`}
             disabled={vrb.size > 10}
@@ -90,13 +91,10 @@ export const VariableItem: React.FC<VariableItemProps> = ({
             )}
           </button>
         ) : (
-          <span className="mljar-variable-text-cell" title={vrb.value}>
+          <span className="mljar-variable-inspector-variable-value" title={vrb.value}>
             {vrb.value}
           </span>
-        )}
-        {showShape && (<span className="mljar-variable-shape">{vrb.shape !== 'None' ? vrb.shape : ''}</span>)}
-        {showSize && (<span className='mljar-variable-inspector-variable-size'>{vrb.size}</span>)}
+        )}      
       </li>
-    </div>
   );
 };
