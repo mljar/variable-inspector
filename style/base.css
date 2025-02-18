@@ -179,6 +179,10 @@
   white-space: nowrap;
 }
 
+.mljar-variable-inspector-variable-size {
+  word-spacing: -5px;
+}
+
 .mljar-variable-inspector-show-variable-button:hover {
   color: #fff;
   background-color: #0099cc;
