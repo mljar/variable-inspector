@@ -13,9 +13,9 @@ import {
   PluginVisibilityContextValue,
   PluginVisibilityContext
 } from '../context/pluginVisibilityContext';
-import { KernelIdleWatcherContextProvider } from '../context/kernelStatusContext';
 import { ILabShell } from '@jupyterlab/application';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { CodeExecutionContextProvider } from '../context/codeExecutionContext';
 
 export class VariableInspectorSidebarWidget extends ReactWidget {
   private notebookWatcher: NotebookWatcher;
@@ -70,15 +70,14 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
               notebookWatcher={this.notebookWatcher}
             >
               <VariableContextProvider>
-                <KernelIdleWatcherContextProvider
-                  settingRegistry={this.settingRegistry}
-                >
+                <CodeExecutionContextProvider
+                settingRegistry={this.settingRegistry}>
                   <VariableListComponent
                     commands={this.commands}
                     labShell={this.labShell}
                     settingRegistry={this.settingRegistry}
                   />
-                </KernelIdleWatcherContextProvider>
+                </CodeExecutionContextProvider>
               </VariableContextProvider>
             </NotebookKernelContextProvider>
           </NotebookPanelContextProvider>
@@ -101,4 +100,3 @@ export function createVariableInspectorSidebar(
     settingRegistry
   );
 }
-

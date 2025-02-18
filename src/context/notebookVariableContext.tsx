@@ -11,7 +11,6 @@ import { KernelMessage } from '@jupyterlab/services';
 import { variableDict } from '../pcode/utils';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 
-
 interface VariableInfo {
   name: string;
   type: string;
@@ -46,7 +45,7 @@ export const VariableContextProvider: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-const [refreshCount, setRefreshCount] = useState<number>(0);
+  const [refreshCount, setRefreshCount] = useState<number>(0);
 
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {

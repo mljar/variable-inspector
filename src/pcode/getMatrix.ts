@@ -1,11 +1,11 @@
-//i need import Type to to check what i can import or not
+//if you want change function name change condition in codeContext
 
 export const getMatrix = (varName: string): string =>
   `
 import importlib
 from IPython.display import JSON
 
-def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
+def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
     if var_name not in globals():
         return JSON({"error": f"Variable '{var_name}' not found."})
     obj = globals()[var_name]
@@ -56,5 +56,5 @@ def __get_matrix_content(var_name="${varName}", max_rows=10000, max_cols=10000):
 
     return JSON({"error": f"Variable '{var_name}' is not a supported array type."})
 
-__get_matrix_content()
+__mljar_variable_inspector_get_matrix_content()
 `;

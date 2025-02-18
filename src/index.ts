@@ -8,10 +8,6 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
 
-//import { createEmptyVariableInspectorPanel } from './components/variableInspectorPanel';
-//import { ICommandPalette } from '@jupyterlab/apputils';
-//
-
 export const VARIABLE_INSPECTOR_ID = 'variable-inspector:plugin';
 export const autoRefreshProperty = 'variableInspectorAutoRefresh';
 export const showTypeProperty = 'variableInspectorShowType';

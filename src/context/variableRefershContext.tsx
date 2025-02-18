@@ -2,20 +2,20 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
 
-interface SimpleKernelIdleWatcherContextValue {
+interface VariableRefreshContextValue {
   refreshCount: number;
 }
 
-const SimpleKernelIdleWatcherContext = createContext<SimpleKernelIdleWatcherContextValue>({
+const VariableRefreshContext = createContext<VariableRefreshContextValue>({
   refreshCount: 0,
 });
 
-interface SimpleKernelIdleWatcherContextProviderProps {
+interface VariableRefreshContextProviderProps {
   children: React.ReactNode;
   notebookPanel?: NotebookPanel | null; 
 }
 
-export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWatcherContextProviderProps> = ({
+export const VariableRefreshContextProvider: React.FC<VariableRefreshContextProviderProps> = ({
   children,
   notebookPanel
 }) => {
@@ -49,21 +49,12 @@ export const SimpleKernelIdleWatcherContextProvider: React.FC<SimpleKernelIdleWa
     };
   }, [notebookPanel]);
 
-  // const withIgnoredKernelUpdates = async <T,>(fn: () => Promise<T>): Promise<T> => {
-  //   ignoreKernelUpdatesRef.current = true;
-  //   try {
-  //     return await fn();
-  //   } finally {
-  //     ignoreKernelUpdatesRef.current = false;
-  //   }
-  // };
-
   return (
-    <SimpleKernelIdleWatcherContext.Provider value={{ refreshCount }}>
+    <VariableRefreshContext.Provider value={{ refreshCount }}>
       {children}
-    </SimpleKernelIdleWatcherContext.Provider>
+    </VariableRefreshContext.Provider>
   );
 };
 
-export const useSimpleKernelIdleWatcherContext = () =>
-  useContext(SimpleKernelIdleWatcherContext);
+export const useVariableRefeshContext = () =>
+  useContext(VariableRefreshContext);

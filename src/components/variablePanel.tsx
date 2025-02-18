@@ -7,7 +7,7 @@ import 'react-virtualized/styles.css';
 import { allowedTypes } from '../utils/allowedTypes';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
-import { useSimpleKernelIdleWatcherContext } from '../context/simpleKernelStatusContext';
+import { useVariableRefeshContext } from '../context/variableRefershContext';
 import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
 
 interface VariablePanelProps {
@@ -34,7 +34,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 }) => {
 
   const [matrixData, setMatrixData] = useState<any[][]>(variableData);
-  const {refreshCount} = useSimpleKernelIdleWatcherContext();
+  const {refreshCount} = useVariableRefeshContext();
 
     useEffect(() => {
       async function fetchData() {
@@ -134,7 +134,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       fontSize: '0.65rem',
       padding: '1px'
     };
-
 
     if (rowIndex === 0 || columnIndex === 0) {
       cellStyle = {

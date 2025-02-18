@@ -2,7 +2,7 @@ import { ReactWidget } from '@jupyterlab/apputils'
 import React from 'react'
 import { VariablePanel } from './variablePanel';
 import { NotebookPanel } from '@jupyterlab/notebook';
-import { SimpleKernelIdleWatcherContextProvider } from '../context/simpleKernelStatusContext';
+import { VariableRefreshContextProvider } from '../context/variableRefershContext';
 
 export interface VariablePanelWidgetProps {
   variableName: string;
@@ -18,20 +18,18 @@ export class VariablePanelWidget extends ReactWidget {
     this.update();
   }
 
-
   protected render(): JSX.Element {
     return (
       <div style={{ height: '100%', width: '100%'}}>
-      <SimpleKernelIdleWatcherContextProvider notebookPanel={this.props.notebookPanel}>
+      <VariableRefreshContextProvider notebookPanel={this.props.notebookPanel}>
       <VariablePanel variableName={this.props.variableName}
         variableType={this.props.variableType}
         variableData={this.props.variableData}
         notebookPanel={this.props.notebookPanel}
         />
-      </SimpleKernelIdleWatcherContextProvider>
+      </VariableRefreshContextProvider>
       </div>
     )
   }
-
 
 }
