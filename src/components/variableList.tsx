@@ -66,24 +66,22 @@ export const VariableList: React.FC<VariableListProps> = ({
   }, []);
 
   return (
-    <div className='mljar-variable-inspector-list-container'>
+    <div className="mljar-variable-inspector-list-container">
       {loading ? (
         <div className="mljar-variable-inspector-message">
           Loading variables...
+        </div>
+      ) : variables.length === 0 ? (
+        <div className="mljar-variable-inspector-message">
+          No variables available.
         </div>
       ) : (
         <ul className="mljar-variable-inspector-list">
           <li className="mljar-variable-inspector-header-list">
             <span>Name</span>
-            {showType && (
-              <span>Type</span>
-            )}
-            {showShape && (
-              <span>Shape</span>
-            )}
-            {showSize && (
-              <span>Size</span>
-            )}
+            {showType && <span>Type</span>}
+            {showShape && <span>Shape</span>}
+            {showSize && <span>Size</span>}
             <span>Value</span>
           </li>
           {filteredVariables.map((variable, index) => (
