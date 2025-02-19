@@ -1,16 +1,38 @@
-# variable_inspector
+# Variable Inspector
 
-[![Github Actions Status](https://github.com/mljar/variable-inspector.git/workflows/Build/badge.svg)](https://github.com/mljar/variable-inspector.git/actions/workflows/build.yml)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mljar/variable-inspector.git/main?urlpath=lab)
+The Variable Inspector is a Jupyter Notebook extension designed to help you manage and track variables within your notebook. It displays all your variables in one convenient location, allowing you to see their names, values, types, shapes, and sizes in real-time. This feature makes it easier to work without the need to manually print or check your variables.
 
+## Features
 
-Variable inspector for jupyter lab.
+### Selecting displayed columns
 
-## Requirements
+You can select which properties of the variables you'd like to display:
+
+![cols](https://github.com/user-attachments/assets/d282fdac-491d-4890-af07-fce5dbdaa27a)
+
+### Automatically refresh
+
+The list of variables will automatically update whenever you edit or add new items. However, if you want to save memory processes, you can choose the Manual Refresh option to update the list at your convenience.
+
+![image](https://github.com/user-attachments/assets/281eec42-a227-434d-bb36-028a10e8338c)
+
+### Handling large variables
+
+If you work with large variables like lists or DataFrames that don't fit in a table, you can display them in a separate panel with only one click:
+
+![image](https://github.com/user-attachments/assets/fea0d038-f674-4148-8c0b-039bea8a34d2)
+
+### Dark theme
+
+If you prefer a darker look, a Dark Theme is also available!
+
+![image](https://github.com/user-attachments/assets/e9b4356a-68dc-4ee9-84bf-de4944466301)
+
+## Variable Inspector requirements
 
 - JupyterLab >= 4.0.0
 
-## Install
+## Install extension
 
 To install the extension, execute:
 
@@ -18,7 +40,7 @@ To install the extension, execute:
 pip install variable_inspector
 ```
 
-## Uninstall
+## Uninstall extension
 
 To remove the extension, execute:
 
