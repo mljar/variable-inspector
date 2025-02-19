@@ -9,7 +9,6 @@
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  /* padding: 10px; */
 }
 
 .mljar-variable-inspector-list-container {
@@ -55,7 +54,6 @@
   padding-bottom: 8px;
   margin: 0;
 }
-/* grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); */
 
 .mljar-variable-inspector-header-list {
   display: grid;
@@ -144,11 +142,6 @@
 .mljar-variable-inspector-search-bar-input::placeholder {
   color: var(--jp-ui-font-color2);
 }
-/* 
-.mljar-variable-inspector-variable-name,
-.mljar-variable-inspector-item.active .mljar-varialbe-version {
-  color: #fff;
-} */
 
 .mljar-variable-inspector-variable-name {
   font-weight: 600;
@@ -248,8 +241,6 @@
   font-size: small;
 }
 
-/* settings menu start */
-
 .mljar-variable-inspector-settings-container {
   position: relative;
   display: inline-block;
@@ -299,8 +290,6 @@
   background-color: var(--jp-layout-color2);
   cursor: pointer;
 }
-
-/* settings menu end */
 
 .mljar-variable-actions-container {
   display: flex;

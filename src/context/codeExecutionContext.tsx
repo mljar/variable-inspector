@@ -1,4 +1,3 @@
-// src/context/CodeExecutionContext.tsx
 import React, { createContext, useContext, useEffect,useState, ReactNode } from 'react';
 import { KernelMessage } from '@jupyterlab/services';
 import { IExecuteInputMsg } from '@jupyterlab/services/lib/kernel/messages';
@@ -37,7 +36,6 @@ export const CodeExecutionContextProvider: React.FC<
         .load(VARIABLE_INSPECTOR_ID)
         .then(settings => {
           const updateSettings = (): void => {
-            console.log("update");
             const loadAutoRefresh = settings.get(autoRefreshProperty)
               .composite as boolean;
             setAutoRefresh(loadAutoRefresh);
@@ -62,7 +60,6 @@ export const CodeExecutionContextProvider: React.FC<
     if (!notebook) {
       return;
     }
-    console.log(autoRefresh);
     const kernel = notebook.sessionContext?.session?.kernel;
     if (!kernel) {
       return;

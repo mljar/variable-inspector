@@ -51,7 +51,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   });
 
   observer.observe(document.body, {
-    attributes: true, //configure it to listen to attribute changes
+    attributes: true, 
     attributeFilter: ['data-jp-theme-name']
   });
   const [matrixData, setMatrixData] = useState<any[][]>(variableData);

@@ -34,11 +34,9 @@ export const executeMatrixContent = async (
           resultResolved = true;
           resolve(content.data['application/json']);
         } else if (content.data && content.data['text/plain']) {
-          console.log('textplain');
           outputData += content.data['text/plain'];
         }
       } else if (msgType === 'stream') {
-        console.log('stream');
       } else if (msgType === 'error') {
         console.error('Python error:', msg.content);
         reject(new Error('Error during Python execution.'));

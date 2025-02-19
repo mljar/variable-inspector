@@ -36,34 +36,5 @@ const leftTab: JupyterFrontEndPlugin<void> = {
   }
 };
 
-// const customVariableInspectorPlugin: JupyterFrontEndPlugin<void> = {
-//   id: 'custom-variableinspector',
-//   autoStart: true,
-//   requires: [ICommandPalette, ILabShell],
-//   activate: (
-//     app: JupyterFrontEnd,
-//     palette: ICommandPalette,
-//     labShell: ILabShell
-//   ) => {
-//     const command = 'custom:open-variable-inspector';
-//     app.commands.addCommand(command, {
-//       label: 'Open Custom Variable Inspector',
-//       execute: (args: any) => {
-//         const variableName = args.variableName || 'Default Name';
-//         const variableType = args.variableType || 'Deafult Type';
-//         const variableData = args.variableData || 'No Data';
-//         createEmptyVariableInspectorPanel(
-//           labShell,
-//           variableName,
-//           variableType,
-//           variableData,
-//           10
-//         );
-//       }
-//     });
-//
-//     palette.addItem({ command, category: 'Custom Extensions' });
-//   }
-// };
 
 export default [leftTab];

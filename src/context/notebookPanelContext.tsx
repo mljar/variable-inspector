@@ -1,4 +1,3 @@
-// contexts/notebook-panel-context.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { NotebookWatcher } from '../watchers/notebookWatcher';

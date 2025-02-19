@@ -99,7 +99,6 @@ export const VariableContextProvider: React.FC<{
                       value: item.varSimpleValue,
                     })
                   );
-                  console.log(mappedVariables);
                   setVariables(mappedVariables);
                 } else {
                   throw new Error('Error during parsing.');
@@ -109,7 +108,6 @@ export const VariableContextProvider: React.FC<{
               setRefreshCount(prev => prev + 1);
               } catch (err) {
                 setError('Error during export JSON.');
-                console.log(err);
                 setLoading(false);
                 setIsRefreshing(false);
               }

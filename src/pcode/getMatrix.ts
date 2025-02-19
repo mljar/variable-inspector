@@ -1,5 +1,3 @@
-//if you want change function name change condition in codeContext
-
 export const getMatrix = (varName: string): string =>
   `
 import importlib

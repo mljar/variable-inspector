@@ -23,13 +23,11 @@ export const VariableRefreshContextProvider: React.FC<VariableRefreshContextProv
 
   useEffect(() => {
     if (!notebookPanel) {
-      console.log('No notebookPanel');
       return;
     }
 
     const kernel = notebookPanel.sessionContext.session?.kernel;
     if (!kernel) {
-      console.log('No kernel');
       return;
     }
 
