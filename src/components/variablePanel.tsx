@@ -30,30 +30,49 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   variableType,
   variableData,
-  notebookPanel,
+  notebookPanel
 }) => {
-
-  const [matrixData, setMatrixData] = useState<any[][]>(variableData);
-  const {refreshCount} = useVariableRefeshContext();
-
-    useEffect(() => {
-      async function fetchData() {
-        try {
-          if (!notebookPanel) {
-            return;
-          }
-          const result = await withIgnoredPanelKernelUpdates(() => executeMatrixContent(
-            variableName,
-            notebookPanel
-          ));
-        setMatrixData(result.content);
-        } catch (error) {
-          console.error('Error fetching matrix content:', error);
+  const t = document.body.dataset?.jpThemeName;
+  const [isDark, setIsDark] = useState(t !== undefined && t.includes('Dark'));
+  var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      if (mutation.type === 'attributes') {
+        if (
+          document.body.attributes
+            .getNamedItem('data-jp-theme-name')
+            ?.value.includes('Dark')
+        ) {
+          setIsDark(true);
+        } else {
+          setIsDark(false);
         }
       }
+    });
+  });
 
-      fetchData();
-    }, [refreshCount]);
+  observer.observe(document.body, {
+    attributes: true, //configure it to listen to attribute changes
+    attributeFilter: ['data-jp-theme-name']
+  });
+  const [matrixData, setMatrixData] = useState<any[][]>(variableData);
+  const { refreshCount } = useVariableRefeshContext();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        if (!notebookPanel) {
+          return;
+        }
+        const result = await withIgnoredPanelKernelUpdates(() =>
+          executeMatrixContent(variableName, notebookPanel)
+        );
+        setMatrixData(result.content);
+      } catch (error) {
+        console.error('Error fetching matrix content:', error);
+      }
+    }
+    fetchData();
+  }, [refreshCount]);
 
   let data2D: any[][] = [];
   if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
@@ -66,13 +85,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   let fixedRowCount = 0;
   let fixedColumnCount = 0;
 
-  if (
-    allowedTypes.includes(variableType) &&
-    data2D.length > 0 &&
-    data2D.length > 0
-  ) {
+  if (allowedTypes.includes(variableType) && data2D.length > 0) {
     const headerRow = ['index'];
-
     let length =
       variableType === 'DataFrame' ? data2D[0].length - 1 : data2D[0].length;
 
@@ -82,14 +96,14 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 
     let newData = [headerRow];
     for (let i = 0; i < data2D.length; i++) {
-      if (variableType == 'DataFrame') {
+      if (variableType === 'DataFrame') {
         newData.push([...data2D[i]]);
       } else {
         newData.push([i, ...data2D[i]]);
       }
     }
 
-    if (variableType == 'DataFrame' || variableType == 'Series') {
+    if (variableType === 'DataFrame' || variableType === 'Series') {
       newData = transpose(newData);
     }
 
@@ -130,22 +144,26 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     let cellStyle: React.CSSProperties = {
       ...style,
       boxSizing: 'border-box',
-      border: '1px solid #ddd',
-      fontSize: '0.65rem',
-      padding: '1px'
+      border: `1px solid ${isDark ? '#444' : '#ddd'}`,
+      fontSize: '0.75rem',
+      padding: '2px',
+      color: isDark ? '#ddd' : '#000',
+      background: isDark
+        ? rowIndex % 2 === 0
+          ? '#333'
+          : '#222'
+        : rowIndex % 2 === 0
+          ? '#fafafa'
+          : '#fff'
     };
 
     if (rowIndex === 0 || columnIndex === 0) {
       cellStyle = {
         ...cellStyle,
-        background: '#e0e0e0',
+        background: isDark ? '#555' : '#e0e0e0',
         fontWeight: 'bold',
-        fontSize: '0.65rem',
-        textAlign: 'center',
-        padding: '1px'
+        textAlign: 'center'
       };
-    } else {
-      cellStyle.background = rowIndex % 2 === 0 ? '#fafafa' : '#fff';
     }
 
     return (
@@ -156,7 +174,15 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   };
 
   return (
-    <div style={{ padding: '10px', fontSize: '16px', height: '100%' }}>
+    <div
+      style={{
+        padding: '10px',
+        fontSize: '16px',
+        height: '100%',
+        background: isDark ? '#222' : '#fff',
+        color: isDark ? '#ddd' : '#000'
+      }}
+    >
       <AutoSizer>
         {({ width, height }: { width: number; height: number }) => (
           <MultiGrid
@@ -169,10 +195,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
             height={height}
             rowCount={rowCount}
             width={width}
-            styleTopLeftGrid={{ background: '#e0e0e0' }}
-            styleTopRightGrid={{ background: '#e0e0e0' }}
-            styleBottomLeftGrid={{ background: '#fff' }}
-            styleBottomRightGrid={{ background: '#fff' }}
+            styleTopLeftGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
+            styleTopRightGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
+            styleBottomLeftGrid={{ background: isDark ? '#222' : '#fff' }}
+            styleBottomRightGrid={{ background: isDark ? '#222' : '#fff' }}
           />
         )}
       </AutoSizer>
