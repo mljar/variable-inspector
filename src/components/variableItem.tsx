@@ -81,8 +81,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
             className="mljar-variable-inspector-show-variable-button"
             onClick={() => handleButtonClick(vrb.name, vrb.type)}
             aria-label={`Show details for ${vrb.name}`}
-            disabled={vrb.size > 10}
-            title={vrb.size > 10 ? 'Variable is too big' : ''}
+            title='Show value'
           >
             {loading ? (
               <div className="mljar-variable-spinner-big" />
