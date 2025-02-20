@@ -7,6 +7,8 @@
 
 The Variable Inspector is a Jupyter Lab extension designed to help you manage and track variables within your notebook. It displays all your variables in one convenient location, allowing you to see their names, values, types, shapes, and sizes in real-time. This feature makes it easier to work without the need to manually print or check your variables. **It is for Python only.**.
 
+Install the extension using `pip` by following the instructions below. It’s also available in our desktop app, [MLJAR Studio](https://mljar.com), which is designed to make Python easier for beginners. 
+
 ## Features
 
 ### Display variables
