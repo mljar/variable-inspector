@@ -1,26 +1,46 @@
-# Variable Inspector
 
-The Variable Inspector is a Jupyter Notebook extension designed to help you manage and track variables within your notebook. It displays all your variables in one convenient location, allowing you to see their names, values, types, shapes, and sizes in real-time. This feature makes it easier to work without the need to manually print or check your variables.
+<p align="center">
+  <img src="https://github.com/mljar/variable-inspector/blob/main/media/jupyter-variable-inspector-banner.jpg?raw=true" alt="Jupyter Variable Inspector banner"/>
+</p>
+
+# Jupyter Variable Inspector
+
+The Variable Inspector is a Jupyter Lab extension designed to help you manage and track variables within your notebook. It displays all your variables in one convenient location, allowing you to see their names, values, types, shapes, and sizes in real-time. This feature makes it easier to work without the need to manually print or check your variables. **It is for Python only.**.
 
 ## Features
 
-### Selecting displayed columns
+### Display variables
+
+Explore all available variables in the current notebook as a list. 
+
+<img src="https://github.com/mljar/variable-inspector/blob/main/media/jupyter-variable-inspector.gif?raw=true" alt="Jupyter Variable Inspector displays variables"/>
+
+
+### Display DataFrames
+
+You can preview the DataFrame values as an interactive table.
+
+<img src="https://github.com/mljar/variable-inspector/blob/main/media/jupyter-variable-inspector-display-data-frame.gif?raw=true" alt="Jupyter Variable Inspector display DataFrame"/>
+
+
+### Display DataFrames with updates
+
+The preview of DataFrame will be automatically refreshed when you change it in the Python code.
+
+<img src="https://github.com/mljar/variable-inspector/blob/main/media/jupyter-variable-inspector-update-data.gif?raw=true" alt="Jupyter Variable Inspector update data"/>
+
+
+### Customize displayed columns
 
 You can select which properties of the variables you'd like to display:
 
 ![cols](https://github.com/user-attachments/assets/d282fdac-491d-4890-af07-fce5dbdaa27a)
 
-### Automatically refresh
+### Automatic or manual refresh
 
-The list of variables will automatically update whenever you edit or add new items. However, if you want to save memory processes, you can choose the Manual Refresh option to update the list at your convenience.
+The list of variables will automatically update whenever you execute a cell. However, you can choose the Manual Refresh option to update the list at your convenience.
 
 ![image](https://github.com/user-attachments/assets/281eec42-a227-434d-bb36-028a10e8338c)
-
-### Handling large variables
-
-If you work with large variables like lists or DataFrames that don't fit in a table, you can display them in a separate panel with only one click:
-
-![image](https://github.com/user-attachments/assets/fea0d038-f674-4148-8c0b-039bea8a34d2)
 
 ### Dark theme
 
