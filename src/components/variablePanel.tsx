@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   MultiGrid as RVMultiGrid,
   AutoSizer as RVAutoSizer
@@ -66,6 +66,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   const [maxColumnPage, setMaxColumnPage] = useState(
     getMaxPage(parseDimensions(variableShape)[1])
   );
+  const [autoSizerKey, setAutoSizerKey] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   function parseDimensions(input: string): [number, number] {
     const regex = /^(-?\d+)\s*x\s*(-?\d+)$/;
@@ -127,6 +129,21 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     fetchMatrixData();
   }, [currentRowPage, currentColumnPage]);
 
+  useEffect(() => {
+    if (containerRef.current) {
+      const resizeObserver = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          console.log('ResizeObserver: zmiana rozmiaru', entry.contentRect);
+          setAutoSizerKey(prev => prev + 1);
+        }
+      });
+      resizeObserver.observe(containerRef.current);
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }
+  }, []);
+
 
     const handlePrevRowPage = () => {
     if (currentRowPage > 1) {
@@ -187,7 +204,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     if (variableType === 'DataFrame' || variableType === 'Series') {
       newData = transpose(newData);
     }
-
     data2D = transpose(data2D);
     data = newData;
     fixedRowCount = 1;
@@ -256,6 +272,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 
   return (
     <div
+      ref={containerRef}
       style={{
         padding: '10px',
         fontSize: '16px',
@@ -280,7 +297,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       </div>
       <div style={{ height: '94%' }}>
         {/* Grid */}
-        <AutoSizer>
+        <AutoSizer key={autoSizerKey}>
           {({ width, height }: { width: number; height: number }) => (
             <MultiGrid
               fixedRowCount={fixedRowCount}
