@@ -63,6 +63,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   const [maxRowPage, setMaxRowPage] = useState(
     getMaxPage(parseDimensions(variableShape)[0])
   );
+  const [rowPageInput, setRowPageInput] = useState(currentRowPage.toString());
+  const [columnPageInput, setColumnPageInput] = useState(
+    currentColumnPage.toString()
+  );
   const [maxColumnPage, setMaxColumnPage] = useState(
     getMaxPage(parseDimensions(variableShape)[1])
   );
@@ -88,6 +92,14 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   function getMaxPage(pagesDataSize: number) {
     return Math.max(1, Math.ceil(pagesDataSize / maxMatrixSize));
   }
+
+  useEffect(() => {
+    setRowPageInput(currentRowPage.toString());
+  }, [currentRowPage]);
+
+  useEffect(() => {
+    setColumnPageInput(currentColumnPage.toString());
+  }, [currentColumnPage]);
 
   async function fetchMatrixData() {
     try {
@@ -268,6 +280,11 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     );
   };
 
+  
+
+
+
+  //add better highcalculation
   return (
     <div
       ref={containerRef}
@@ -282,14 +299,61 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       {/* pagination */}
       <div style={{ height: '2%', marginBottom: '20px', textAlign: 'center' }}>
         <button onClick={handlePrevRowPage}>←</button>
-        <span style={{ margin: '0 10px' }}>
-          {currentRowPage} - {maxRowPage}
-        </span>
+        <input
+          type="number"
+          value={rowPageInput}
+          onChange={e => {
+            setRowPageInput(e.target.value);
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              const newPage = parseInt(rowPageInput, 10);
+              if (!isNaN(newPage) && newPage >= 1 && newPage <= maxRowPage) {
+                setCurrentRowPage(newPage);
+                setRowPageInput(currentRowPage.toString());
+              }
+            }
+          }}
+          onBlur={() => {
+            const newPage = parseInt(rowPageInput, 10);
+            if (isNaN(newPage) || newPage < 1 || newPage > maxRowPage) {
+              setRowPageInput(currentRowPage.toString());
+            } else {
+              setCurrentRowPage(newPage);
+            }
+          }}
+          style={{ width: '50px', margin: '0 10px' }}
+        />
+        <span>/ {maxRowPage} (Rows)</span>
         <button onClick={handleNextRowPage}>→</button>
         <button onClick={handlePrevColumnPage}>←</button>
-        <span style={{ margin: '0 10px' }}>
-          {currentColumnPage} - {maxColumnPage}
-        </span>
+        <input
+          type="number"
+          value={columnPageInput}
+          onChange={e => {
+            setColumnPageInput(e.target.value);
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              const newPage = parseInt(columnPageInput, 10);
+              if (!isNaN(newPage) && newPage >= 1 && newPage <= maxColumnPage) {
+                setCurrentColumnPage(newPage);
+              } else {
+                setColumnPageInput(currentColumnPage.toString());
+              }
+            }
+          }}
+          onBlur={() => {
+            const newPage = parseInt(columnPageInput, 10);
+            if (isNaN(newPage) || newPage < 1 || newPage > maxColumnPage) {
+              setColumnPageInput(currentColumnPage.toString());
+            } else {
+              setCurrentColumnPage(newPage);
+            }
+          }}
+          style={{ width: '50px', margin: '0 10px' }}
+        />
+        <span>/ {maxColumnPage} (Columns)</span>
         <button onClick={handleNextColumnPage}>→</button>
         <span>{variableShape}</span>
       </div>
