@@ -5,7 +5,7 @@ export const getMatrix = (
   startColumn: number,
   endColumn: number
 ): string =>
-  `
+`
 import importlib
 from IPython.display import JSON
 
@@ -18,9 +18,28 @@ def __get_variable_shape(obj):
         return str(len(obj))
     return ""
 
+def __format_content(item):
+    if isinstance(item, list):
+        return [__format_content(subitem) for subitem in item]
+    elif isinstance(item, str):
+        return item[:50] + "..." if len(item) > 50 else item
+    elif isinstance(item, (int, float, bool)) or item is None:
+        return item
+    elif isinstance(item, dict):
+        if "name" in item:
+            return item["name"]
+        else:
+            return type(item).__name__
+    # Dla innych obiektów – jeśli mają atrybut "name", zwracamy go, w przeciwnym wypadku nazwę typu
+    else:
+        if hasattr(item, "name"):
+            return getattr(item, "name")
+        return type(item).__name__
+
 def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_row=${startRow}, end_row=${endRow}, start_column=${startColumn}, end_column=${endColumn}):
     if var_name not in globals():
-        return JSON({"error": f"Variable '${varName}' not found."})
+        return JSON({"error": f"Variable not found."})
+
     obj = globals()[var_name]
     module_name = type(obj).__module__
     var_type = type(obj).__name__
@@ -47,13 +66,13 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 actual_end_row = min(end_row, obj.shape[0])
                 actual_end_column = min(end_column, obj.shape[1])
                 sliced = obj[start_row:actual_end_row, start_column:actual_end_column]
-                returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
+                returnedSize = [startRow, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
-                "content": sliced.tolist()
+                "content": __format_content(sliced.tolist())
             })
 
     if "pandas" in module_name:
@@ -69,13 +88,13 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             for col in sliced.columns:
                 col_values = [col] + sliced[col].tolist()
                 result.append(col_values)
-            returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
+            returnedSize = [startRow, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
-                "content": result
+                "content": __format_content(result)
             })
         elif isinstance(obj, pd.Series):
             actual_end_row = min(end_row, len(obj))
@@ -85,13 +104,13 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             for col in df.columns:
                 col_values = [col] + df[col].tolist()
                 result.append(col_values)
-            returnedSize = [start_row, actual_end_row, 0, 1]
+            returnedSize = [startRow, actual_end_row, 0, 1]
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
-                "content": result
+                "content": __format_content(result)
             })
 
     if isinstance(obj, list):
@@ -105,18 +124,18 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
-                "content": sliced
+                "content": __format_content(sliced)
             })
         else:
             actual_end_row = min(end_row, len(obj))
             sliced = obj[start_row:actual_end_row]
             returnedSize = [start_row, actual_end_row, 0, 1]
             return JSON({
-                "variable": varName,
+                "variable": var_name,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
-                "content": sliced
+                "content": __format_content(sliced)
             })
 
     return JSON({
@@ -124,8 +143,9 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
         "variableType": var_type,
         "variableShape": "10 x 10",
         "error": f"Variable is not a supported array type.",
-        "content": [10,10,10],
+        "content": [10,10,10]
     })
 
 __mljar_variable_inspector_get_matrix_content()
-`;
+`
+;
