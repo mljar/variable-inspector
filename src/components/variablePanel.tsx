@@ -70,17 +70,19 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   function parseDimensions(input: string): [number, number] {
-    const regex = /^(-?\d+)\s*x\s*(-?\d+)$/;
-    const match = input.match(regex);
-
-    if (!match) {
-      throw new Error('Wrong format');
+    const regex2D = /^(-?\d+)\s*x\s*(-?\d+)$/;
+    const match2D = input.match(regex2D);
+    if (match2D) {
+      const a = parseInt(match2D[1], 10);
+      const b = parseInt(match2D[2], 10);
+      return [a, b];
     }
-
-    const a = parseInt(match[1], 10);
-    const b = parseInt(match[2], 10);
-
-    return [a, b];
+    const regex1D = /^-?\d+$/;
+    if (input.match(regex1D)) {
+      const n = parseInt(input, 10);
+      return [n, 1];
+    }
+    throw new Error('Wrong format');
   }
 
   function getMaxPage(pagesDataSize: number) {
@@ -121,9 +123,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     setMaxColumnPage(getMaxPage(cols));
     setCurrentRowPage(1);
     setCurrentColumnPage(1);
-    
   }, [refreshCount]);
-
 
   useEffect(() => {
     fetchMatrixData();
@@ -144,8 +144,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     }
   }, []);
 
-
-    const handlePrevRowPage = () => {
+  const handlePrevRowPage = () => {
     if (currentRowPage > 1) {
       setCurrentRowPage(currentRowPage - 1);
     }
@@ -181,7 +180,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   let fixedColumnCount = 0;
 
   if (allowedTypes.includes(variableType) && data2D.length > 0) {
-
     const globalColumnStart = (currentColumnPage - 1) * maxMatrixSize;
     const headerRow = ['index'];
     let length =
