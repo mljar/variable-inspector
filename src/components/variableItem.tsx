@@ -38,12 +38,17 @@ export const VariableItem: React.FC<VariableItemProps> = ({
 
   const handleButtonClick = async (
     variableName: string,
-    variableType: string
+    variableType: string,
+    variableShape: string,
   ) => {
     if (notebookPanel) {
       try {
-        const result = await executeMatrixContent(variableName, notebookPanel);
+        const result = await executeMatrixContent(variableName,0,100,0,100, notebookPanel);
+        const returnedSize = result.returnedSize;
+        console.log(returnedSize, "returnedSize");
+
         const variableData = result.content;
+
         let isOpen = false;
         for (const widget of labShell.widgets('main')) {
           if (widget.id === `${variableType}-${variableName}`) {
@@ -58,7 +63,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
           labShell,
           variableName,
           variableType,
-          variableData,
+          variableShape,
           notebookPanel,
         );
 
@@ -79,7 +84,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
           <button
             className="mljar-variable-inspector-show-variable-button"
-            onClick={() => handleButtonClick(vrb.name, vrb.type)}
+            onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
             aria-label={`Show details for ${vrb.name}`}
             title='Show value'
           >

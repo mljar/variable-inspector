@@ -7,7 +7,7 @@ import { VariableRefreshContextProvider } from '../context/variableRefershContex
 export interface VariablePanelWidgetProps {
   variableName: string;
   variableType: string;
-  variableData: any[];
+  variableShape: string;
   notebookPanel?: NotebookPanel | null;
 }
 
@@ -24,7 +24,7 @@ export class VariablePanelWidget extends ReactWidget {
       <VariableRefreshContextProvider notebookPanel={this.props.notebookPanel}>
       <VariablePanel variableName={this.props.variableName}
         variableType={this.props.variableType}
-        variableData={this.props.variableData}
+        variableShape={this.props.variableShape}
         notebookPanel={this.props.notebookPanel}
         />
       </VariableRefreshContextProvider>

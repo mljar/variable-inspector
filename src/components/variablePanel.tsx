@@ -13,7 +13,7 @@ import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier'
 interface VariablePanelProps {
   variableName: string;
   variableType: string;
-  variableData: any[][];
+  variableShape: string;
   notebookPanel?: NotebookPanel | null;
 }
 
@@ -29,7 +29,7 @@ function transpose<T>(matrix: T[][]): T[][] {
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   variableType,
-  variableData,
+  variableShape,
   notebookPanel
 }) => {
   const t = document.body.dataset?.jpThemeName;
@@ -51,28 +51,106 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   });
 
   observer.observe(document.body, {
-    attributes: true, 
+    attributes: true,
     attributeFilter: ['data-jp-theme-name']
   });
-  const [matrixData, setMatrixData] = useState<any[][]>(variableData);
+  const maxMatrixSize = 100;
+  const [matrixData, setMatrixData] = useState<any[][]>([]);
   const { refreshCount } = useVariableRefeshContext();
+  const [currentRowPage, setCurrentRowPage] = useState(1);
+  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+  const [returnedSize, setReturnedSize] = useState<any[]>([]);
+  const [maxRowPage, setMaxRowPage] = useState(
+    getMaxPage(parseDimensions(variableShape)[0])
+  );
+  const [maxColumnPage, setMaxColumnPage] = useState(
+    getMaxPage(parseDimensions(variableShape)[1])
+  );
+
+  function parseDimensions(input: string): [number, number] {
+    const regex = /^(-?\d+)\s*x\s*(-?\d+)$/;
+    const match = input.match(regex);
+
+    if (!match) {
+      throw new Error('Wrong format');
+    }
+
+    const a = parseInt(match[1], 10);
+    const b = parseInt(match[2], 10);
+
+    return [a, b];
+  }
+
+  function getMaxPage(pagesDataSize: number) {
+    return Math.max(1, Math.ceil(pagesDataSize / maxMatrixSize));
+  }
+
+  async function fetchMatrixData() {
+    try {
+      if (!notebookPanel) {
+        return;
+      }
+
+      const result = await withIgnoredPanelKernelUpdates(() =>
+        executeMatrixContent(
+          variableName,
+          (currentColumnPage - 1) * maxMatrixSize,
+          currentColumnPage * maxMatrixSize,
+          (currentRowPage - 1) * maxMatrixSize,
+          currentRowPage * maxMatrixSize,
+          notebookPanel
+        )
+      );
+
+      setReturnedSize(result.returnedSize);
+      console.log(returnedSize, 'returnedSize');
+      setMatrixData(result.content);
+      console.log(notebookPanel);
+      console.log(result.content);
+    } catch (error) {
+      console.error('Error fetching matrix content:', error);
+    }
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        if (!notebookPanel) {
-          return;
-        }
-        const result = await withIgnoredPanelKernelUpdates(() =>
-          executeMatrixContent(variableName, notebookPanel)
-        );
-        setMatrixData(result.content);
-      } catch (error) {
-        console.error('Error fetching matrix content:', error);
-      }
-    }
-    fetchData();
+    fetchMatrixData();
+    const [rows, cols] = parseDimensions(variableShape);
+    setMaxRowPage(getMaxPage(rows));
+    setMaxColumnPage(getMaxPage(cols));
+    setCurrentRowPage(1);
+    setCurrentColumnPage(1);
+    
   }, [refreshCount]);
+
+
+  useEffect(() => {
+    fetchMatrixData();
+  }, [currentRowPage, currentColumnPage]);
+
+
+    const handlePrevRowPage = () => {
+    if (currentRowPage > 1) {
+      setCurrentRowPage(currentRowPage - 1);
+    }
+  };
+
+  const handleNextRowPage = () => {
+    if (currentRowPage < maxRowPage) {
+      setCurrentRowPage(currentRowPage + 1);
+    }
+  };
+
+  const handlePrevColumnPage = () => {
+    if (currentColumnPage > 1) {
+      setCurrentColumnPage(currentColumnPage - 1);
+    }
+  };
+
+  const handleNextColumnPage = () => {
+    if (currentColumnPage < maxColumnPage) {
+      setCurrentColumnPage(currentColumnPage + 1);
+    }
+  };
 
   let data2D: any[][] = [];
   if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
@@ -86,12 +164,14 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   let fixedColumnCount = 0;
 
   if (allowedTypes.includes(variableType) && data2D.length > 0) {
+
+    const globalColumnStart = (currentColumnPage - 1) * maxMatrixSize;
     const headerRow = ['index'];
     let length =
       variableType === 'DataFrame' ? data2D[0].length - 1 : data2D[0].length;
 
     for (let j = 0; j < length; j++) {
-      headerRow.push(j.toString());
+      headerRow.push((globalColumnStart + j).toString());
     }
 
     let newData = [headerRow];
@@ -99,7 +179,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       if (variableType === 'DataFrame') {
         newData.push([...data2D[i]]);
       } else {
-        newData.push([i, ...data2D[i]]);
+        const globalIndex = (currentRowPage - 1) * maxMatrixSize + i;
+        newData.push([globalIndex, ...data2D[i]]);
       }
     }
 
@@ -126,7 +207,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
         maxLength = cellStr.length;
       }
     }
-    columnWidths[col] = maxLength * 6 + 16;
+    columnWidths[col] = maxLength * 7 + 16;
   }
 
   const cellRenderer = ({
@@ -183,25 +264,44 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
         color: isDark ? '#ddd' : '#000'
       }}
     >
-      <AutoSizer>
-        {({ width, height }: { width: number; height: number }) => (
-          <MultiGrid
-            fixedRowCount={fixedRowCount}
-            fixedColumnCount={fixedColumnCount}
-            cellRenderer={cellRenderer}
-            columnCount={colCount}
-            columnWidth={({ index }: { index: number }) => columnWidths[index]}
-            rowHeight={20}
-            height={height}
-            rowCount={rowCount}
-            width={width}
-            styleTopLeftGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
-            styleTopRightGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
-            styleBottomLeftGrid={{ background: isDark ? '#222' : '#fff' }}
-            styleBottomRightGrid={{ background: isDark ? '#222' : '#fff' }}
-          />
-        )}
-      </AutoSizer>
+      {/* pagination */}
+      <div style={{ height: '2%', marginBottom: '20px', textAlign: 'center' }}>
+        <button onClick={handlePrevRowPage}>←</button>
+        <span style={{ margin: '0 10px' }}>
+          {currentRowPage} - {maxRowPage}
+        </span>
+        <button onClick={handleNextRowPage}>→</button>
+        <button onClick={handlePrevColumnPage}>←</button>
+        <span style={{ margin: '0 10px' }}>
+          {currentColumnPage} - {maxColumnPage}
+        </span>
+        <button onClick={handleNextColumnPage}>→</button>
+        <span>{variableShape}</span>
+      </div>
+      <div style={{ height: '94%' }}>
+        {/* Grid */}
+        <AutoSizer>
+          {({ width, height }: { width: number; height: number }) => (
+            <MultiGrid
+              fixedRowCount={fixedRowCount}
+              fixedColumnCount={fixedColumnCount}
+              cellRenderer={cellRenderer}
+              columnCount={colCount}
+              columnWidth={({ index }: { index: number }) =>
+                columnWidths[index]
+              }
+              rowHeight={20}
+              height={height}
+              rowCount={rowCount}
+              width={width}
+              styleTopLeftGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
+              styleTopRightGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
+              styleBottomLeftGrid={{ background: isDark ? '#222' : '#fff' }}
+              styleBottomRightGrid={{ background: isDark ? '#222' : '#fff' }}
+            />
+          )}
+        </AutoSizer>
+      </div>
     </div>
   );
 };

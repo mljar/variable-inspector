@@ -7,13 +7,13 @@ export function createEmptyVariableInspectorPanel(
   labShell: ILabShell,
   variableName: string,
   variableType: string,
-  variableData: any[],
+  variableShape: string,
   notebookPanel?: NotebookPanel | null,
 ): void {
   const panel = new VariablePanelWidget({
     variableName,
     variableType,
-    variableData,
+    variableShape,
     notebookPanel
   });
 

@@ -4,13 +4,17 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 
 export const executeMatrixContent = async (
   varName: string,
-  notebookPanel: NotebookPanel
+  varStartColumn: number,
+  varEndColumn: number,
+  varStartRow: number,
+  varEndRow: number,
+  notebookPanel: NotebookPanel,
 ): Promise<any> => {
   if (!notebookPanel) {
     throw new Error('Kernel not available.');
   }
 
-  const code = getMatrix(varName);
+  const code = getMatrix(varName, varStartRow, varEndRow, varStartColumn, varEndColumn);
 
   return new Promise((resolve, reject) => {
     let outputData = '';

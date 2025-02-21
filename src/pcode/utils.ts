@@ -41,15 +41,24 @@ def __mljar_variable_inspector_check_imported():
 
 
 def __mljar_variable_inspector_getshapeof(x):
+    def get_list_shape(lst):
+        if isinstance(lst, list):
+            if not lst:
+                return "0"
+            sub_shape = get_list_shape(lst[0])
+            return f"{len(lst)}" if sub_shape == "" else f"{len(lst)} x {sub_shape}"
+        else:
+            return ""
+
     if __pd and isinstance(x, __pd.DataFrame):
-        return "%d rows x %d cols" % x.shape
+        return "%d x %d" % x.shape
     if __pd and isinstance(x, __pd.Series):
-        return "%d rows" % x.shape
+        return "%d" % x.shape
     if __np and isinstance(x, __np.ndarray):
         shape = " x ".join([str(i) for i in x.shape])
         return "%s" % shape
     if __pyspark and isinstance(x, __pyspark.sql.DataFrame):
-        return "? rows x %d cols" % len(x.columns)
+        return "? x %d" % len(x.columns)
     if __tf and isinstance(x, __tf.Variable):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "%s" % shape
@@ -63,7 +72,7 @@ def __mljar_variable_inspector_getshapeof(x):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "%s" % shape
     if isinstance(x, list):
-        return "%s" % len(x)
+        return get_list_shape(x)
     if isinstance(x, dict):
         return "%s keys" % len(x)
     return None
