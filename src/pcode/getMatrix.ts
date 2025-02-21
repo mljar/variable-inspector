@@ -30,7 +30,6 @@ def __format_content(item):
             return item["name"]
         else:
             return type(item).__name__
-    # Dla innych obiektów – jeśli mają atrybut "name", zwracamy go, w przeciwnym wypadku nazwę typu
     else:
         if hasattr(item, "name"):
             return getattr(item, "name")
@@ -66,7 +65,7 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 actual_end_row = min(end_row, obj.shape[0])
                 actual_end_column = min(end_column, obj.shape[1])
                 sliced = obj[start_row:actual_end_row, start_column:actual_end_column]
-                returnedSize = [startRow, actual_end_row, start_column, actual_end_column]
+                returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
@@ -88,7 +87,7 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             for col in sliced.columns:
                 col_values = [col] + sliced[col].tolist()
                 result.append(col_values)
-            returnedSize = [startRow, actual_end_row, start_column, actual_end_column]
+            returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
@@ -104,7 +103,7 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             for col in df.columns:
                 col_values = [col] + df[col].tolist()
                 result.append(col_values)
-            returnedSize = [startRow, actual_end_row, 0, 1]
+            returnedSize = [start_row, actual_end_row, 0, 1]
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
