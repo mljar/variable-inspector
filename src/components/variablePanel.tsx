@@ -72,6 +72,16 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   );
   const [autoSizerKey, setAutoSizerKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [cellRowInput, setCellRowInput] = useState('');
+  const [cellColumnInput, setCellColumnInput] = useState('');
+  const [gotoCell, setGotoCell] = useState<{
+    row: number;
+    column: number;
+  } | null>(null);
+  const [highlightCell, setHighlightCell] = useState<{
+    row: number;
+    column: number;
+  } | null>(null);
 
   function parseDimensions(input: string): [number, number] {
     const regex2D = /^(-?\d+)\s*x\s*(-?\d+)$/;
@@ -264,6 +274,17 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
           : '#fff'
     };
 
+    if (
+      highlightCell &&
+      rowIndex === highlightCell.row &&
+      columnIndex === highlightCell.column
+    ) {
+      cellStyle = {
+        ...cellStyle,
+        border: '2px solid yellow'
+      };
+    }
+
     if (rowIndex === 0 || columnIndex === 0) {
       cellStyle = {
         ...cellStyle,
@@ -280,9 +301,34 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     );
   };
 
-  
-
-
+  const handleGotoCell = () => {
+    const targetGlobalRow = parseInt(cellRowInput, 10);
+    const targetGlobalCol = parseInt(cellColumnInput, 10);
+    if (
+      !isNaN(targetGlobalRow) &&
+      targetGlobalRow >= 1 &&
+      !isNaN(targetGlobalCol) &&
+      targetGlobalCol >= 1
+    ) {
+      const newRowPage = Math.ceil(targetGlobalRow / maxMatrixSize);
+      const newColPage = Math.ceil(targetGlobalCol / maxMatrixSize);
+      setRowPageInput(newRowPage.toString());
+      setColumnPageInput(newColPage.toString());
+      const localRow = targetGlobalRow - (newRowPage - 1) * maxMatrixSize;
+      const localCol = targetGlobalCol - (newColPage - 1) * maxMatrixSize;
+      const gridRow = fixedRowCount + localRow - 1;
+      const gridCol = fixedColumnCount + localCol - 1;
+      setCurrentRowPage(newRowPage);
+      setCurrentColumnPage(newColPage);
+      setTimeout(() => {
+        setGotoCell({ row: gridRow, column: gridCol });
+        setHighlightCell({ row: gridRow, column: gridCol });
+        setTimeout(() => {
+          setHighlightCell(null);
+        }, 2000);
+      }, 500);
+    }
+  };
 
   //add better highcalculation
   return (
@@ -356,6 +402,54 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
         <span>/ {maxColumnPage} (Columns)</span>
         <button onClick={handleNextColumnPage}>→</button>
         <span>{variableShape}</span>
+        <span>Goto cell (row col): </span>
+        <input
+          type="number"
+          placeholder="Row"
+          value={cellRowInput}
+          onChange={e => setCellRowInput(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              const newVal = parseInt(cellRowInput, 10);
+              if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[0]) {
+                setCellRowInput('1');
+              } else {
+                handleGotoCell();
+              }
+            }
+          }}
+          onBlur={() => {
+            const newVal = parseInt(cellRowInput, 10);
+            if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[0]) {
+              setCellRowInput('1');
+            }
+          }}
+          style={{ width: '50px', margin: '0 5px' }}
+        />
+        <input
+          type="number"
+          placeholder="Column"
+          value={cellColumnInput}
+          onChange={e => setCellColumnInput(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              const newVal = parseInt(cellColumnInput, 10);
+              if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[1] ) {
+                setCellColumnInput('1');
+              } else {
+                handleGotoCell();
+              }
+            }
+          }}
+          onBlur={() => {
+            const newVal = parseInt(cellColumnInput, 10);
+            if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[1]) {
+              setCellColumnInput('1');
+            }
+          }}
+          style={{ width: '50px', margin: '0 5px' }}
+        />
+        <button onClick={handleGotoCell}>Go</button>
       </div>
       <div style={{ height: '94%' }}>
         {/* Grid */}
@@ -373,6 +467,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
               height={height}
               rowCount={rowCount}
               width={width}
+              scrollToRow={gotoCell ? gotoCell.row : undefined}
+              scrollToColumn={gotoCell ? gotoCell.column : undefined}
               styleTopLeftGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
               styleTopRightGrid={{ background: isDark ? '#555' : '#e0e0e0' }}
               styleBottomLeftGrid={{ background: isDark ? '#222' : '#fff' }}
