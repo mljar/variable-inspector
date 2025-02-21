@@ -23,8 +23,8 @@ export class VariablePanelWidget extends ReactWidget {
       <div style={{ height: '100%', width: '100%'}}>
       <VariableRefreshContextProvider notebookPanel={this.props.notebookPanel}>
       <VariablePanel variableName={this.props.variableName}
-        variableType={this.props.variableType}
-        variableShape={this.props.variableShape}
+        initVariableType={this.props.variableType}
+        initVariableShape={this.props.variableShape}
         notebookPanel={this.props.notebookPanel}
         />
       </VariableRefreshContextProvider>

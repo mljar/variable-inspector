@@ -12,8 +12,8 @@ import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier'
 
 interface VariablePanelProps {
   variableName: string;
-  variableType: string;
-  variableShape: string;
+  initVariableType: string;
+  initVariableShape: string;
   notebookPanel?: NotebookPanel | null;
 }
 
@@ -28,12 +28,17 @@ function transpose<T>(matrix: T[][]): T[][] {
 
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
-  variableType,
-  variableShape,
+  initVariableType,
+  initVariableShape,
   notebookPanel
 }) => {
   const t = document.body.dataset?.jpThemeName;
   const [isDark, setIsDark] = useState(t !== undefined && t.includes('Dark'));
+  const [variableShape,setVariableShape] = useState(initVariableShape);
+  const [variableType, setVariableType] = useState(initVariableType);
+  void setVariableType;
+  void setVariableShape;
+
   var observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
       if (mutation.type === 'attributes') {
@@ -127,7 +132,9 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
           notebookPanel
         )
       );
-
+      setVariableShape(result.variableShape);
+      setVariableType(result.variableType);
+      console.log(variableType);
       setReturnedSize(result.returnedSize);
       console.log(returnedSize, 'returnedSize');
       setMatrixData(result.content);
@@ -155,7 +162,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     if (containerRef.current) {
       const resizeObserver = new ResizeObserver(entries => {
         for (const entry of entries) {
-          console.log('ResizeObserver: zmiana rozmiaru', entry.contentRect);
+          void entry;
           setAutoSizerKey(prev => prev + 1);
         }
       });
@@ -330,7 +337,24 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     }
   };
 
-  //add better highcalculation
+
+
+ if (!allowedTypes.includes(variableType)) {
+    return (
+      <div
+        style={{
+          padding: '10px',
+          fontSize: '16px',
+          height: '100%',
+          background: isDark ? '#222' : '#fff',
+          color: isDark ? '#ddd' : '#000'
+        }}
+      >
+        <p>Wrong variable type: {variableType}</p>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}

@@ -9,11 +9,22 @@ export const getMatrix = (
 import importlib
 from IPython.display import JSON
 
+def __get_variable_shape(obj):
+    if hasattr(obj, 'shape'):
+        return " x ".join(map(str, obj.shape))
+    if isinstance(obj, list):
+        if obj and all(isinstance(el, list) for el in obj):
+            return f"{len(obj)} x {len(obj[0])}"
+        return str(len(obj))
+    return ""
+
 def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_row=${startRow}, end_row=${endRow}, start_column=${startColumn}, end_column=${endColumn}):
     if var_name not in globals():
         return JSON({"error": f"Variable '${varName}' not found."})
     obj = globals()[var_name]
     module_name = type(obj).__module__
+    var_type = type(obj).__name__
+    var_shape = __get_variable_shape(obj)
 
     if "numpy" in module_name:
         try:
@@ -22,7 +33,12 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             return JSON({"error": "Numpy is not installed."})
         if isinstance(obj, np.ndarray):
             if obj.ndim > 2:
-                return JSON({"error": "Numpy array has more than 2 dimensions."})
+                return JSON({
+                    "variable": var_name,
+                    "variableType": var_type,
+                    "variableShape": var_shape,
+                    "error": "Numpy array has more than 2 dimensions."
+                })
             if obj.ndim == 1:
                 actual_end_row = min(end_row, len(obj))
                 sliced = obj[start_row:actual_end_row]
@@ -34,6 +50,8 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
+                "variableType": var_type,
+                "variableShape": var_shape,
                 "returnedSize": returnedSize,
                 "content": sliced.tolist()
             })
@@ -54,6 +72,8 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
+                "variableType": var_type,
+                "variableShape": var_shape,
                 "returnedSize": returnedSize,
                 "content": result
             })
@@ -68,6 +88,8 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             returnedSize = [start_row, actual_end_row, 0, 1]
             return JSON({
                 "variable": var_name,
+                "variableType": var_type,
+                "variableShape": var_shape,
                 "returnedSize": returnedSize,
                 "content": result
             })
@@ -80,6 +102,8 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
             return JSON({
                 "variable": var_name,
+                "variableType": var_type,
+                "variableShape": var_shape,
                 "returnedSize": returnedSize,
                 "content": sliced
             })
@@ -89,11 +113,19 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             returnedSize = [start_row, actual_end_row, 0, 1]
             return JSON({
                 "variable": varName,
+                "variableType": var_type,
+                "variableShape": var_shape,
                 "returnedSize": returnedSize,
                 "content": sliced
             })
 
-    return JSON({"error": f"Variable '{varName}' is not a supported array type."})
+    return JSON({
+        "variable": var_name,
+        "variableType": var_type,
+        "variableShape": "10 x 10",
+        "error": f"Variable is not a supported array type.",
+        "content": [10,10,10],
+    })
 
 __mljar_variable_inspector_get_matrix_content()
 `;
