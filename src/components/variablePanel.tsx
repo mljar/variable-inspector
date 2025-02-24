@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   MultiGrid as RVMultiGrid,
   AutoSizer as RVAutoSizer
@@ -34,31 +34,31 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
 }) => {
   const t = document.body.dataset?.jpThemeName;
   const [isDark, setIsDark] = useState(t !== undefined && t.includes('Dark'));
-  const [variableShape,setVariableShape] = useState(initVariableShape);
+  const [variableShape, setVariableShape] = useState(initVariableShape);
   const [variableType, setVariableType] = useState(initVariableType);
-  void setVariableType;
-  void setVariableShape;
 
-  var observer = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      if (mutation.type === 'attributes') {
-        if (
-          document.body.attributes
-            .getNamedItem('data-jp-theme-name')
-            ?.value.includes('Dark')
-        ) {
-          setIsDark(true);
-        } else {
-          setIsDark(false);
+  useEffect(() => {
+    var observer = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.type === 'attributes') {
+          if (
+            document.body.attributes
+              .getNamedItem('data-jp-theme-name')
+              ?.value.includes('Dark')
+          ) {
+            setIsDark(true);
+          } else {
+            setIsDark(false);
+          }
         }
-      }
+      });
     });
-  });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['data-jp-theme-name']
+    });
+  }, []);
 
-  observer.observe(document.body, {
-    attributes: true,
-    attributeFilter: ['data-jp-theme-name']
-  });
   const maxMatrixSize = 100;
   const [matrixData, setMatrixData] = useState<any[][]>([]);
   const { refreshCount } = useVariableRefeshContext();
@@ -88,35 +88,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     column: number;
   } | null>(null);
 
-  function parseDimensions(input: string): [number, number] {
-    const regex2D = /^(-?\d+)\s*x\s*(-?\d+)$/;
-    const match2D = input.match(regex2D);
-    if (match2D) {
-      const a = parseInt(match2D[1], 10);
-      const b = parseInt(match2D[2], 10);
-      return [a, b];
-    }
-    const regex1D = /^-?\d+$/;
-    if (input.match(regex1D)) {
-      const n = parseInt(input, 10);
-      return [n, 1];
-    }
-    throw new Error('Wrong format');
-  }
-
-  function getMaxPage(pagesDataSize: number) {
-    return Math.max(1, Math.ceil(pagesDataSize / maxMatrixSize));
-  }
-
-  useEffect(() => {
-    setRowPageInput(currentRowPage.toString());
-  }, [currentRowPage]);
-
-  useEffect(() => {
-    setColumnPageInput(currentColumnPage.toString());
-  }, [currentColumnPage]);
-
-  async function fetchMatrixData() {
+  const fetchMatrixData = useCallback(async () => {
     try {
       if (!notebookPanel) {
         return;
@@ -143,7 +115,29 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     } catch (error) {
       console.error('Error fetching matrix content:', error);
     }
-  }
+  }, [
+    notebookPanel,
+    variableName,
+    currentColumnPage,
+    currentRowPage,
+    maxMatrixSize,
+    withIgnoredPanelKernelUpdates,
+    executeMatrixContent,
+    setVariableShape,
+    setVariableType,
+    setReturnedSize,
+    setMatrixData,
+    variableType,
+    returnedSize
+  ]);
+
+  useEffect(() => {
+    setRowPageInput(currentRowPage.toString());
+  }, [currentRowPage]);
+
+  useEffect(() => {
+    setColumnPageInput(currentColumnPage.toString());
+  }, [currentColumnPage]);
 
   useEffect(() => {
     fetchMatrixData();
@@ -196,6 +190,26 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       setCurrentColumnPage(currentColumnPage + 1);
     }
   };
+
+  function parseDimensions(input: string): [number, number] {
+    const regex2D = /^(-?\d+)\s*x\s*(-?\d+)$/;
+    const match2D = input.match(regex2D);
+    if (match2D) {
+      const a = parseInt(match2D[1], 10);
+      const b = parseInt(match2D[2], 10);
+      return [a, b];
+    }
+    const regex1D = /^-?\d+$/;
+    if (input.match(regex1D)) {
+      const n = parseInt(input, 10);
+      return [n, 1];
+    }
+    throw new Error('Wrong format');
+  }
+
+  function getMaxPage(pagesDataSize: number) {
+    return Math.max(1, Math.ceil(pagesDataSize / maxMatrixSize));
+  }
 
   let data2D: any[][] = [];
   if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
@@ -337,9 +351,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     }
   };
 
-
-
- if (!allowedTypes.includes(variableType)) {
+  if (!allowedTypes.includes(variableType)) {
     return (
       <div
         style={{
@@ -358,6 +370,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   return (
     <div
       ref={containerRef}
+      className="mljar-variable-inspector-grid-container"
       style={{
         padding: '10px',
         fontSize: '16px',
@@ -367,113 +380,144 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       }}
     >
       {/* pagination */}
-      <div style={{ height: '2%', marginBottom: '20px', textAlign: 'center' }}>
-        <button onClick={handlePrevRowPage}>←</button>
-        <input
-          type="number"
-          value={rowPageInput}
-          onChange={e => {
-            setRowPageInput(e.target.value);
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
+      <div
+        className="mljar-variable-inspector-grid-header"
+        style={{ height: '2%', marginBottom: '20px', textAlign: 'center' }}
+      >
+        <div className="mljar-variable-inspector-grid-item">
+          <button onClick={handlePrevRowPage}>←</button>
+          <input
+            type="number"
+            value={rowPageInput}
+            onChange={e => {
+              setRowPageInput(e.target.value);
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newPage = parseInt(rowPageInput, 10);
+                if (!isNaN(newPage) && newPage >= 1 && newPage <= maxRowPage) {
+                  setCurrentRowPage(newPage);
+                  setRowPageInput(currentRowPage.toString());
+                }
+              }
+            }}
+            onBlur={() => {
               const newPage = parseInt(rowPageInput, 10);
-              if (!isNaN(newPage) && newPage >= 1 && newPage <= maxRowPage) {
-                setCurrentRowPage(newPage);
+              if (isNaN(newPage) || newPage < 1 || newPage > maxRowPage) {
                 setRowPageInput(currentRowPage.toString());
+              } else {
+                setCurrentRowPage(newPage);
               }
-            }
-          }}
-          onBlur={() => {
-            const newPage = parseInt(rowPageInput, 10);
-            if (isNaN(newPage) || newPage < 1 || newPage > maxRowPage) {
-              setRowPageInput(currentRowPage.toString());
-            } else {
-              setCurrentRowPage(newPage);
-            }
-          }}
-          style={{ width: '50px', margin: '0 10px' }}
-        />
-        <span>/ {maxRowPage} (Rows)</span>
-        <button onClick={handleNextRowPage}>→</button>
-        <button onClick={handlePrevColumnPage}>←</button>
-        <input
-          type="number"
-          value={columnPageInput}
-          onChange={e => {
-            setColumnPageInput(e.target.value);
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
+            }}
+            style={{ width: '50px', margin: '0 10px' }}
+          />
+          <span>/ {maxRowPage} (Rows)</span>
+          <button onClick={handleNextRowPage}>→</button>
+        </div>
+        <div className="mljar-variable-inspector-grid-item">
+          <button onClick={handlePrevColumnPage}>←</button>
+          <input
+            type="number"
+            value={columnPageInput}
+            onChange={e => {
+              setColumnPageInput(e.target.value);
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newPage = parseInt(columnPageInput, 10);
+                if (
+                  !isNaN(newPage) &&
+                  newPage >= 1 &&
+                  newPage <= maxColumnPage
+                ) {
+                  setCurrentColumnPage(newPage);
+                } else {
+                  setColumnPageInput(currentColumnPage.toString());
+                }
+              }
+            }}
+            onBlur={() => {
               const newPage = parseInt(columnPageInput, 10);
-              if (!isNaN(newPage) && newPage >= 1 && newPage <= maxColumnPage) {
-                setCurrentColumnPage(newPage);
-              } else {
+              if (isNaN(newPage) || newPage < 1 || newPage > maxColumnPage) {
                 setColumnPageInput(currentColumnPage.toString());
+              } else {
+                setCurrentColumnPage(newPage);
               }
-            }
-          }}
-          onBlur={() => {
-            const newPage = parseInt(columnPageInput, 10);
-            if (isNaN(newPage) || newPage < 1 || newPage > maxColumnPage) {
-              setColumnPageInput(currentColumnPage.toString());
-            } else {
-              setCurrentColumnPage(newPage);
-            }
-          }}
-          style={{ width: '50px', margin: '0 10px' }}
-        />
-        <span>/ {maxColumnPage} (Columns)</span>
-        <button onClick={handleNextColumnPage}>→</button>
-        <span>{variableShape}</span>
-        <span>Goto cell (row col): </span>
-        <input
-          type="number"
-          placeholder="Row"
-          value={cellRowInput}
-          onChange={e => setCellRowInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
+            }}
+            style={{ width: '50px', margin: '0 10px' }}
+          />
+          <span>/ {maxColumnPage} (Columns)</span>
+          <button onClick={handleNextColumnPage}>→</button>
+        </div>
+        <div className="mljar-variable-inspector-grid-item">
+          <span>{variableShape}</span>
+        </div>
+        <div className="mljar-variable-inspector-grid-item">
+          <span>Goto cell (row col): </span>
+          <input
+            type="number"
+            placeholder="Row"
+            value={cellRowInput}
+            onChange={e => setCellRowInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newVal = parseInt(cellRowInput, 10);
+                if (
+                  isNaN(newVal) ||
+                  newVal < 1 ||
+                  newVal > parseDimensions(variableShape)[0]
+                ) {
+                  setCellRowInput('1');
+                } else {
+                  handleGotoCell();
+                }
+              }
+            }}
+            onBlur={() => {
               const newVal = parseInt(cellRowInput, 10);
-              if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[0]) {
+              if (
+                isNaN(newVal) ||
+                newVal < 1 ||
+                newVal > parseDimensions(variableShape)[0]
+              ) {
                 setCellRowInput('1');
-              } else {
-                handleGotoCell();
               }
-            }
-          }}
-          onBlur={() => {
-            const newVal = parseInt(cellRowInput, 10);
-            if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[0]) {
-              setCellRowInput('1');
-            }
-          }}
-          style={{ width: '50px', margin: '0 5px' }}
-        />
-        <input
-          type="number"
-          placeholder="Column"
-          value={cellColumnInput}
-          onChange={e => setCellColumnInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
+            }}
+            style={{ width: '50px', margin: '0 5px' }}
+          />
+          <input
+            type="number"
+            placeholder="Column"
+            value={cellColumnInput}
+            onChange={e => setCellColumnInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newVal = parseInt(cellColumnInput, 10);
+                if (
+                  isNaN(newVal) ||
+                  newVal < 1 ||
+                  newVal > parseDimensions(variableShape)[1]
+                ) {
+                  setCellColumnInput('1');
+                } else {
+                  handleGotoCell();
+                }
+              }
+            }}
+            onBlur={() => {
               const newVal = parseInt(cellColumnInput, 10);
-              if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[1] ) {
+              if (
+                isNaN(newVal) ||
+                newVal < 1 ||
+                newVal > parseDimensions(variableShape)[1]
+              ) {
                 setCellColumnInput('1');
-              } else {
-                handleGotoCell();
               }
-            }
-          }}
-          onBlur={() => {
-            const newVal = parseInt(cellColumnInput, 10);
-            if (isNaN(newVal) || newVal < 1 || newVal > parseDimensions(variableShape)[1]) {
-              setCellColumnInput('1');
-            }
-          }}
-          style={{ width: '50px', margin: '0 5px' }}
-        />
-        <button onClick={handleGotoCell}>Go</button>
+            }}
+            style={{ width: '50px', margin: '0 5px' }}
+          />
+          <button onClick={handleGotoCell}>Go</button>
+        </div>
       </div>
       <div style={{ height: '94%' }}>
         {/* Grid */}
