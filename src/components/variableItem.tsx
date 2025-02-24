@@ -44,9 +44,6 @@ export const VariableItem: React.FC<VariableItemProps> = ({
     if (notebookPanel) {
       try {
         const result = await executeMatrixContent(variableName,0,100,0,100, notebookPanel);
-        const returnedSize = result.returnedSize;
-        console.log(returnedSize, "returnedSize");
-
         const variableData = result.content;
 
         let isOpen = false;

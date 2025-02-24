@@ -9,6 +9,9 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useVariableRefeshContext } from '../context/variableRefershContext';
 import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
+import { skipLeftIcon } from '../icons/skipLeftIcon';
+import { skipRightIcon } from '../icons/skipRightIcon';
+import { gridScanIcon } from '../icons/gridScanIcon'; 
 
 interface VariablePanelProps {
   variableName: string;
@@ -87,6 +90,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     row: number;
     column: number;
   } | null>(null);
+  const headerSize = 50;
+  void headerSize;
 
   const fetchMatrixData = useCallback(async () => {
     try {
@@ -106,12 +111,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       );
       setVariableShape(result.variableShape);
       setVariableType(result.variableType);
-      console.log(variableType);
       setReturnedSize(result.returnedSize);
-      console.log(returnedSize, 'returnedSize');
       setMatrixData(result.content);
-      console.log(notebookPanel);
-      console.log(result.content);
     } catch (error) {
       console.error('Error fetching matrix content:', error);
     }
@@ -372,8 +373,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       ref={containerRef}
       className="mljar-variable-inspector-grid-container"
       style={{
-        padding: '10px',
-        fontSize: '16px',
         height: '100%',
         background: isDark ? '#222' : '#fff',
         color: isDark ? '#ddd' : '#000'
@@ -382,13 +381,19 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       {/* pagination */}
       <div
         className="mljar-variable-inspector-grid-header"
-        style={{ height: '2%', marginBottom: '20px', textAlign: 'center' }}
+        style={{ height: '6%' }}
       >
         <div className="mljar-variable-inspector-grid-item">
-          <button onClick={handlePrevRowPage}>←</button>
+          <button
+            onClick={handlePrevRowPage}
+            className="mljar-variable-inspector-skip-button"
+          >
+            <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
           <input
             type="number"
             value={rowPageInput}
+            className="mljar-variable-inspector-grid-input"
             onChange={e => {
               setRowPageInput(e.target.value);
             }}
@@ -409,16 +414,24 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 setCurrentRowPage(newPage);
               }
             }}
-            style={{ width: '50px', margin: '0 10px' }}
           />
           <span>/ {maxRowPage} (Rows)</span>
-          <button onClick={handleNextRowPage}>→</button>
-        </div>
-        <div className="mljar-variable-inspector-grid-item">
-          <button onClick={handlePrevColumnPage}>←</button>
+          <button
+            onClick={handleNextRowPage}
+            className="mljar-variable-inspector-skip-button"
+          >
+            <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <button
+            onClick={handlePrevColumnPage}
+            className="mljar-variable-inspector-skip-button"
+          >
+            <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
           <input
             type="number"
             value={columnPageInput}
+            className="mljar-variable-inspector-grid-input"
             onChange={e => {
               setColumnPageInput(e.target.value);
             }}
@@ -444,20 +457,22 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 setCurrentColumnPage(newPage);
               }
             }}
-            style={{ width: '50px', margin: '0 10px' }}
           />
           <span>/ {maxColumnPage} (Columns)</span>
-          <button onClick={handleNextColumnPage}>→</button>
+          <button
+            onClick={handleNextColumnPage}
+            className="mljar-variable-inspector-skip-button"
+          >
+            <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
         </div>
         <div className="mljar-variable-inspector-grid-item">
-          <span>{variableShape}</span>
-        </div>
-        <div className="mljar-variable-inspector-grid-item">
-          <span>Goto cell (row col): </span>
+          <span>Goto cell: </span>
           <input
             type="number"
             placeholder="Row"
             value={cellRowInput}
+            className="mljar-variable-inspector-grid-input"
             onChange={e => setCellRowInput(e.target.value)}
             onKeyDown={e => {
               if (e.key === 'Enter') {
@@ -483,12 +498,12 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 setCellRowInput('1');
               }
             }}
-            style={{ width: '50px', margin: '0 5px' }}
           />
           <input
             type="number"
             placeholder="Column"
             value={cellColumnInput}
+            className="mljar-variable-inspector-grid-input"
             onChange={e => setCellColumnInput(e.target.value)}
             onKeyDown={e => {
               if (e.key === 'Enter') {
@@ -514,12 +529,15 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 setCellColumnInput('1');
               }
             }}
-            style={{ width: '50px', margin: '0 5px' }}
           />
-          <button onClick={handleGotoCell}>Go</button>
+          <button onClick={handleGotoCell}
+          className="mljar-variable-inspector-skip-button"
+          >
+              <gridScanIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
         </div>
       </div>
-      <div style={{ height: '94%' }}>
+      <div style={{ height: '86%' }}>
         {/* Grid */}
         <AutoSizer key={autoSizerKey}>
           {({ width, height }: { width: number; height: number }) => (
