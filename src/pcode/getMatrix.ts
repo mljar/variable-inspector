@@ -14,7 +14,11 @@ def __get_variable_shape(obj):
         return " x ".join(map(str, obj.shape))
     if isinstance(obj, list):
         if obj and all(isinstance(el, list) for el in obj):
-            return f"{len(obj)} x {len(obj[0])}"
+            if len(set(map(len, obj))) == 1:
+                return f"{len(obj)} x {len(obj[0])}"
+            else:
+                # Dla niejednolitych podlist zwracamy tylko liczbę wierszy
+                return f"{len(obj)}"
         return str(len(obj))
     return ""
 
@@ -37,13 +41,13 @@ def __format_content(item):
 
 def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_row=${startRow}, end_row=${endRow}, start_column=${startColumn}, end_column=${endColumn}):
     if var_name not in globals():
-        return JSON({"error": f"Variable not found."})
-
+        return JSON({"error": "Variable not found."})
+    
     obj = globals()[var_name]
     module_name = type(obj).__module__
     var_type = type(obj).__name__
     var_shape = __get_variable_shape(obj)
-
+    
     if "numpy" in module_name:
         try:
             np = importlib.import_module("numpy")
@@ -73,7 +77,7 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 "returnedSize": returnedSize,
                 "content": __format_content(sliced.tolist())
             })
-
+    
     if "pandas" in module_name:
         try:
             pd = importlib.import_module("pandas")
@@ -105,25 +109,33 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 result.append(col_values)
             returnedSize = [start_row, actual_end_row, 0, 1]
             return JSON({
-                "variable": var_name,
+                "variable": varName,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
                 "content": __format_content(result)
             })
-
+    
     if isinstance(obj, list):
         if all(isinstance(el, list) for el in obj):
-            actual_end_row = min(end_row, len(obj))
-            actual_end_column = min(end_column, len(obj[0]) if obj else 0)
-            sliced = [row[start_column:actual_end_column] for row in obj[start_row:actual_end_row]]
-            returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
+            if len(set(map(len, obj))) == 1:
+                actual_end_row = min(end_row, len(obj))
+                actual_end_column = min(end_column, len(obj[0]))
+                sliced = [row[start_column:actual_end_column] for row in obj[start_row:actual_end_row]]
+                returnedSize = [start_row, actual_end_row, start_column, actual_end_column]
+                content = __format_content(sliced)
+            else:
+                actual_end_row = min(end_row, len(obj))
+                sliced = obj[start_row:actual_end_row]
+                returnedSize = [start_row, actual_end_row, 0, 1]
+                content = ["list" for _ in sliced]
+                var_shape = f"{len(obj)}"
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,
-                "content": __format_content(sliced)
+                "content": content
             })
         else:
             actual_end_row = min(end_row, len(obj))
@@ -132,16 +144,16 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
             return JSON({
                 "variable": var_name,
                 "variableType": var_type,
-                "variableShape": var_shape,
+                "variableShape": str(len(obj)),
                 "returnedSize": returnedSize,
                 "content": __format_content(sliced)
             })
-
+    
     return JSON({
         "variable": var_name,
         "variableType": var_type,
         "variableShape": "10 x 10",
-        "error": f"Variable is not a supported array type.",
+        "error": "Variable is not a supported array type.",
         "content": [10,10,10]
     })
 

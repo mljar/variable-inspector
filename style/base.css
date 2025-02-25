@@ -407,8 +407,42 @@
   background-clip: padding-box;
 }
 
-/* .ReactVirtualized__Grid::-webkit-scrollbar-thumb:hover { */
-/*   background: #555; */
-/* } */
+.mljar-variable-inspector-preview {
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #1976d2;
+}
 
+.mljar-variable-inspector-preview:hover {
+  text-decoration: underline;
+}
 
+.mljar-variable-inspector-item {
+  cursor: pointer;
+}
+.mljar-variable-inspector-variable-preview {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.7rem;
+  font-weight: bold;
+
+  display: inline-block;
+  max-width: 100%;     
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: left;   
+  color: var(--jp-ui-font-color1);
+}
+
+.mljar-variable-inspector-variable-preview:hover {
+  text-decoration: underline;
+  background-color: #D3D3D3;
+}

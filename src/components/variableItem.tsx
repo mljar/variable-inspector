@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { detailIcon } from '../icons/detailIcon';
 import { CommandRegistry } from '@lumino/commands';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
@@ -35,38 +35,81 @@ export const VariableItem: React.FC<VariableItemProps> = ({
 }) => {
   const notebookPanel = useNotebookPanelContext();
   const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState<string>('');
+  const [previewLoading, setPreviewLoading] = useState(false);
+  void previewLoading;
+  const loadPreview = async () => {
+    if (notebookPanel) {
+      try {
+        setPreviewLoading(true);
+        const result = await executeMatrixContent(
+          vrb.name,
+          0,
+          10,
+          0,
+          10,
+          notebookPanel
+        );
+        const content = result.content;
+        console.log(content);
+        try {
+          setPreview(`[ ${content} ]`);
+        } catch (e) {
+          console.log('error');
+          setPreview('failed to load content');
+        }
+      } catch (err) {
+        console.error('Error fetching preview:', err);
+      } finally {
+        setPreviewLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (
+      allowedTypes.includes(vrb.type) &&
+      vrb.dimension === 1 &&
+      vrb.type === 'list'
+    ) {
+      loadPreview();
+    }
+  }, [notebookPanel, vrb]);
 
   const handleButtonClick = async (
     variableName: string,
     variableType: string,
-    variableShape: string,
+    variableShape: string
   ) => {
     if (notebookPanel) {
       try {
-        const result = await executeMatrixContent(variableName,0,100,0,100, notebookPanel);
+        const result = await executeMatrixContent(
+          variableName,
+          0,
+          100,
+          0,
+          100,
+          notebookPanel
+        );
         const variableData = result.content;
-
         let isOpen = false;
         for (const widget of labShell.widgets('main')) {
           if (widget.id === `${variableType}-${variableName}`) {
             isOpen = true;
           }
         }
-
         if (variableData && !isOpen) {
-           setLoading(true);
-
-        createEmptyVariableInspectorPanel(
-          labShell,
-          variableName,
-          variableType,
-          variableShape,
-          notebookPanel,
-        );
-
+          setLoading(true);
+          createEmptyVariableInspectorPanel(
+            labShell,
+            variableName,
+            variableType,
+            variableShape,
+            notebookPanel
+          );
         }
       } catch (err) {
-        console.error("uknown error", err);
+        console.error('unknown error', err);
       } finally {
         setLoading(false);
       }
@@ -74,17 +117,36 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   };
 
   return (
-      <li className={`mljar-variable-inspector-item ${allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? `` : `small-value`}`}>
-        <span className="mljar-variable-inspector-variable-name">{vrb.name}</span>
-        {showType && (<span className="mljar-variable-type">{vrb.type}</span>)}
-        {showShape && (<span className="mljar-variable-shape">{vrb.shape !== 'None' ? vrb.shape : ''}</span>)}
-        {showSize && (<span className='mljar-variable-inspector-variable-size'>{vrb.size}</span>)}
-        {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
+    <li
+      className={`mljar-variable-inspector-item ${allowedTypes.includes(vrb.type) && vrb.dimension <= 2 && vrb.type !== 'list' && vrb.dimension !== 1 ? '' : 'small-value'}`}
+    >
+      <span className="mljar-variable-inspector-variable-name">{vrb.name}</span>
+      {showType && <span className="mljar-variable-type">{vrb.type}</span>}
+      {showShape && (
+        <span className="mljar-variable-shape">
+          {vrb.shape !== 'None' ? vrb.shape : ''}
+        </span>
+      )}
+      {showSize && (
+        <span className="mljar-variable-inspector-variable-size">
+          {vrb.size}
+        </span>
+      )}
+      {allowedTypes.includes(vrb.type) && vrb.dimension <= 2 ? (
+        vrb.dimension === 1 && vrb.type === 'list' ? (
+          <button
+            className="mljar-variable-inspector-variable-preview"
+            title={vrb.value}
+            onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
+          >
+            {preview}
+          </button>
+        ) : (
           <button
             className="mljar-variable-inspector-show-variable-button"
             onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
             aria-label={`Show details for ${vrb.name}`}
-            title='Show value'
+            title="Show value"
           >
             {loading ? (
               <div className="mljar-variable-spinner-big" />
@@ -92,11 +154,15 @@ export const VariableItem: React.FC<VariableItemProps> = ({
               <detailIcon.react className="mljar-variable-detail-button-icon" />
             )}
           </button>
-        ) : (
-          <span className="mljar-variable-inspector-variable-value" title={vrb.value}>
-            {vrb.value}
-          </span>
-        )}      
-      </li>
+        )
+      ) : (
+        <span
+          className="mljar-variable-inspector-variable-value"
+          title={vrb.value}
+        >
+          {vrb.value}
+        </span>
+      )}
+    </li>
   );
 };
