@@ -303,7 +303,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     ) {
       cellStyle = {
         ...cellStyle,
-        border: '2px solid yellow'
+        border: '2px solid #0099cc'
       };
     }
 
@@ -328,18 +328,18 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     const targetGlobalCol = parseInt(cellColumnInput, 10);
     if (
       !isNaN(targetGlobalRow) &&
-      targetGlobalRow >= 1 &&
+      targetGlobalRow >= 0 &&
       !isNaN(targetGlobalCol) &&
-      targetGlobalCol >= 1
+      targetGlobalCol >= 0
     ) {
-      const newRowPage = Math.ceil(targetGlobalRow / maxMatrixSize);
-      const newColPage = Math.ceil(targetGlobalCol / maxMatrixSize);
+      const newRowPage = Math.floor(targetGlobalRow / maxMatrixSize) + 1;
+      const newColPage = Math.floor(targetGlobalCol / maxMatrixSize) + 1;
       setRowPageInput(newRowPage.toString());
       setColumnPageInput(newColPage.toString());
-      const localRow = targetGlobalRow - (newRowPage - 1) * maxMatrixSize;
-      const localCol = targetGlobalCol - (newColPage - 1) * maxMatrixSize;
-      const gridRow = fixedRowCount + localRow - 1;
-      const gridCol = fixedColumnCount + localCol - 1;
+      const localRow = targetGlobalRow - (newRowPage-1) * maxMatrixSize;
+      const localCol = targetGlobalCol - (newColPage-1) * maxMatrixSize;
+      const gridRow = fixedRowCount + localRow;
+      const gridCol = fixedColumnCount + localCol;
       setCurrentRowPage(newRowPage);
       setCurrentColumnPage(newColPage);
       setTimeout(() => {
@@ -479,10 +479,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 const newVal = parseInt(cellRowInput, 10);
                 if (
                   isNaN(newVal) ||
-                  newVal < 1 ||
-                  newVal > parseDimensions(variableShape)[0]
+                  newVal < 0 ||
+                  newVal > parseDimensions(variableShape)[0]-1
                 ) {
-                  setCellRowInput('1');
+                  setCellRowInput('0');
                 } else {
                   handleGotoCell();
                 }
@@ -492,10 +492,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
               const newVal = parseInt(cellRowInput, 10);
               if (
                 isNaN(newVal) ||
-                newVal < 1 ||
-                newVal > parseDimensions(variableShape)[0]
+                newVal < 0 ||
+                newVal > parseDimensions(variableShape)[0] - 1
               ) {
-                setCellRowInput('1');
+                setCellRowInput('0');
               }
             }}
           />
@@ -510,10 +510,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 const newVal = parseInt(cellColumnInput, 10);
                 if (
                   isNaN(newVal) ||
-                  newVal < 1 ||
-                  newVal > parseDimensions(variableShape)[1]
+                  newVal < 0 ||
+                  newVal > parseDimensions(variableShape)[1]-1
                 ) {
-                  setCellColumnInput('1');
+                  setCellColumnInput('0');
                 } else {
                   handleGotoCell();
                 }
@@ -523,10 +523,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
               const newVal = parseInt(cellColumnInput, 10);
               if (
                 isNaN(newVal) ||
-                newVal < 1 ||
-                newVal > parseDimensions(variableShape)[1]
+                newVal < 0 ||
+                newVal > parseDimensions(variableShape)[1]-1
               ) {
-                setCellColumnInput('1');
+                setCellColumnInput('0');
               }
             }}
           />
@@ -537,7 +537,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
           </button>
         </div>
       </div>
-      <div style={{ height: '86%' }}>
+      <div style={{ height: '94%' }}>
         {/* Grid */}
         <AutoSizer key={autoSizerKey}>
           {({ width, height }: { width: number; height: number }) => (

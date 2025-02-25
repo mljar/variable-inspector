@@ -390,4 +390,25 @@
   margin: 0px 4px;
 }
 
+.ReactVirtualized__Grid::-webkit-scrollbar {
+  width: 9px;
+  height: 8px;
+}
+
+.ReactVirtualized__Grid::-webkit-scrollbar-track {
+  background: var(--jp-layout-color3);
+  border-radius: 8px;
+}
+
+.ReactVirtualized__Grid::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* .ReactVirtualized__Grid::-webkit-scrollbar-thumb:hover { */
+/*   background: #555; */
+/* } */
+
 
