@@ -17,7 +17,6 @@ def __get_variable_shape(obj):
             if len(set(map(len, obj))) == 1:
                 return f"{len(obj)} x {len(obj[0])}"
             else:
-                # Dla niejednolitych podlist zwracamy tylko liczbę wierszy
                 return f"{len(obj)}"
         return str(len(obj))
     return ""
@@ -109,7 +108,7 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
                 result.append(col_values)
             returnedSize = [start_row, actual_end_row, 0, 1]
             return JSON({
-                "variable": varName,
+                "variable": var_name,
                 "variableType": var_type,
                 "variableShape": var_shape,
                 "returnedSize": returnedSize,

@@ -136,7 +136,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         vrb.dimension === 1 && vrb.type === 'list' ? (
           <button
             className="mljar-variable-inspector-variable-preview"
-            title={vrb.value}
+            title={preview}
             onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
           >
             {preview}
