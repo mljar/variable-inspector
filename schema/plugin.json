@@ -14,7 +14,7 @@
       "type": "boolean",
       "title": "variableInspectorShowType",
       "description": "Show Type Column",
-      "default": false
+      "default": true
     },
     "variableInspectorShowShape": {
       "type": "boolean",
