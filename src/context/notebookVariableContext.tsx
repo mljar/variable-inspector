@@ -49,78 +49,78 @@ export const VariableContextProvider: React.FC<{
 
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {
-    setIsRefreshing(true);
-    setLoading(true);
-    setError(null);
+      setIsRefreshing(true);
+      setLoading(true);
+      setError(null);
 
+      if (!notebookPanel) {
+        setLoading(false);
+        setIsRefreshing(false);
+        return;
+      }
+      setVariables([]);
 
-    if (!notebookPanel) {
-      setLoading(false);
-      setIsRefreshing(false);
-      return;
-    }
-    setVariables([]);
-
-    try {
-      const future =
-        notebookPanel.sessionContext?.session?.kernel?.requestExecute({
-          code: variableDict,
-          store_history: false
-        });
-      if (future) {
-        future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
-          const msgType = msg.header.msg_type;
-          if (
-            msgType === 'execute_result' ||
-            msgType === 'display_data' ||
-            msgType === 'update_display_data' ||
-            msgType === 'error'
-          ) {
-            const content = msg.content as any;
-            const jsonData = content.data['application/json'];
-            const textData = content.data['text/plain'];
-            if (jsonData) {
-              setLoading(false);
-              setIsRefreshing(false);
-              setRefreshCount(prev => prev + 1);
-            } else if (textData) {
-              try {
-                const cleanedData = textData.replace(/^['"]|['"]$/g, '');
-                const doubleQuotedData = cleanedData.replace(/'/g, '"');
-                const parsedData: VariableInfo[] = JSON.parse(doubleQuotedData);
-                if (Array.isArray(parsedData)) {
-                  const mappedVariables: VariableInfo[] = parsedData.map(
-                    (item: any) => ({
-                      name: item.varName,
-                      type: item.varType,
-                      shape: item.varShape || 'None',
-                      dimension: item.varDimension,
-                      size: item.varSize,
-                      value: item.varSimpleValue,
-                    })
-                  );
-                  setVariables(mappedVariables);
-                } else {
-                  throw new Error('Error during parsing.');
+      try {
+        const future =
+          notebookPanel.sessionContext?.session?.kernel?.requestExecute({
+            code: variableDict,
+            store_history: false
+          });
+        if (future) {
+          future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
+            const msgType = msg.header.msg_type;
+            if (
+              msgType === 'execute_result' ||
+              msgType === 'display_data' ||
+              msgType === 'update_display_data' ||
+              msgType === 'error'
+            ) {
+              const content = msg.content as any;
+              const jsonData = content.data['application/json'];
+              const textData = content.data['text/plain'];
+              if (jsonData) {
+                setLoading(false);
+                setIsRefreshing(false);
+                setRefreshCount(prev => prev + 1);
+              } else if (textData) {
+                try {
+                  const cleanedData = textData.replace(/^['"]|['"]$/g, '');
+                  const doubleQuotedData = cleanedData.replace(/'/g, '"');
+                  const parsedData: VariableInfo[] =
+                    JSON.parse(doubleQuotedData);
+                  if (Array.isArray(parsedData)) {
+                    const mappedVariables: VariableInfo[] = parsedData.map(
+                      (item: any) => ({
+                        name: item.varName,
+                        type: item.varType,
+                        shape: item.varShape || 'None',
+                        dimension: item.varDimension,
+                        size: item.varSize,
+                        value: item.varSimpleValue
+                      })
+                    );
+                    setVariables(mappedVariables);
+                  } else {
+                    throw new Error('Error during parsing.');
+                  }
+                  setLoading(false);
+                  setIsRefreshing(false);
+                  setRefreshCount(prev => prev + 1);
+                } catch (err) {
+                  setError('Error during export JSON.');
+                  setLoading(false);
+                  setIsRefreshing(false);
                 }
-                setLoading(false);
-                setIsRefreshing(false);
-              setRefreshCount(prev => prev + 1);
-              } catch (err) {
-                setError('Error during export JSON.');
-                setLoading(false);
-                setIsRefreshing(false);
               }
             }
-          }
-        };
+          };
+        }
+      } catch (err) {
+        setError('Unexpected error.');
+        setLoading(false);
+        setIsRefreshing(false);
       }
-    } catch (err) {
-      setError('Unexpected error.');
-      setLoading(false);
-      setIsRefreshing(false);
-    }
-  });
+    });
   }, [notebookPanel, kernel]);
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export const VariableContextProvider: React.FC<{
         setSearchTerm,
         refreshVariables: executeCode,
         isRefreshing,
-        refreshCount,
+        refreshCount
       }}
     >
       {children}

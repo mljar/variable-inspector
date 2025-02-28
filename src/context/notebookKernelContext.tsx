@@ -45,5 +45,3 @@ export function NotebookKernelContextProvider({
     </NotebookKernelContext.Provider>
   );
 }
-
-

@@ -8,7 +8,7 @@ export function createEmptyVariableInspectorPanel(
   variableName: string,
   variableType: string,
   variableShape: string,
-  notebookPanel?: NotebookPanel | null,
+  notebookPanel?: NotebookPanel | null
 ): void {
   const panel = new VariablePanelWidget({
     variableName,
@@ -22,11 +22,11 @@ export function createEmptyVariableInspectorPanel(
   panel.title.closable = true;
   panel.title.icon = panelIcon;
 
- const existingPanel = Array.from(labShell.widgets('main')).find(
+  const existingPanel = Array.from(labShell.widgets('main')).find(
     widget => widget.id === panel.id
   );
 
-    if(existingPanel){
+  if (existingPanel) {
     labShell.add(panel, 'main', { mode: 'tab-after', ref: existingPanel.id });
   } else {
     labShell.add(panel, 'main', { mode: 'split-right' });

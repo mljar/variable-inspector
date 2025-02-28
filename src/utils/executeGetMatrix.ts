@@ -8,13 +8,19 @@ export const executeMatrixContent = async (
   varEndColumn: number,
   varStartRow: number,
   varEndRow: number,
-  notebookPanel: NotebookPanel,
+  notebookPanel: NotebookPanel
 ): Promise<any> => {
   if (!notebookPanel) {
     throw new Error('Kernel not available.');
   }
 
-  const code = getMatrix(varName, varStartRow, varEndRow, varStartColumn, varEndColumn);
+  const code = getMatrix(
+    varName,
+    varStartRow,
+    varEndRow,
+    varStartColumn,
+    varEndColumn
+  );
 
   return new Promise((resolve, reject) => {
     let outputData = '';

@@ -38,7 +38,6 @@ export function NotebookPanelContextProvider({
     return () => {
       notebookWatcher.notebookPanelChanged.disconnect(onNotebookPanelChange);
     };
-
   }, [notebookWatcher]);
 
   return (
@@ -47,4 +46,3 @@ export function NotebookPanelContextProvider({
     </NotebookPanelContext.Provider>
   );
 }
-

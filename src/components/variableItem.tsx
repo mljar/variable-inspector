@@ -55,7 +55,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         try {
           setPreview(`[ ${content} ]`);
         } catch (e) {
-          console.log('error');
+          console.error('Failed to load conent');
           setPreview('failed to load content');
         }
       } catch (err) {

@@ -5,7 +5,6 @@ import { Signal } from '@lumino/signaling';
 import { DocumentWidget } from '@jupyterlab/docregistry';
 import { NotebookPanel } from '@jupyterlab/notebook';
 
-
 function getNotebook(widget: Widget | null): Notebook | null {
   if (!(widget instanceof DocumentWidget)) {
     return null;
@@ -58,7 +57,6 @@ export function getNotebookSelections(notebook: Notebook): NotebookSelections {
     }
   }
 
-
   return selections;
 }
 
@@ -71,8 +69,6 @@ export class NotebookWatcher {
       this._notebookPanelChanged.emit(this._notebookPanel);
       this._attachKernelChangeHandler();
     });
-
-
   }
 
   get selection(): NotebookSelections {
@@ -87,7 +83,7 @@ export class NotebookWatcher {
     return this._notebookPanelChanged;
   }
 
-    get kernelInfo(): KernelInfo | null {
+  get kernelInfo(): KernelInfo | null {
     return this._kernelInfo;
   }
 
@@ -103,11 +99,10 @@ export class NotebookWatcher {
     return notebook.parent instanceof NotebookPanel ? notebook.parent : null;
   }
 
-
- private _attachKernelChangeHandler(): void {
+  private _attachKernelChangeHandler(): void {
     if (this._notebookPanel) {
       const session = this._notebookPanel.sessionContext.session;
-      
+
       if (session) {
         session.kernelChanged.connect(this._onKernelChanged, this);
         this._updateKernelInfo(session.kernel);
@@ -118,11 +113,12 @@ export class NotebookWatcher {
             delayedSession.kernelChanged.connect(this._onKernelChanged, this);
             this._updateKernelInfo(delayedSession.kernel);
           } else {
-            console.warn("Session not initialized after delay");
+            console.warn('Session not initialized after delay');
           }
-        }, 2000);      }
+        }, 2000);
+      }
     } else {
-      console.warn("Session not initalizated");
+      console.warn('Session not initalizated');
     }
   }
 
@@ -153,11 +149,12 @@ export class NotebookWatcher {
   protected _selections: NotebookSelections = [];
   protected _selectionChanged = new Signal<this, NotebookSelections>(this);
   protected _notebookPanel: NotebookPanel | null = null;
-  protected _notebookPanelChanged = new Signal<this, NotebookPanel | null>(this);
+  protected _notebookPanelChanged = new Signal<this, NotebookPanel | null>(
+    this
+  );
 }
 
 export type KernelInfo = {
   name: string;
   id: string;
 };
-

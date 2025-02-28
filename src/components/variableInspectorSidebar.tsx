@@ -71,7 +71,8 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
             >
               <VariableContextProvider>
                 <CodeExecutionContextProvider
-                settingRegistry={this.settingRegistry}>
+                  settingRegistry={this.settingRegistry}
+                >
                   <VariableListComponent
                     commands={this.commands}
                     labShell={this.labShell}

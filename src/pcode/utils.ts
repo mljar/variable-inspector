@@ -246,4 +246,4 @@ def __mljar_variable_inspector_deletevariable(x):
     exec("del %s" % x, globals())
 
 __mljar_variable_inspector_dict_list()
-`
+`;

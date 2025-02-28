@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect,useState, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode
+} from 'react';
 import { KernelMessage } from '@jupyterlab/services';
 import { IExecuteInputMsg } from '@jupyterlab/services/lib/kernel/messages';
 import { useNotebookPanelContext } from './notebookPanelContext';
@@ -8,7 +14,7 @@ import { variableDict } from '../pcode/utils';
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
-interface ICodeExecutionContext {}
+interface ICodeExecutionContext { }
 
 interface CodeExecutionContextProviderProps {
   children: ReactNode;
@@ -68,7 +74,11 @@ export const CodeExecutionContextProvider: React.FC<
       if (msg.header.msg_type === 'execute_input') {
         const inputMsg = msg as IExecuteInputMsg;
         const code = inputMsg.content.code;
-        if (code !== getVariableCode && !code.includes(matrixFunctionHeader) && autoRefresh) {
+        if (
+          code !== getVariableCode &&
+          !code.includes(matrixFunctionHeader) &&
+          autoRefresh
+        ) {
           refreshVariables();
         }
       }
@@ -79,7 +89,7 @@ export const CodeExecutionContextProvider: React.FC<
     return () => {
       kernel.iopubMessage.disconnect(handleIOPubMessage);
     };
-  }, [notebook, notebook?.sessionContext, kernelReady,autoRefresh]);
+  }, [notebook, notebook?.sessionContext, kernelReady, autoRefresh]);
 
   return (
     <CodeExecutionContext.Provider value={{}}>

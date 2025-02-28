@@ -5,7 +5,7 @@ export const getMatrix = (
   startColumn: number,
   endColumn: number
 ): string =>
-`
+  `
 import importlib
 from IPython.display import JSON
 
@@ -157,5 +157,4 @@ def __mljar_variable_inspector_get_matrix_content(var_name="${varName}", start_r
     })
 
 __mljar_variable_inspector_get_matrix_content()
-`
-;
+`;

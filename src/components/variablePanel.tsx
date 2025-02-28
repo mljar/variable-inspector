@@ -11,7 +11,7 @@ import { useVariableRefeshContext } from '../context/variableRefershContext';
 import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
 import { skipLeftIcon } from '../icons/skipLeftIcon';
 import { skipRightIcon } from '../icons/skipRightIcon';
-import { gridScanIcon } from '../icons/gridScanIcon'; 
+import { gridScanIcon } from '../icons/gridScanIcon';
 
 interface VariablePanelProps {
   variableName: string;
@@ -41,8 +41,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   const [variableType, setVariableType] = useState(initVariableType);
 
   useEffect(() => {
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
         if (mutation.type === 'attributes') {
           if (
             document.body.attributes
@@ -336,8 +336,8 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       const newColPage = Math.floor(targetGlobalCol / maxMatrixSize) + 1;
       setRowPageInput(newRowPage.toString());
       setColumnPageInput(newColPage.toString());
-      const localRow = targetGlobalRow - (newRowPage-1) * maxMatrixSize;
-      const localCol = targetGlobalCol - (newColPage-1) * maxMatrixSize;
+      const localRow = targetGlobalRow - (newRowPage - 1) * maxMatrixSize;
+      const localCol = targetGlobalCol - (newColPage - 1) * maxMatrixSize;
       const gridRow = fixedRowCount + localRow;
       const gridCol = fixedColumnCount + localCol;
       setCurrentRowPage(newRowPage);
@@ -480,7 +480,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 if (
                   isNaN(newVal) ||
                   newVal < 0 ||
-                  newVal > parseDimensions(variableShape)[0]-1
+                  newVal > parseDimensions(variableShape)[0] - 1
                 ) {
                   setCellRowInput('0');
                 } else {
@@ -511,7 +511,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
                 if (
                   isNaN(newVal) ||
                   newVal < 0 ||
-                  newVal > parseDimensions(variableShape)[1]-1
+                  newVal > parseDimensions(variableShape)[1] - 1
                 ) {
                   setCellColumnInput('0');
                 } else {
@@ -524,16 +524,17 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
               if (
                 isNaN(newVal) ||
                 newVal < 0 ||
-                newVal > parseDimensions(variableShape)[1]-1
+                newVal > parseDimensions(variableShape)[1] - 1
               ) {
                 setCellColumnInput('0');
               }
             }}
           />
-          <button onClick={handleGotoCell}
-          className="mljar-variable-inspector-skip-button"
+          <button
+            onClick={handleGotoCell}
+            className="mljar-variable-inspector-skip-button"
           >
-              <gridScanIcon.react className="mljar-variable-inspector-skip-icon" />
+            <gridScanIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
         </div>
       </div>

@@ -30,7 +30,9 @@ export class KernelOperationNotifier {
 
 export const kernelOperationNotifier = new KernelOperationNotifier();
 
-export async function withIgnoredSidebarKernelUpdates<T>(fn: () => Promise<T>): Promise<T> {
+export async function withIgnoredSidebarKernelUpdates<T>(
+  fn: () => Promise<T>
+): Promise<T> {
   kernelOperationNotifier.inProgressSidebar = true;
   try {
     return await fn();
@@ -39,7 +41,9 @@ export async function withIgnoredSidebarKernelUpdates<T>(fn: () => Promise<T>): 
   }
 }
 
-export async function withIgnoredPanelKernelUpdates<T>(fn: () => Promise<T>): Promise<T> {
+export async function withIgnoredPanelKernelUpdates<T>(
+  fn: () => Promise<T>
+): Promise<T> {
   kernelOperationNotifier.inProgressPanel = true;
   try {
     return await fn();
