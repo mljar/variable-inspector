@@ -10,9 +10,9 @@ import { IExecuteInputMsg } from '@jupyterlab/services/lib/kernel/messages';
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
 import { useVariableContext } from './notebookVariableContext';
-import { variableDict } from '../pcode/utils';
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { variableDict } from '../python_code/getVariables';
 
 interface ICodeExecutionContext { }
 

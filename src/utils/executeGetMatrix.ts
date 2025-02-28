@@ -1,6 +1,6 @@
 import { KernelMessage } from '@jupyterlab/services';
-import { getMatrix } from '../pcode/getMatrix';
 import { NotebookPanel } from '@jupyterlab/notebook';
+import { getMatrix } from '../python_code/getMatrix';
 
 export const executeMatrixContent = async (
   varName: string,

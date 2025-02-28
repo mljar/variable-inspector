@@ -9,9 +9,9 @@ import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useVariableRefeshContext } from '../context/variableRefershContext';
 import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
-import { skipLeftIcon } from '../icons/skipLeftIcon';
-import { skipRightIcon } from '../icons/skipRightIcon';
-import { gridScanIcon } from '../icons/gridScanIcon';
+import { useThemeContext } from '../context/themeContext';
+import { transformMatrixData } from '../utils/utils';
+import { PaginationControls } from './paginationControls';
 
 interface VariablePanelProps {
   variableName: string;
@@ -23,45 +23,15 @@ interface VariablePanelProps {
 const AutoSizer = RVAutoSizer as unknown as React.ComponentType<any>;
 const MultiGrid = RVMultiGrid as unknown as React.ComponentType<any>;
 
-function transpose<T>(matrix: T[][]): T[][] {
-  return matrix[0].map((_, colIndex) =>
-    matrix.map((row: T[]) => row[colIndex])
-  );
-}
-
 export const VariablePanel: React.FC<VariablePanelProps> = ({
   variableName,
   initVariableType,
   initVariableShape,
   notebookPanel
 }) => {
-  const t = document.body.dataset?.jpThemeName;
-  const [isDark, setIsDark] = useState(t !== undefined && t.includes('Dark'));
   const [variableShape, setVariableShape] = useState(initVariableShape);
   const [variableType, setVariableType] = useState(initVariableType);
-
-  useEffect(() => {
-    var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'attributes') {
-          if (
-            document.body.attributes
-              .getNamedItem('data-jp-theme-name')
-              ?.value.includes('Dark')
-          ) {
-            setIsDark(true);
-          } else {
-            setIsDark(false);
-          }
-        }
-      });
-    });
-    observer.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['data-jp-theme-name']
-    });
-  }, []);
-
+  const { isDark } = useThemeContext();
   const maxMatrixSize = 100;
   const [matrixData, setMatrixData] = useState<any[][]>([]);
   const { refreshCount } = useVariableRefeshContext();
@@ -90,8 +60,6 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     row: number;
     column: number;
   } | null>(null);
-  const headerSize = 50;
-  void headerSize;
 
   const fetchMatrixData = useCallback(async () => {
     try {
@@ -212,45 +180,13 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     return Math.max(1, Math.ceil(pagesDataSize / maxMatrixSize));
   }
 
-  let data2D: any[][] = [];
-  if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
-    data2D = (matrixData as any[]).map(item => [item]);
-  } else {
-    data2D = matrixData as any[][];
-  }
-
-  let data: any[][] = data2D;
-  let fixedRowCount = 0;
-  let fixedColumnCount = 0;
-
-  if (allowedTypes.includes(variableType) && data2D.length > 0) {
-    const globalColumnStart = (currentColumnPage - 1) * maxMatrixSize;
-    const headerRow = ['index'];
-    let length =
-      variableType === 'DataFrame' ? data2D[0].length - 1 : data2D[0].length;
-
-    for (let j = 0; j < length; j++) {
-      headerRow.push((globalColumnStart + j).toString());
-    }
-
-    let newData = [headerRow];
-    for (let i = 0; i < data2D.length; i++) {
-      if (variableType === 'DataFrame') {
-        newData.push([...data2D[i]]);
-      } else {
-        const globalIndex = (currentRowPage - 1) * maxMatrixSize + i;
-        newData.push([globalIndex, ...data2D[i]]);
-      }
-    }
-
-    if (variableType === 'DataFrame' || variableType === 'Series') {
-      newData = transpose(newData);
-    }
-    data2D = transpose(data2D);
-    data = newData;
-    fixedRowCount = 1;
-    fixedColumnCount = 1;
-  }
+  const { data, fixedRowCount, fixedColumnCount } = transformMatrixData(
+    matrixData,
+    variableType,
+    currentRowPage,
+    currentColumnPage,
+    maxMatrixSize
+  );
 
   const rowCount = data.length;
   const colCount = data[0]?.length || 0;
@@ -379,165 +315,28 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       }}
     >
       {/* pagination */}
-      <div
-        className="mljar-variable-inspector-grid-header"
-        style={{ height: '6%' }}
-      >
-        <div className="mljar-variable-inspector-grid-item">
-          <button
-            onClick={handlePrevRowPage}
-            className="mljar-variable-inspector-skip-button"
-          >
-            <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-          </button>
-          <input
-            type="number"
-            value={rowPageInput}
-            className="mljar-variable-inspector-grid-input"
-            onChange={e => {
-              setRowPageInput(e.target.value);
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const newPage = parseInt(rowPageInput, 10);
-                if (!isNaN(newPage) && newPage >= 1 && newPage <= maxRowPage) {
-                  setCurrentRowPage(newPage);
-                  setRowPageInput(currentRowPage.toString());
-                }
-              }
-            }}
-            onBlur={() => {
-              const newPage = parseInt(rowPageInput, 10);
-              if (isNaN(newPage) || newPage < 1 || newPage > maxRowPage) {
-                setRowPageInput(currentRowPage.toString());
-              } else {
-                setCurrentRowPage(newPage);
-              }
-            }}
-          />
-          <span>/ {maxRowPage} (Rows)</span>
-          <button
-            onClick={handleNextRowPage}
-            className="mljar-variable-inspector-skip-button"
-          >
-            <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-          </button>
-          <button
-            onClick={handlePrevColumnPage}
-            className="mljar-variable-inspector-skip-button"
-          >
-            <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-          </button>
-          <input
-            type="number"
-            value={columnPageInput}
-            className="mljar-variable-inspector-grid-input"
-            onChange={e => {
-              setColumnPageInput(e.target.value);
-            }}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const newPage = parseInt(columnPageInput, 10);
-                if (
-                  !isNaN(newPage) &&
-                  newPage >= 1 &&
-                  newPage <= maxColumnPage
-                ) {
-                  setCurrentColumnPage(newPage);
-                } else {
-                  setColumnPageInput(currentColumnPage.toString());
-                }
-              }
-            }}
-            onBlur={() => {
-              const newPage = parseInt(columnPageInput, 10);
-              if (isNaN(newPage) || newPage < 1 || newPage > maxColumnPage) {
-                setColumnPageInput(currentColumnPage.toString());
-              } else {
-                setCurrentColumnPage(newPage);
-              }
-            }}
-          />
-          <span>/ {maxColumnPage} (Columns)</span>
-          <button
-            onClick={handleNextColumnPage}
-            className="mljar-variable-inspector-skip-button"
-          >
-            <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-          </button>
-        </div>
-        <div className="mljar-variable-inspector-grid-item">
-          <span>Goto cell: </span>
-          <input
-            type="number"
-            placeholder="Row"
-            value={cellRowInput}
-            className="mljar-variable-inspector-grid-input"
-            onChange={e => setCellRowInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const newVal = parseInt(cellRowInput, 10);
-                if (
-                  isNaN(newVal) ||
-                  newVal < 0 ||
-                  newVal > parseDimensions(variableShape)[0] - 1
-                ) {
-                  setCellRowInput('0');
-                } else {
-                  handleGotoCell();
-                }
-              }
-            }}
-            onBlur={() => {
-              const newVal = parseInt(cellRowInput, 10);
-              if (
-                isNaN(newVal) ||
-                newVal < 0 ||
-                newVal > parseDimensions(variableShape)[0] - 1
-              ) {
-                setCellRowInput('0');
-              }
-            }}
-          />
-          <input
-            type="number"
-            placeholder="Column"
-            value={cellColumnInput}
-            className="mljar-variable-inspector-grid-input"
-            onChange={e => setCellColumnInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                const newVal = parseInt(cellColumnInput, 10);
-                if (
-                  isNaN(newVal) ||
-                  newVal < 0 ||
-                  newVal > parseDimensions(variableShape)[1] - 1
-                ) {
-                  setCellColumnInput('0');
-                } else {
-                  handleGotoCell();
-                }
-              }
-            }}
-            onBlur={() => {
-              const newVal = parseInt(cellColumnInput, 10);
-              if (
-                isNaN(newVal) ||
-                newVal < 0 ||
-                newVal > parseDimensions(variableShape)[1] - 1
-              ) {
-                setCellColumnInput('0');
-              }
-            }}
-          />
-          <button
-            onClick={handleGotoCell}
-            className="mljar-variable-inspector-skip-button"
-          >
-            <gridScanIcon.react className="mljar-variable-inspector-skip-icon" />
-          </button>
-        </div>
-      </div>
+      <PaginationControls
+        rowPageInput={rowPageInput}
+        setRowPageInput={setRowPageInput}
+        currentRowPage={currentRowPage}
+        setCurrentRowPage={setCurrentRowPage}
+        maxRowPage={maxRowPage}
+        columnPageInput={columnPageInput}
+        setColumnPageInput={setColumnPageInput}
+        currentColumnPage={currentColumnPage}
+        setCurrentColumnPage={setCurrentColumnPage}
+        maxColumnPage={maxColumnPage}
+        cellRowInput={cellRowInput}
+        setCellRowInput={setCellRowInput}
+        cellColumnInput={cellColumnInput}
+        setCellColumnInput={setCellColumnInput}
+        handleGotoCell={handleGotoCell}
+        handlePrevRowPage={handlePrevRowPage}
+        handleNextRowPage={handleNextRowPage}
+        handlePrevColumnPage={handlePrevColumnPage}
+        handleNextColumnPage={handleNextColumnPage}
+      />
+
       <div style={{ height: '94%' }}>
         {/* Grid */}
         <AutoSizer key={autoSizerKey}>

@@ -8,8 +8,8 @@ import React, {
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
 import { KernelMessage } from '@jupyterlab/services';
-import { variableDict } from '../pcode/utils';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
+import { variableDict } from '../python_code/getVariables';
 
 interface VariableInfo {
   name: string;

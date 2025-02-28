@@ -3,6 +3,7 @@ import React from 'react';
 import { VariablePanel } from './variablePanel';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { VariableRefreshContextProvider } from '../context/variableRefershContext';
+import { ThemeContextProvider } from '../context/themeContext';
 
 export interface VariablePanelWidgetProps {
   variableName: string;
@@ -23,12 +24,14 @@ export class VariablePanelWidget extends ReactWidget {
         <VariableRefreshContextProvider
           notebookPanel={this.props.notebookPanel}
         >
+        <ThemeContextProvider>
           <VariablePanel
             variableName={this.props.variableName}
             initVariableType={this.props.variableType}
             initVariableShape={this.props.variableShape}
             notebookPanel={this.props.notebookPanel}
           />
+          </ThemeContextProvider>
         </VariableRefreshContextProvider>
       </div>
     );

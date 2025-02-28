@@ -1,1 +1,1 @@
-export const allowedTypes = ['ndarray', 'DataFrame', 'list', 'Series'];
+export const allowedTypes = ['ndarray', 'DataFrame', 'list', 'Series', 'tuple'];
