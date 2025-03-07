@@ -32,22 +32,17 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   const [variableShape, setVariableShape] = useState(initVariableShape);
   const [variableType, setVariableType] = useState(initVariableType);
   const { isDark } = useThemeContext();
-  const maxMatrixSize = 100;
+  const maxRowsRange = 100;
+  const maxColsRange = 50;
   const [matrixData, setMatrixData] = useState<any[][]>([]);
   const { refreshCount } = useVariableRefeshContext();
-  const [currentRowPage, setCurrentRowPage] = useState(1);
-  const [currentColumnPage, setCurrentColumnPage] = useState(1);
+  const [currentRow, setCurrentRow] = useState(0);
+  const [currentColumn, setCurrentColumn] = useState(0);
   const [returnedSize, setReturnedSize] = useState<any[]>([]);
-  const [maxRowPage, setMaxRowPage] = useState(
-    getMaxPage(parseDimensions(variableShape)[0])
-  );
-  const [rowPageInput, setRowPageInput] = useState(currentRowPage.toString());
-  const [columnPageInput, setColumnPageInput] = useState(
-    currentColumnPage.toString()
-  );
-  const [maxColumnPage, setMaxColumnPage] = useState(
-    getMaxPage(parseDimensions(variableShape)[1])
-  );
+  const [rowInput, setRowInput] = useState(currentRow.toString());
+  const [columnInput, setColumnInput] = useState(currentColumn.toString());
+  const [rowsCount, setRowsCount] = useState(parseDimensions(variableShape)[0]);
+  const [colsCount, setColsCount] = useState(parseDimensions(variableShape)[1]);
   const [autoSizerKey, setAutoSizerKey] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [cellRowInput, setCellRowInput] = useState('');
@@ -70,10 +65,15 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       const result = await withIgnoredPanelKernelUpdates(() =>
         executeMatrixContent(
           variableName,
-          (currentColumnPage - 1) * maxMatrixSize,
-          currentColumnPage * maxMatrixSize,
-          (currentRowPage - 1) * maxMatrixSize,
-          currentRowPage * maxMatrixSize,
+          currentColumn,
+          currentColumn + maxColsRange > colsCount
+            ? colsCount
+            : currentColumn + maxColsRange,
+          currentRow,
+          currentRow + maxRowsRange > rowsCount
+            ? rowsCount
+            : currentRow + maxRowsRange,
+
           notebookPanel
         )
       );
@@ -87,9 +87,10 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   }, [
     notebookPanel,
     variableName,
-    currentColumnPage,
-    currentRowPage,
-    maxMatrixSize,
+    currentColumn,
+    currentRow,
+    maxColsRange,
+    maxRowsRange,
     withIgnoredPanelKernelUpdates,
     executeMatrixContent,
     setVariableShape,
@@ -101,25 +102,23 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   ]);
 
   useEffect(() => {
-    setRowPageInput(currentRowPage.toString());
-  }, [currentRowPage]);
+    setRowInput(currentRow.toString());
+  }, [currentRow]);
 
   useEffect(() => {
-    setColumnPageInput(currentColumnPage.toString());
-  }, [currentColumnPage]);
+    setColumnInput(currentColumn.toString());
+  }, [currentColumn]);
 
   useEffect(() => {
     fetchMatrixData();
     const [rows, cols] = parseDimensions(variableShape);
-    setMaxRowPage(getMaxPage(rows));
-    setMaxColumnPage(getMaxPage(cols));
-    setCurrentRowPage(1);
-    setCurrentColumnPage(1);
+    setRowsCount(rows);
+    setColsCount(cols);
   }, [refreshCount]);
 
   useEffect(() => {
     fetchMatrixData();
-  }, [currentRowPage, currentColumnPage]);
+  }, [currentRow, currentColumn]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -136,27 +135,63 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     }
   }, []);
 
-  const handlePrevRowPage = () => {
-    if (currentRowPage > 1) {
-      setCurrentRowPage(currentRowPage - 1);
+  const handlePrevRowPage = (value: string) => {
+    if (value === 'previous') {
+      if (currentRow > maxRowsRange - 1) {
+        setCurrentRow(currentRow - maxRowsRange);
+      } else {
+        setCurrentRow(0);
+      }
+    }
+    if (value === 'first') {
+      setCurrentRow(0);
     }
   };
 
-  const handleNextRowPage = () => {
-    if (currentRowPage < maxRowPage) {
-      setCurrentRowPage(currentRowPage + 1);
+  const handleNextRowPage = (value: string) => {
+    if (rowsCount > maxRowsRange) {
+      if (value === 'next') {
+        if (currentRow + 2 * maxRowsRange < rowsCount) {
+          setCurrentRow(currentRow + maxRowsRange);
+        } else {
+          setCurrentRow(rowsCount - maxRowsRange);
+        }
+      }
+      if (value === 'last') {
+        setCurrentRow(rowsCount - maxRowsRange);
+      }
+    } else {
+      setCurrentRow(0);
     }
   };
 
-  const handlePrevColumnPage = () => {
-    if (currentColumnPage > 1) {
-      setCurrentColumnPage(currentColumnPage - 1);
+  const handlePrevColumnPage = (value: string) => {
+    if (value === 'previous') {
+      if (currentColumn > maxColsRange - 1) {
+        setCurrentColumn(currentColumn - maxColsRange);
+      } else {
+        setCurrentColumn(0);
+      }
+    }
+    if (value === 'first') {
+      setCurrentColumn(0);
     }
   };
 
-  const handleNextColumnPage = () => {
-    if (currentColumnPage < maxColumnPage) {
-      setCurrentColumnPage(currentColumnPage + 1);
+  const handleNextColumnPage = (value: string) => {
+    if (colsCount > maxColsRange) {
+      if (value === 'next') {
+        if (currentColumn + 2 * maxColsRange < colsCount) {
+          setCurrentColumn(currentColumn + maxColsRange);
+        } else {
+          setCurrentColumn(colsCount - maxColsRange);
+        }
+      }
+      if (value === 'last') {
+        setCurrentColumn(colsCount - maxColsRange);
+      }
+    } else {
+      setCurrentColumn(0);
     }
   };
 
@@ -176,16 +211,11 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     throw new Error('Wrong format');
   }
 
-  function getMaxPage(pagesDataSize: number) {
-    return Math.max(1, Math.ceil(pagesDataSize / maxMatrixSize));
-  }
-
   const { data, fixedRowCount, fixedColumnCount } = transformMatrixData(
     matrixData,
     variableType,
-    currentRowPage,
-    currentColumnPage,
-    maxMatrixSize
+    currentRow,
+    currentColumn
   );
 
   const rowCount = data.length;
@@ -268,16 +298,16 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
       !isNaN(targetGlobalCol) &&
       targetGlobalCol >= 0
     ) {
-      const newRowPage = Math.floor(targetGlobalRow / maxMatrixSize) + 1;
-      const newColPage = Math.floor(targetGlobalCol / maxMatrixSize) + 1;
-      setRowPageInput(newRowPage.toString());
-      setColumnPageInput(newColPage.toString());
-      const localRow = targetGlobalRow - (newRowPage - 1) * maxMatrixSize;
-      const localCol = targetGlobalCol - (newColPage - 1) * maxMatrixSize;
+      const newRowPage = Math.floor(targetGlobalRow / maxRowsRange) + 1;
+      const newColPage = Math.floor(targetGlobalCol / maxColsRange) + 1;
+      setRowInput(newRowPage.toString());
+      setColumnInput(newColPage.toString());
+      const localRow = targetGlobalRow - (newRowPage - 1) * maxRowsRange;
+      const localCol = targetGlobalCol - (newColPage - 1) * maxColsRange;
       const gridRow = fixedRowCount + localRow;
       const gridCol = fixedColumnCount + localCol;
-      setCurrentRowPage(newRowPage);
-      setCurrentColumnPage(newColPage);
+      setCurrentRow(newRowPage);
+      setCurrentColumn(newColPage);
       setTimeout(() => {
         setGotoCell({ row: gridRow, column: gridCol });
         setHighlightCell({ row: gridRow, column: gridCol });
@@ -307,37 +337,14 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
   return (
     <div
       ref={containerRef}
-      className="mljar-variable-inspector-grid-container"
+      className="mljar-variable-inspector-pagination-container"
       style={{
         height: '100%',
         background: isDark ? '#222' : '#fff',
         color: isDark ? '#ddd' : '#000'
       }}
     >
-      {/* pagination */}
-      <PaginationControls
-        rowPageInput={rowPageInput}
-        setRowPageInput={setRowPageInput}
-        currentRowPage={currentRowPage}
-        setCurrentRowPage={setCurrentRowPage}
-        maxRowPage={maxRowPage}
-        columnPageInput={columnPageInput}
-        setColumnPageInput={setColumnPageInput}
-        currentColumnPage={currentColumnPage}
-        setCurrentColumnPage={setCurrentColumnPage}
-        maxColumnPage={maxColumnPage}
-        cellRowInput={cellRowInput}
-        setCellRowInput={setCellRowInput}
-        cellColumnInput={cellColumnInput}
-        setCellColumnInput={setCellColumnInput}
-        handleGotoCell={handleGotoCell}
-        handlePrevRowPage={handlePrevRowPage}
-        handleNextRowPage={handleNextRowPage}
-        handlePrevColumnPage={handlePrevColumnPage}
-        handleNextColumnPage={handleNextColumnPage}
-      />
-
-      <div style={{ height: '94%' }}>
+      <div style={{ height: '90%' }}>
         {/* Grid */}
         <AutoSizer key={autoSizerKey}>
           {({ width, height }: { width: number; height: number }) => (
@@ -362,6 +369,30 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
             />
           )}
         </AutoSizer>
+      </div>
+      <div>
+        {/* pagination */}
+        <PaginationControls
+          rowsCount={rowsCount}
+          colsCount={colsCount}
+          rowInput={rowInput}
+          setRowInput={setRowInput}
+          currentRow={currentRow}
+          setCurrentRow={setCurrentRow}
+          columnInput={columnInput}
+          setColumnInput={setColumnInput}
+          currentColumn={currentColumn}
+          setCurrentColumn={setCurrentColumn}
+          cellRowInput={cellRowInput}
+          setCellRowInput={setCellRowInput}
+          cellColumnInput={cellColumnInput}
+          setCellColumnInput={setCellColumnInput}
+          handleGotoCell={handleGotoCell}
+          handlePrevRowPage={handlePrevRowPage}
+          handleNextRowPage={handleNextRowPage}
+          handlePrevColumnPage={handlePrevColumnPage}
+          handleNextColumnPage={handleNextColumnPage}
+        />
       </div>
     </div>
   );

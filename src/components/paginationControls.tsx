@@ -1,41 +1,43 @@
 import React from 'react';
 import { skipLeftIcon } from '../icons/skipLeftIcon';
+import { smallSkipLeftIcon } from '../icons/smallSkipLeftIcon';
+import { smallSkipRightIcon } from '../icons/smallSkipRightIcon';
 import { skipRightIcon } from '../icons/skipRightIcon';
-import { gridScanIcon } from '../icons/gridScanIcon';
+// import { gridScanIcon } from '../icons/gridScanIcon';
 
 interface PaginationControlsProps {
-  rowPageInput: string;
-  setRowPageInput: (value: string) => void;
-  currentRowPage: number;
-  setCurrentRowPage: (value: number) => void;
-  maxRowPage: number;
-  columnPageInput: string;
-  setColumnPageInput: (value: string) => void;
-  currentColumnPage: number;
-  setCurrentColumnPage: (value: number) => void;
-  maxColumnPage: number;
+  rowsCount: number;
+  colsCount: number;
+  rowInput: string;
+  setRowInput: (value: string) => void;
+  currentRow: number;
+  setCurrentRow: (value: number) => void;
+  columnInput: string;
+  setColumnInput: (value: string) => void;
+  currentColumn: number;
+  setCurrentColumn: (value: number) => void;
   cellRowInput: string;
   setCellRowInput: (value: string) => void;
   cellColumnInput: string;
   setCellColumnInput: (value: string) => void;
   handleGotoCell: () => void;
-  handlePrevRowPage: () => void;
-  handleNextRowPage: () => void;
-  handlePrevColumnPage: () => void;
-  handleNextColumnPage: () => void;
+  handlePrevRowPage: (value: string) => void;
+  handleNextRowPage: (value: string) => void;
+  handlePrevColumnPage: (value: string) => void;
+  handleNextColumnPage: (value: string) => void;
 }
 
 export const PaginationControls: React.FC<PaginationControlsProps> = ({
-  rowPageInput,
-  setRowPageInput,
-  currentRowPage,
-  setCurrentRowPage,
-  maxRowPage,
-  columnPageInput,
-  setColumnPageInput,
-  currentColumnPage,
-  setCurrentColumnPage,
-  maxColumnPage,
+  rowsCount,
+  colsCount,
+  rowInput,
+  setRowInput,
+  currentRow,
+  setCurrentRow,
+  columnInput,
+  setColumnInput,
+  currentColumn,
+  setCurrentColumn,
   cellRowInput,
   setCellRowInput,
   cellColumnInput,
@@ -47,121 +49,197 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
   handleNextColumnPage
 }) => {
   return (
-    <div className="mljar-variable-inspector-grid-header" style={{ height: '6%' }}>
-      <div className="mljar-variable-inspector-grid-item">
-        <button onClick={handlePrevRowPage} className="mljar-variable-inspector-skip-button">
-          <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-        </button>
-        <input
-          type="number"
-          value={rowPageInput}
-          className="mljar-variable-inspector-grid-input"
-          onChange={e => setRowPageInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              const newPage = parseInt(rowPageInput, 10);
-              if (!isNaN(newPage) && newPage >= 1 && newPage <= maxRowPage) {
-                setCurrentRowPage(newPage);
-                setRowPageInput(newPage.toString());
+    <div className="mljar-variable-inspector-pagination-container">
+      <div className="mljar-variable-inspector-pagination-item">
+        <div className="mljar-variable-inspector-choose-range">
+          <span>Displaying rows from </span>
+          <button
+            onClick={e => handlePrevRowPage('first')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display first 100 rows'}
+          >
+            <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <button
+            onClick={e => handlePrevRowPage('previous')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display previous 100 rows'}
+          >
+            <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <input
+            title={'Start with row'}
+            type="number"
+            min={0}
+            max={rowsCount - 1}
+            value={rowInput === '' ? (rowInput = '0') : rowInput}
+            className="mljar-variable-inspector-pagination-input"
+            onChange={e => setRowInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newPage = parseInt(rowInput, 10);
+                if (!isNaN(newPage) && newPage >= 0 && newPage <= rowsCount) {
+                  setCurrentRow(newPage);
+                  setRowInput(newPage.toString());
+                }
               }
-            }
-          }}
-          onBlur={() => {
-            const newPage = parseInt(rowPageInput, 10);
-            if (isNaN(newPage) || newPage < 1 || newPage > maxRowPage) {
-              setRowPageInput(currentRowPage.toString());
-            } else {
-              setCurrentRowPage(newPage);
-            }
-          }}
-        />
-        <span>/ {maxRowPage} (Rows)</span>
-        <button onClick={handleNextRowPage} className="mljar-variable-inspector-skip-button">
-          <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-        </button>
-        <button onClick={handlePrevColumnPage} className="mljar-variable-inspector-skip-button">
-          <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-        </button>
-        <input
-          type="number"
-          value={columnPageInput}
-          className="mljar-variable-inspector-grid-input"
-          onChange={e => setColumnPageInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              const newPage = parseInt(columnPageInput, 10);
-              if (!isNaN(newPage) && newPage >= 1 && newPage <= maxColumnPage) {
-                setCurrentColumnPage(newPage);
+            }}
+            onBlur={() => {
+              const newPage = parseInt(rowInput, 10);
+              if (isNaN(newPage) || newPage < 0 || newPage > rowsCount) {
+                setRowInput(currentRow.toString());
               } else {
-                setColumnPageInput(currentColumnPage.toString());
+                setCurrentRow(newPage);
               }
-            }
-          }}
-          onBlur={() => {
-            const newPage = parseInt(columnPageInput, 10);
-            if (isNaN(newPage) || newPage < 1 || newPage > maxColumnPage) {
-              setColumnPageInput(currentColumnPage.toString());
-            } else {
-              setCurrentColumnPage(newPage);
-            }
-          }}
-        />
-        <span>/ {maxColumnPage} (Columns)</span>
-        <button onClick={handleNextColumnPage} className="mljar-variable-inspector-skip-button">
-          <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-        </button>
-      </div>
-      <div className="mljar-variable-inspector-grid-item">
-        <span>Goto cell: </span>
-        <input
-          type="number"
-          placeholder="Row"
-          value={cellRowInput}
-          className="mljar-variable-inspector-grid-input"
-          onChange={e => setCellRowInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
+            }}
+          />
+          <span>to </span>
+          <span>
+            {parseInt(rowInput) + 99 >= rowsCount
+              ? rowsCount - 1
+              : parseInt(rowInput) + 99}
+          </span>
+          <button
+            onClick={e => handleNextRowPage('next')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display next 100 rows'}
+          >
+            <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <button
+            onClick={e => handleNextRowPage('last')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display last 100 rows'}
+          >
+            <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <span>
+            from total <span style={{ fontWeight: 600 }}>{rowsCount}</span> rows
+          </span>
+        </div>
+        <div className="mljar-variable-inspector-choose-range">
+          <span>Displaying columns from </span>
+          <button
+            onClick={e => handlePrevColumnPage('first')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display first 50 columns'}
+          >
+            <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <button
+            onClick={e => handlePrevColumnPage('previous')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display previous 50 columns'}
+          >
+            <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <input
+            title={'Start with column'}
+            type="number"
+            min={0}
+            max={colsCount - 1}
+            value={columnInput === '' ? (columnInput = '0') : columnInput}
+            className="mljar-variable-inspector-pagination-input"
+            onChange={e => setColumnInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newPage = parseInt(columnInput, 10);
+                if (!isNaN(newPage) && newPage >= 0 && newPage <= colsCount) {
+                  setCurrentColumn(newPage);
+                  setColumnInput(newPage.toString());
+                }
+              }
+            }}
+            onBlur={() => {
+              const newPage = parseInt(columnInput, 10);
+              if (isNaN(newPage) || newPage < 0 || newPage > colsCount) {
+                setColumnInput(currentColumn.toString());
+              } else {
+                setCurrentColumn(newPage);
+              }
+            }}
+          />
+          <span>to </span>
+          <span>
+            {parseInt(columnInput) + 49 >= colsCount
+              ? colsCount - 1
+              : parseInt(columnInput) + 49}
+          </span>
+          <button
+            onClick={e => handleNextColumnPage('next')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display next 50 columns'}
+          >
+            <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <button
+            onClick={e => handleNextColumnPage('last')}
+            className="mljar-variable-inspector-skip-button"
+            title={'Display last 50 columns'}
+          >
+            <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+          <span>
+            from total <span style={{ fontWeight: 600 }}>{colsCount}</span>{' '}
+            columns
+          </span>
+        </div>
+        {/* Goto Cell section */}
+        {/* <div className="mljar-variable-inspector-choose-range">
+          <span>Goto cell: </span>
+          <input
+            type="number"
+            placeholder="Row"
+            value={cellRowInput}
+            className="mljar-variable-inspector-pagination-input"
+            onChange={e => setCellRowInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newVal = parseInt(cellRowInput, 10);
+                if (isNaN(newVal) || newVal < 0) {
+                  setCellRowInput('0');
+                } else {
+                  handleGotoCell();
+                }
+              }
+            }}
+            onBlur={() => {
               const newVal = parseInt(cellRowInput, 10);
               if (isNaN(newVal) || newVal < 0) {
                 setCellRowInput('0');
-              } else {
-                handleGotoCell();
               }
-            }
-          }}
-          onBlur={() => {
-            const newVal = parseInt(cellRowInput, 10);
-            if (isNaN(newVal) || newVal < 0) {
-              setCellRowInput('0');
-            }
-          }}
-        />
-        <input
-          type="number"
-          placeholder="Column"
-          value={cellColumnInput}
-          className="mljar-variable-inspector-grid-input"
-          onChange={e => setCellColumnInput(e.target.value)}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
+            }}
+          />
+          <input
+            type="number"
+            placeholder="Column"
+            value={cellColumnInput}
+            className="mljar-variable-inspector-pagination-input"
+            onChange={e => setCellColumnInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const newVal = parseInt(cellColumnInput, 10);
+                if (isNaN(newVal) || newVal < 0) {
+                  setCellColumnInput('0');
+                } else {
+                  handleGotoCell();
+                }
+              }
+            }}
+            onBlur={() => {
               const newVal = parseInt(cellColumnInput, 10);
               if (isNaN(newVal) || newVal < 0) {
                 setCellColumnInput('0');
-              } else {
-                handleGotoCell();
               }
-            }
-          }}
-          onBlur={() => {
-            const newVal = parseInt(cellColumnInput, 10);
-            if (isNaN(newVal) || newVal < 0) {
-              setCellColumnInput('0');
-            }
-          }}
-        />
-        <button onClick={handleGotoCell} className="mljar-variable-inspector-skip-button">
-          <gridScanIcon.react className="mljar-variable-inspector-skip-icon" />
-        </button>
+            }}
+          />
+          <button
+            onClick={handleGotoCell}
+            className="mljar-variable-inspector-skip-button"
+          >
+            <gridScanIcon.react className="mljar-variable-inspector-skip-icon" />
+          </button>
+        </div> */}
       </div>
     </div>
   );

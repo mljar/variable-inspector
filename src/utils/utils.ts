@@ -1,4 +1,4 @@
-import { allowedTypes } from "./allowedTypes";
+import { allowedTypes } from './allowedTypes';
 
 export function transpose<T>(matrix: T[][]): T[][] {
   return matrix[0].map((_, colIndex) =>
@@ -21,9 +21,8 @@ interface TransformedMatrix {
 export function transformMatrixData(
   matrixData: any[],
   variableType: string,
-  currentRowPage: number,
-  currentColumnPage: number,
-  maxMatrixSize: number
+  currentRow: number,
+  currentColumn: number
 ): TransformedMatrix {
   let data2D: any[][] = [];
   if (matrixData.length > 0 && !Array.isArray(matrixData[0])) {
@@ -37,12 +36,12 @@ export function transformMatrixData(
   let fixedColumnCount = 0;
 
   if (data2D.length > 0 && allowedTypes.includes(variableType)) {
-    const globalColumnStart = (currentColumnPage - 1) * maxMatrixSize;
+    const globalRowStart = currentRow;
     const headerRow = ['index'];
     const headerLength =
       variableType === 'DataFrame' ? data2D[0].length - 1 : data2D[0].length;
     for (let j = 0; j < headerLength; j++) {
-      headerRow.push((globalColumnStart + j).toString());
+      headerRow.push((globalRowStart + j).toString());
     }
 
     let newData = [headerRow];
@@ -50,7 +49,7 @@ export function transformMatrixData(
       if (variableType === 'DataFrame') {
         newData.push([...data2D[i]]);
       } else {
-        const globalIndex = (currentRowPage - 1) * maxMatrixSize + i;
+        const globalIndex = currentRow + i;
         newData.push([globalIndex, ...data2D[i]]);
       }
     }
@@ -67,4 +66,3 @@ export function transformMatrixData(
 
   return { data, fixedRowCount, fixedColumnCount };
 }
-

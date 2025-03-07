@@ -221,7 +221,8 @@
   color: #0099cc;
   background-color: transparent;
   border: none;
-  padding: 0px;
+  padding: 2px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 0.75rem;
   transition: background-color 0.3s ease;
@@ -365,29 +366,47 @@
   }
 }
 
-.mljar-variable-inspector-grid-header {
+.mljar-variable-inspector-pagination-container {
+  padding: 8px;
+  background-color: var(--jp-layout-color0);
+  margin: auto;
+  align-items: center;
+}
+
+.mljar-variable-inspector-pagination-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  background-color: var(--jp-layout-color0);
-  border-bottom: 2px solid var(--jp-border-color2);
+  gap: 10px;
 }
 
-.mljar-variable-inspector-grid-header .mljar-variable-inspector-grid-item {
+.mljar-variable-inspector-choose-range {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  /* font-weight: bold; */
-  margin: 0px;
-  width: 100%;
+  gap: 10px;
+  font-size: 14px;
 }
 
-.mljar-variable-inspector-grid-input {
-  width: 65px;
-  height: 8px;
-  margin: 0px 4px;
+.mljar-variable-inspector-pagination-input {
+  width: 60px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--jp-border-color2);
+}
+
+.mljar-variable-inspector-pagination-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+.mljar-variable-inspector-pagination-input::-webkit-outer-spin-button,
+.mljar-variable-inspector-pagination-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .ReactVirtualized__Grid::-webkit-scrollbar {
@@ -437,11 +456,11 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  text-align: left;   
+  text-align: left;
   color: var(--jp-ui-font-color1);
 }
 
 .mljar-variable-inspector-variable-preview:hover {
   text-decoration: underline;
-  background-color: #D3D3D3;
+  background-color: #d3d3d3;
 }
