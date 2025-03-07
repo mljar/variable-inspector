@@ -38,7 +38,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
   const [preview, setPreview] = useState<string>('');
   const [previewLoading, setPreviewLoading] = useState(false);
   void previewLoading;
-  const loadPreview = async () => {
+  const loadPreview = async (type: string) => {
     if (notebookPanel) {
       try {
         setPreviewLoading(true);
@@ -51,9 +51,15 @@ export const VariableItem: React.FC<VariableItemProps> = ({
           notebookPanel
         );
         const content = result.content;
-        console.log(content);
         try {
-          setPreview(`[ ${content} ]`);
+          if (type === 'list') {
+            setPreview(`[ ${content}...]`);
+          }
+          if (type === 'dict') {
+            const jsonStr = JSON.stringify(content);
+            const shortenedJsonStr = jsonStr.slice(0, -1) + ' ...}';
+            setPreview(shortenedJsonStr);
+          }
         } catch (e) {
           console.error('Failed to load conent');
           setPreview('failed to load content');
@@ -72,7 +78,10 @@ export const VariableItem: React.FC<VariableItemProps> = ({
       vrb.dimension === 1 &&
       vrb.type === 'list'
     ) {
-      loadPreview();
+      loadPreview('list');
+    }
+    if (vrb.type === 'dict') {
+      loadPreview('dict');
     }
   }, [notebookPanel, vrb]);
 
@@ -155,6 +164,13 @@ export const VariableItem: React.FC<VariableItemProps> = ({
             )}
           </button>
         )
+      ) : vrb.type === 'dict' ? (
+        <span
+          className="mljar-variable-inspector-variable-value"
+          title={preview}
+        >
+          {preview}
+        </span>
       ) : (
         <span
           className="mljar-variable-inspector-variable-value"
