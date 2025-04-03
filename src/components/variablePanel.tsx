@@ -284,7 +284,11 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
 
     return (
       <div key={key} style={cellStyle}>
-        {cellData}
+        {typeof cellData === 'boolean'
+          ? cellData
+            ? 'True'
+            : 'False'
+          : cellData}
       </div>
     );
   };
