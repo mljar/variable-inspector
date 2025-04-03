@@ -53,7 +53,14 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         const content = result.content;
         try {
           if (type === 'list') {
-            setPreview(`[ ${content}...]`);
+            let listLen = 10;
+            try {
+              listLen = parseInt(vrb.shape);
+            } catch {
+              /* empty */
+            } finally {
+              setPreview(`[${content}${listLen > 10 ? '...' : ''}]`);
+            }
           }
           if (type === 'dict') {
             const jsonStr = JSON.stringify(content);

@@ -18,48 +18,6 @@ function getNotebook(widget: Widget | null): Notebook | null {
   return content;
 }
 
-export type NotebookSelection = {
-  start: { line: number; column: number };
-  end: { line: number; column: number };
-  text: string;
-  numLines: number;
-  widgetId: string;
-  cellId?: string;
-};
-
-export type NotebookSelections = NotebookSelection[];
-
-export function getNotebookSelections(notebook: Notebook): NotebookSelections {
-  const selections: NotebookSelections = [];
-
-  const cellModels = notebook.model?.cells;
-
-  if (cellModels) {
-    for (let i = 0; i < cellModels.length; i++) {
-      const cell = cellModels.get(i);
-      const cellSource = cell?.sharedModel.getSource();
-      const cellId = cell?.id;
-
-      if (cellSource && cellId) {
-        const numLines = cellSource.split('\n').length;
-
-        const selection: NotebookSelection = {
-          start: { line: 0, column: 0 },
-          end: { line: numLines - 1, column: cellSource.length },
-          text: cellSource,
-          numLines,
-          widgetId: notebook.id,
-          cellId
-        };
-
-        selections.push(selection);
-      }
-    }
-  }
-
-  return selections;
-}
-
 export class NotebookWatcher {
   constructor(shell: JupyterFrontEnd.IShell) {
     this._shell = shell;
@@ -69,14 +27,6 @@ export class NotebookWatcher {
       this._notebookPanelChanged.emit(this._notebookPanel);
       this._attachKernelChangeHandler();
     });
-  }
-
-  get selection(): NotebookSelections {
-    return this._selections;
-  }
-
-  get selectionChanged(): Signal<this, NotebookSelections> {
-    return this._selectionChanged;
   }
 
   get notebookPanelChanged(): Signal<this, NotebookPanel | null> {
@@ -146,8 +96,6 @@ export class NotebookWatcher {
   protected _kernelChanged = new Signal<this, KernelInfo | null>(this);
   protected _shell: JupyterFrontEnd.IShell;
   protected _mainAreaWidget: Widget | null = null;
-  protected _selections: NotebookSelections = [];
-  protected _selectionChanged = new Signal<this, NotebookSelections>(this);
   protected _notebookPanel: NotebookPanel | null = null;
   protected _notebookPanelChanged = new Signal<this, NotebookPanel | null>(
     this

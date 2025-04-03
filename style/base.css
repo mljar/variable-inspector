@@ -464,3 +464,8 @@
   text-decoration: underline;
   background-color: #d3d3d3;
 }
+
+.mljar-variable-inspector-variable-preview,
+.mljar-variable-inspector-variable-value {
+  padding-left: 7px;
+}

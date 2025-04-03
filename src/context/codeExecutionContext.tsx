@@ -14,7 +14,7 @@ import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { variableDict } from '../python_code/getVariables';
 
-interface ICodeExecutionContext { }
+interface ICodeExecutionContext {}
 
 interface CodeExecutionContextProviderProps {
   children: ReactNode;
@@ -32,8 +32,6 @@ export const CodeExecutionContextProvider: React.FC<
   const kernelReady = useNotebookKernelContext();
   const { refreshVariables } = useVariableContext();
   const getVariableCode = variableDict;
-  const matrixFunctionHeader =
-    '__mljar_variable_inspector_get_matrix_content()';
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const loadAutoRefresh = () => {
@@ -74,16 +72,18 @@ export const CodeExecutionContextProvider: React.FC<
       if (msg.header.msg_type === 'execute_input') {
         const inputMsg = msg as IExecuteInputMsg;
         const code = inputMsg.content.code;
+        const variableInspectorPrefix = '_jupyterlab_variableinspector';
+        const mljarPrefix = '__mljar';
         if (
           code !== getVariableCode &&
-          !code.includes(matrixFunctionHeader) &&
+          !code.includes(variableInspectorPrefix) &&
+          !code.includes(mljarPrefix) &&
           autoRefresh
         ) {
           refreshVariables();
         }
       }
     };
-
     kernel.iopubMessage.connect(handleIOPubMessage);
 
     return () => {

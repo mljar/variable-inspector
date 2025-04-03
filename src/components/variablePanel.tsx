@@ -13,7 +13,7 @@ import { useThemeContext } from '../context/themeContext';
 import { transformMatrixData } from '../utils/utils';
 import { PaginationControls } from './paginationControls';
 
-interface VariablePanelProps {
+interface IVariablePanelProps {
   variableName: string;
   initVariableType: string;
   initVariableShape: string;
@@ -23,7 +23,7 @@ interface VariablePanelProps {
 const AutoSizer = RVAutoSizer as unknown as React.ComponentType<any>;
 const MultiGrid = RVMultiGrid as unknown as React.ComponentType<any>;
 
-export const VariablePanel: React.FC<VariablePanelProps> = ({
+export const VariablePanel: React.FC<IVariablePanelProps> = ({
   variableName,
   initVariableType,
   initVariableShape,
@@ -226,7 +226,7 @@ export const VariablePanel: React.FC<VariablePanelProps> = ({
     let maxLength = 0;
     for (let row = 0; row < rowCount; row++) {
       const cell = data[row][col];
-      const cellStr = cell != null ? cell.toString() : '';
+      const cellStr = cell !== null ? cell.toString() : '';
       if (cellStr.length > maxLength) {
         maxLength = cellStr.length;
       }

@@ -47,6 +47,7 @@ export const executeMatrixContent = async (
           outputData += content.data['text/plain'];
         }
       } else if (msgType === 'stream') {
+        /* empty */
       } else if (msgType === 'error') {
         console.error('Python error:', msg.content);
         reject(new Error('Error during Python execution.'));

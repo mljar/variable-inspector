@@ -11,7 +11,7 @@ import { KernelMessage } from '@jupyterlab/services';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 import { variableDict } from '../python_code/getVariables';
 
-interface VariableInfo {
+interface IVariableInfo {
   name: string;
   type: string;
   shape: string;
@@ -20,8 +20,8 @@ interface VariableInfo {
   value: string;
 }
 
-interface VariableContextProps {
-  variables: VariableInfo[];
+interface IVariableContextProps {
+  variables: IVariableInfo[];
   loading: boolean;
   error: string | null;
   searchTerm: string;
@@ -31,34 +31,82 @@ interface VariableContextProps {
   refreshCount: number;
 }
 
-const VariableContext = createContext<VariableContextProps | undefined>(
+const VariableContext = createContext<IVariableContextProps | undefined>(
   undefined
 );
+
+type Task = () => Promise<void> | void;
+
+class DebouncedTaskQueue {
+  // Holds the timer handle.
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  // Holds the most recently added task.
+  private lastTask: Task | null = null;
+  private delay: number;
+
+  /**
+   * @param delay Time in milliseconds to wait before executing the last task.
+   */
+  constructor(delay: number = 500) {
+    this.delay = delay;
+  }
+
+  /**
+   * Adds a new task to the queue. Only the last task added within the delay period will be executed.
+   * @param task A function representing the task.
+   */
+  add(task: Task): void {
+    // Save (or overwrite) the latest task.
+    this.lastTask = task;
+
+    // If there’s already a pending timer, clear it.
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+
+    // Start (or restart) the timer.
+    this.timer = setTimeout(async () => {
+      if (this.lastTask) {
+        try {
+          // Execute the latest task.
+          await this.lastTask();
+        } catch (error) {
+          console.error('Task execution failed:', error);
+        }
+      }
+      // After execution, clear the stored task and timer.
+      this.lastTask = null;
+      this.timer = null;
+    }, this.delay);
+  }
+}
 
 export const VariableContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const notebookPanel = useNotebookPanelContext();
   const kernel = useNotebookKernelContext();
-  const [variables, setVariables] = useState<VariableInfo[]>([]);
+  const [variables, setVariables] = useState<IVariableInfo[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [refreshCount, setRefreshCount] = useState<number>(0);
+  const queue = new DebouncedTaskQueue(250);
 
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {
-      setIsRefreshing(true);
-      setLoading(true);
+      //setIsRefreshing(true);
+      //setLoading(true);
       setError(null);
 
       if (!notebookPanel) {
+        setVariables([]);
         setLoading(false);
         setIsRefreshing(false);
         return;
       }
-      setVariables([]);
+      //setVariables([]);
 
       try {
         const future =
@@ -86,10 +134,10 @@ export const VariableContextProvider: React.FC<{
                 try {
                   const cleanedData = textData.replace(/^['"]|['"]$/g, '');
                   const doubleQuotedData = cleanedData.replace(/'/g, '"');
-                  const parsedData: VariableInfo[] =
+                  const parsedData: IVariableInfo[] =
                     JSON.parse(doubleQuotedData);
                   if (Array.isArray(parsedData)) {
-                    const mappedVariables: VariableInfo[] = parsedData.map(
+                    const mappedVariables: IVariableInfo[] = parsedData.map(
                       (item: any) => ({
                         name: item.varName,
                         type: item.varType,
@@ -108,6 +156,7 @@ export const VariableContextProvider: React.FC<{
                   setRefreshCount(prev => prev + 1);
                 } catch (err) {
                   setError('Error during export JSON.');
+                  setVariables([]);
                   setLoading(false);
                   setIsRefreshing(false);
                 }
@@ -121,6 +170,7 @@ export const VariableContextProvider: React.FC<{
         setIsRefreshing(false);
       }
     });
+    return;
   }, [notebookPanel, kernel]);
 
   useEffect(() => {
@@ -135,7 +185,7 @@ export const VariableContextProvider: React.FC<{
         error,
         searchTerm,
         setSearchTerm,
-        refreshVariables: executeCode,
+        refreshVariables: () => queue.add(() => executeCode()),
         isRefreshing,
         refreshCount
       }}
@@ -145,7 +195,7 @@ export const VariableContextProvider: React.FC<{
   );
 };
 
-export const useVariableContext = (): VariableContextProps => {
+export const useVariableContext = (): IVariableContextProps => {
   const context = useContext(VariableContext);
   if (context === undefined) {
     throw new Error(

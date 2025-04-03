@@ -73,7 +73,7 @@ export const VariableList: React.FC<VariableListProps> = ({
         </div>
       ) : variables.length === 0 ? (
         <div className="mljar-variable-inspector-message">
-          No variables available.
+          Sorry, no variables available.
         </div>
       ) : (
         <ul className="mljar-variable-inspector-list">

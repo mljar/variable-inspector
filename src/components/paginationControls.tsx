@@ -52,7 +52,7 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
     <div className="mljar-variable-inspector-pagination-container">
       <div className="mljar-variable-inspector-pagination-item">
         <div className="mljar-variable-inspector-choose-range">
-          <span>Displaying rows from </span>
+          <span>Rows from </span>
           <button
             onClick={e => handlePrevRowPage('first')}
             className="mljar-variable-inspector-skip-button"
@@ -114,11 +114,11 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
             <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <span>
-            from total <span style={{ fontWeight: 600 }}>{rowsCount}</span> rows
+            Total <span style={{ fontWeight: 600 }}>{rowsCount}</span> rows
           </span>
         </div>
         <div className="mljar-variable-inspector-choose-range">
-          <span>Displaying columns from </span>
+          <span>Columns from </span>
           <button
             onClick={e => handlePrevColumnPage('first')}
             className="mljar-variable-inspector-skip-button"
@@ -180,8 +180,7 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
             <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <span>
-            from total <span style={{ fontWeight: 600 }}>{colsCount}</span>{' '}
-            columns
+            Total <span style={{ fontWeight: 600 }}>{colsCount}</span> columns
           </span>
         </div>
         {/* Goto Cell section */}
