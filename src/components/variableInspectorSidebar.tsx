@@ -5,6 +5,8 @@ import { Message } from '@lumino/messaging';
 import { pluginIcon } from '../icons/pluginIcon';
 import { NotebookWatcher } from '../watchers/notebookWatcher';
 import { CommandRegistry } from '@lumino/commands';
+import { IStateDB } from '@jupyterlab/statedb';
+
 import { NotebookPanelContextProvider } from '../context/notebookPanelContext';
 import { NotebookKernelContextProvider } from '../context/notebookKernelContext';
 import { VariableContextProvider } from '../context/notebookVariableContext';
@@ -23,12 +25,14 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
   private isOpen = false;
   private labShell: ILabShell;
   private settingRegistry: ISettingRegistry | null = null;
+  private _stateDB: IStateDB;
 
   constructor(
     notebookWatcher: NotebookWatcher,
     commands: CommandRegistry,
     labShell: ILabShell,
-    settingRegistry: ISettingRegistry | null
+    settingRegistry: ISettingRegistry | null,
+    stateDB: IStateDB
   ) {
     super();
     this.notebookWatcher = notebookWatcher;
@@ -39,6 +43,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     this.addClass('mljar-variable-inspector-sidebar-widget');
     this.labShell = labShell;
     this.settingRegistry = settingRegistry;
+    this._stateDB = stateDB;
   }
 
   protected onAfterShow(msg: Message): void {
@@ -69,7 +74,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
             <NotebookKernelContextProvider
               notebookWatcher={this.notebookWatcher}
             >
-              <VariableContextProvider>
+              <VariableContextProvider stateDB={this._stateDB}>
                 <CodeExecutionContextProvider
                   settingRegistry={this.settingRegistry}
                 >
@@ -92,12 +97,14 @@ export function createVariableInspectorSidebar(
   notebookWatcher: NotebookWatcher,
   commands: CommandRegistry,
   labShell: ILabShell,
-  settingRegistry: ISettingRegistry | null
+  settingRegistry: ISettingRegistry | null,
+  stateDB: IStateDB
 ): VariableInspectorSidebarWidget {
   return new VariableInspectorSidebarWidget(
     notebookWatcher,
     commands,
     labShell,
-    settingRegistry
+    settingRegistry,
+    stateDB
   );
 }

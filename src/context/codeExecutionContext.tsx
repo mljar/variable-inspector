@@ -16,7 +16,7 @@ import { variableDict } from '../python_code/getVariables';
 
 interface ICodeExecutionContext {}
 
-interface CodeExecutionContextProviderProps {
+interface ICodeExecutionContextProviderProps {
   children: ReactNode;
   settingRegistry: ISettingRegistry | null;
 }
@@ -26,7 +26,7 @@ const CodeExecutionContext = createContext<ICodeExecutionContext | undefined>(
 );
 
 export const CodeExecutionContextProvider: React.FC<
-  CodeExecutionContextProviderProps
+  ICodeExecutionContextProviderProps
 > = ({ children, settingRegistry }) => {
   const notebook = useNotebookPanelContext();
   const kernelReady = useNotebookKernelContext();

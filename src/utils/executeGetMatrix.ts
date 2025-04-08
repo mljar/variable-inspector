@@ -13,7 +13,6 @@ export const executeMatrixContent = async (
   if (!notebookPanel) {
     throw new Error('Kernel not available.');
   }
-
   const code = getMatrix(
     varName,
     varStartRow,

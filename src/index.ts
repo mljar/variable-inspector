@@ -5,6 +5,8 @@ import {
 } from '@jupyterlab/application';
 
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { IStateDB } from '@jupyterlab/statedb';
+
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
 
@@ -18,23 +20,24 @@ const leftTab: JupyterFrontEndPlugin<void> = {
   id: VARIABLE_INSPECTOR_ID,
   description: 'A JupyterLab extension to easy manage variables.',
   autoStart: true,
-  requires: [ILabShell, ISettingRegistry],
+  requires: [ILabShell, ISettingRegistry, IStateDB],
   activate: async (
     app: JupyterFrontEnd,
     labShell: ILabShell,
-    settingregistry: ISettingRegistry | null
+    settingregistry: ISettingRegistry | null,
+    stateDB: IStateDB
   ) => {
     const notebookWatcher = new NotebookWatcher(app.shell);
     const widget = createVariableInspectorSidebar(
       notebookWatcher,
       app.commands,
       labShell,
-      settingregistry
+      settingregistry,
+      stateDB
     );
 
     app.shell.add(widget, 'left', { rank: 1998 });
   }
 };
-
 
 export default [leftTab];

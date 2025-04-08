@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { detailIcon } from '../icons/detailIcon';
 import { CommandRegistry } from '@lumino/commands';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
@@ -35,62 +35,6 @@ export const VariableItem: React.FC<VariableItemProps> = ({
 }) => {
   const notebookPanel = useNotebookPanelContext();
   const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState<string>('');
-  const [previewLoading, setPreviewLoading] = useState(false);
-  void previewLoading;
-  const loadPreview = async (type: string) => {
-    if (notebookPanel) {
-      try {
-        setPreviewLoading(true);
-        const result = await executeMatrixContent(
-          vrb.name,
-          0,
-          10,
-          0,
-          10,
-          notebookPanel
-        );
-        const content = result.content;
-        try {
-          if (type === 'list') {
-            let listLen = 10;
-            try {
-              listLen = parseInt(vrb.shape);
-            } catch {
-              /* empty */
-            } finally {
-              setPreview(`[${content}${listLen > 10 ? '...' : ''}]`);
-            }
-          }
-          if (type === 'dict') {
-            const jsonStr = JSON.stringify(content);
-            const shortenedJsonStr = jsonStr.slice(0, -1) + ' ...}';
-            setPreview(shortenedJsonStr);
-          }
-        } catch (e) {
-          console.error('Failed to load conent');
-          setPreview('failed to load content');
-        }
-      } catch (err) {
-        console.error('Error fetching preview:', err);
-      } finally {
-        setPreviewLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (
-      allowedTypes.includes(vrb.type) &&
-      vrb.dimension === 1 &&
-      vrb.type === 'list'
-    ) {
-      loadPreview('list');
-    }
-    if (vrb.type === 'dict') {
-      loadPreview('dict');
-    }
-  }, [notebookPanel, vrb]);
 
   const handleButtonClick = async (
     variableName: string,
@@ -152,10 +96,10 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         vrb.dimension === 1 && vrb.type === 'list' ? (
           <button
             className="mljar-variable-inspector-variable-preview"
-            title={preview}
+            title={vrb.value}
             onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
           >
-            {preview}
+            {vrb.value}
           </button>
         ) : (
           <button
@@ -174,9 +118,9 @@ export const VariableItem: React.FC<VariableItemProps> = ({
       ) : vrb.type === 'dict' ? (
         <span
           className="mljar-variable-inspector-variable-value"
-          title={preview}
+          title={vrb.value}
         >
-          {preview}
+          {vrb.value}
         </span>
       ) : (
         <span

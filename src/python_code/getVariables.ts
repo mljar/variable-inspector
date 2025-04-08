@@ -78,6 +78,20 @@ def __mljar_variable_inspector_getshapeof(x):
     return None
 
 
+def __format_content(item):
+    if isinstance(item, list):
+        return __format_content(str([__format_content(subitem) for subitem in item]))
+    elif isinstance(item, dict):
+        return __format_content(str({k: __format_content(v) for k, v in item.items()}))
+    elif isinstance(item, str):
+        return item[:100] + "..." if len(item) > 100 else item
+    elif isinstance(item, (int, float, bool, set)) or item is None:
+        return item
+    else:
+        if hasattr(item, "name"):
+            return getattr(item, "name")
+        return type(item).__name__   
+
 def __mljar_variable_inspector_get_simple_value(x):
     if isinstance(x, bytes):
         return ""
@@ -85,8 +99,15 @@ def __mljar_variable_inspector_get_simple_value(x):
         return "None"
     if __np is not None and __np.isscalar(x) and not isinstance(x, bytes):
         return str(x)
-    if isinstance(x, (int, float, complex, bool, str)):
-        return str(x)
+    if isinstance(x, (int, float, complex, bool, str, set, list, dict)):
+        strValue = str(x) #__format_content(x)
+        if len(strValue) > 100:
+            return strValue[:100] + "..."
+        else:
+            return strValue
+    # if isinstance(x, (list, dict)):
+    #     return __format_content(x)
+
     return ""
 
 
@@ -143,9 +164,10 @@ def __mljar_variable_inspector_dict_list():
                 'varShape': str(__mljar_variable_inspector_getshapeof(_ev)) if __mljar_variable_inspector_getshapeof(_ev) else '',
                 'varDimension': __mljar_variable_inspector_getdim(_ev),
                 'varSize': __mljar_variable_inspector_size_converter(__mljar_variable_inspector_get_size_mb(_ev)),
-                'varSimpleValue': __mljar_variable_inspector_get_simple_value(_ev)[0:50] + "..." if isinstance(_ev, str) and len(__mljar_variable_inspector_get_simple_value(_ev)) > 50 else __mljar_variable_inspector_get_simple_value(_ev)
+                'varSimpleValue': __mljar_variable_inspector_get_simple_value(_ev)
             }]
-  
+    # from IPython.display import JSON
+    # return JSON(vardic)
     return json.dumps(vardic, ensure_ascii=False)
 
 

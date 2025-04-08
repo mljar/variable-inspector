@@ -8,10 +8,11 @@ import React, {
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
 import { KernelMessage } from '@jupyterlab/services';
+import { IStateDB } from '@jupyterlab/statedb';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 import { variableDict } from '../python_code/getVariables';
 
-interface IVariableInfo {
+export interface IVariableInfo {
   name: string;
   type: string;
   shape: string;
@@ -83,7 +84,8 @@ class DebouncedTaskQueue {
 
 export const VariableContextProvider: React.FC<{
   children: React.ReactNode;
-}> = ({ children }) => {
+  stateDB: IStateDB;
+}> = ({ children, stateDB }) => {
   const notebookPanel = useNotebookPanelContext();
   const kernel = useNotebookKernelContext();
   const [variables, setVariables] = useState<IVariableInfo[]>([]);
