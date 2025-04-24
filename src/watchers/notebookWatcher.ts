@@ -68,7 +68,7 @@ export class NotebookWatcher {
         }, 2000);
       }
     } else {
-      console.warn('Session not initalizated');
+      // console.warn('Session not initalizated');
     }
   }
 

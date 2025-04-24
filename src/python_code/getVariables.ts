@@ -121,6 +121,42 @@ def __mljar_variable_inspector_size_converter(size):
     return f"{converted_size} {units[index]}"
 
 
+def __mljar_variableinspector_is_matrix(x):
+    # True if type(x).__name__ in ["DataFrame", "ndarray", "Series"] else False
+    if __pd and isinstance(x, __pd.DataFrame):
+        return True
+    if __pd and isinstance(x, __pd.Series):
+        return True
+    if __np and isinstance(x, __np.ndarray) and len(x.shape) <= 2:
+        return True
+    if __pyspark and isinstance(x, __pyspark.sql.DataFrame):
+        return True
+    if __tf and isinstance(x, __tf.Variable) and len(x.shape) <= 2:
+        return True
+    if __tf and isinstance(x, __tf.Tensor) and len(x.shape) <= 2:
+        return True
+    if __torch and isinstance(x, __torch.Tensor) and len(x.shape) <= 2:
+        return True
+    if __xr and isinstance(x, __xr.DataArray) and len(x.shape) <= 2:
+        return True
+    if isinstance(x, list):
+        return True
+    return False
+
+
+def __mljar_variableinspector_is_widget(x):
+    return __ipywidgets and issubclass(x, __ipywidgets.DOMWidget)
+
+def __mljar_variableinspector_getcolumnsof(x):
+    if __pd and isinstance(x, __pd.DataFrame):
+        return list(x.columns)
+    return []
+
+def __mljar_variableinspector_getcolumntypesof(x):
+    if __pd and isinstance(x, __pd.DataFrame):
+        return [str(t) for t in x.dtypes]
+    return []
+    
 def __mljar_variable_inspector_dict_list():
     __mljar_variable_inspector_check_imported()
     def __mljar_variable_inspector_keep_cond(v):
@@ -164,7 +200,11 @@ def __mljar_variable_inspector_dict_list():
                 'varShape': str(__mljar_variable_inspector_getshapeof(_ev)) if __mljar_variable_inspector_getshapeof(_ev) else '',
                 'varDimension': __mljar_variable_inspector_getdim(_ev),
                 'varSize': __mljar_variable_inspector_size_converter(__mljar_variable_inspector_get_size_mb(_ev)),
-                'varSimpleValue': __mljar_variable_inspector_get_simple_value(_ev)
+                'varSimpleValue': __mljar_variable_inspector_get_simple_value(_ev),
+                'isMatrix': __mljar_variableinspector_is_matrix(_ev),
+                'isWidget': __mljar_variableinspector_is_widget(type(_ev)),
+                'varColumns': __mljar_variableinspector_getcolumnsof(_ev),
+                'varColumnTypes': __mljar_variableinspector_getcolumntypesof(_ev),
             }]
     # from IPython.display import JSON
     # return JSON(vardic)

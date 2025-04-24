@@ -11,6 +11,7 @@ import { KernelMessage } from '@jupyterlab/services';
 import { IStateDB } from '@jupyterlab/statedb';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 import { variableDict } from '../python_code/getVariables';
+import { CommandRegistry } from '@lumino/commands';
 
 export interface IVariableInfo {
   name: string;
@@ -85,7 +86,8 @@ class DebouncedTaskQueue {
 export const VariableContextProvider: React.FC<{
   children: React.ReactNode;
   stateDB: IStateDB;
-}> = ({ children, stateDB }) => {
+  commands: CommandRegistry;
+}> = ({ children, stateDB, commands }) => {
   const notebookPanel = useNotebookPanelContext();
   const kernel = useNotebookKernelContext();
   const [variables, setVariables] = useState<IVariableInfo[]>([]);
@@ -100,17 +102,20 @@ export const VariableContextProvider: React.FC<{
     await withIgnoredSidebarKernelUpdates(async () => {
       //setIsRefreshing(true);
       //setLoading(true);
+      stateDB.save('mljarVariablesStatus', 'loading');
       setError(null);
 
       if (!notebookPanel) {
         setVariables([]);
         setLoading(false);
         setIsRefreshing(false);
+        stateDB.save('mljarVariables', []);
         return;
       }
       //setVariables([]);
 
       try {
+        await notebookPanel.sessionContext?.ready;
         const future =
           notebookPanel.sessionContext?.session?.kernel?.requestExecute({
             code: variableDict,
@@ -149,7 +154,20 @@ export const VariableContextProvider: React.FC<{
                         value: item.varSimpleValue
                       })
                     );
+
                     setVariables(mappedVariables);
+                    stateDB.save(
+                      'mljarVariables',
+                      JSON.parse(doubleQuotedData)
+                    );
+                    stateDB.save('mljarVariablesStatus', 'loaded');
+
+                    commands
+                      .execute('mljar-piece-of-code:refresh-variables')
+                      .catch(err => {});
+                    commands
+                      .execute('mljar-ai-data-scientist:refresh-variables')
+                      .catch(err => {});
                   } else {
                     throw new Error('Error during parsing.');
                   }
@@ -161,6 +179,7 @@ export const VariableContextProvider: React.FC<{
                   setVariables([]);
                   setLoading(false);
                   setIsRefreshing(false);
+                  stateDB.save('mljarVariablesStatus', 'error');
                 }
               }
             }
@@ -170,13 +189,15 @@ export const VariableContextProvider: React.FC<{
         setError('Unexpected error.');
         setLoading(false);
         setIsRefreshing(false);
+        stateDB.save('mljarVariablesStatus', 'error');
       }
     });
     return;
   }, [notebookPanel, kernel]);
 
   useEffect(() => {
-    executeCode();
+    stateDB.save('mljarVariablesStatus', 'loading');
+    queue.add(() => executeCode());
   }, [executeCode]);
 
   return (
@@ -187,7 +208,10 @@ export const VariableContextProvider: React.FC<{
         error,
         searchTerm,
         setSearchTerm,
-        refreshVariables: () => queue.add(() => executeCode()),
+        refreshVariables: () => {
+          stateDB.save('mljarVariablesStatus', 'loading');
+          queue.add(() => executeCode());
+        },
         isRefreshing,
         refreshCount
       }}

@@ -74,7 +74,10 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
             <NotebookKernelContextProvider
               notebookWatcher={this.notebookWatcher}
             >
-              <VariableContextProvider stateDB={this._stateDB}>
+              <VariableContextProvider
+                stateDB={this._stateDB}
+                commands={this.commands}
+              >
                 <CodeExecutionContextProvider
                   settingRegistry={this.settingRegistry}
                 >
