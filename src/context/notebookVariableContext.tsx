@@ -165,9 +165,6 @@ export const VariableContextProvider: React.FC<{
                     commands
                       .execute('mljar-piece-of-code:refresh-variables')
                       .catch(err => {});
-                    commands
-                      .execute('mljar-ai-data-scientist:refresh-variables')
-                      .catch(err => {});
                   } else {
                     throw new Error('Error during parsing.');
                   }
