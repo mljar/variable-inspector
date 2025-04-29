@@ -5,7 +5,7 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 import {
   VARIABLE_INSPECTOR_ID,
-  autoRefreshProperty,
+  // autoRefreshProperty,
   showTypeProperty,
   showShapeProperty,
   showSizeProperty
@@ -19,7 +19,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
   settingRegistry
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  // const [autoRefresh, setAutoRefresh] = useState(true);
   const [showType, setShowType] = useState(false);
   const [showShape, setShowShape] = useState(false);
   const [showSize, setShowSize] = useState(false);
@@ -47,9 +47,9 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
         .load(VARIABLE_INSPECTOR_ID)
         .then(settings => {
           const updateSettings = (): void => {
-            const loadAutoRefresh = settings.get(autoRefreshProperty)
-              .composite as boolean;
-            setAutoRefresh(loadAutoRefresh);
+            // const loadAutoRefresh = settings.get(autoRefreshProperty)
+            //   .composite as boolean;
+            // setAutoRefresh(loadAutoRefresh);
 
             const loadShowType = settings.get(showTypeProperty)
               .composite as boolean;
@@ -92,10 +92,12 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
       {isOpen && (
         <div className="mljar-variable-inspector-settings-menu">
           <ul className="mljar-variable-inspector-settings-menu-list">
-            <button
+            {/* <button
               className="mljar-variable-inspector-settings-menu-item first"
               onClick={() => {
-                if (!autoRefresh) savePropertyValue(autoRefreshProperty, true);
+                if (!autoRefresh) {
+                  savePropertyValue(autoRefreshProperty, true);
+                }
               }}
             >
               Automatically refresh
@@ -106,7 +108,9 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
             <button
               className="mljar-variable-inspector-settings-menu-item"
               onClick={() => {
-                if (autoRefresh) savePropertyValue(autoRefreshProperty, false);
+                if (autoRefresh) {
+                  savePropertyValue(autoRefreshProperty, false);
+                }
               }}
             >
               Manually refresh
@@ -114,7 +118,8 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
                 <checkIcon.react className="mljar-variable-inspector-settings-icon" />
               )}
             </button>
-            <hr />
+            <hr /> */}
+
             <button
               className="mljar-variable-inspector-settings-menu-item"
               onClick={() => savePropertyValue(showTypeProperty, !showType)}
