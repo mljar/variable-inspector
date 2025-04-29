@@ -23,9 +23,11 @@ export class NotebookWatcher {
     this._shell = shell;
     this._shell.currentChanged?.connect((sender, args) => {
       this._mainAreaWidget = args.newValue;
-      this._notebookPanel = this.notebookPanel();
-      this._notebookPanelChanged.emit(this._notebookPanel);
-      this._attachKernelChangeHandler();
+      if (this._mainAreaWidget instanceof DocumentWidget) {
+        this._notebookPanel = this.notebookPanel();
+        this._notebookPanelChanged.emit(this._notebookPanel);
+        this._attachKernelChangeHandler();
+      }
     });
   }
 
