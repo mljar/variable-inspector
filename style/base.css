@@ -14,7 +14,7 @@
 .mljar-variable-inspector-list-container {
   flex: 1;
   overflow-y: hidden;
-  padding-right: 10px;
+  /* padding-right: 10px; */
 }
 
 .mljar-variable-inspector-list-container::-webkit-scrollbar {
@@ -41,7 +41,7 @@
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 8px;
-  margin-right: 8px;
+  /* margin-right: 8px; */
   border-bottom: 2px solid #ddd;
 }
 
@@ -121,7 +121,7 @@
 }
 
 .mljar-variable-search-bar-container {
-  margin: 0px 10px 10px 0px;
+  margin: 0px 0px 10px 0px;
 }
 
 .mljar-variable-inspector-search-bar-input {
