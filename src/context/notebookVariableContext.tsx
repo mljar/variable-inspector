@@ -104,7 +104,6 @@ export const VariableContextProvider: React.FC<{
       //setLoading(true);
       stateDB.save('mljarVariablesStatus', 'loading');
       setError(null);
-
       if (!notebookPanel) {
         setVariables([]);
         setLoading(false);
@@ -113,7 +112,6 @@ export const VariableContextProvider: React.FC<{
         return;
       }
       //setVariables([]);
-
       try {
         await notebookPanel.sessionContext?.ready;
         const future =
@@ -154,8 +152,8 @@ export const VariableContextProvider: React.FC<{
                         value: item.varSimpleValue
                       })
                     );
-
                     setVariables(mappedVariables);
+
                     stateDB.save(
                       'mljarVariables',
                       JSON.parse(doubleQuotedData)
@@ -181,6 +179,8 @@ export const VariableContextProvider: React.FC<{
               }
             }
           };
+          await future.done;
+          stateDB.save('mljarVariablesStatus', 'loaded');
         }
       } catch (err) {
         setError('Unexpected error.');

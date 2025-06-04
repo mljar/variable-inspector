@@ -35,6 +35,9 @@ const leftTab: JupyterFrontEndPlugin<void> = {
       settingregistry,
       stateDB
     );
+    // initialize variables list
+    stateDB.save('mljarVariablesStatus', 'loaded');
+    stateDB.save('mljarVariables', []);
 
     app.shell.add(widget, 'left', { rank: 1998 });
   }
