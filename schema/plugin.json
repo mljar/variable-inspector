@@ -27,6 +27,12 @@
       "title": "variableInspectorShowSize",
       "description": "Show Size Column",
       "default": false
+    },
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Set the display language for the Variable Inspector.",
+      "default": "en"
     }
   },
   "additionalProperties": false

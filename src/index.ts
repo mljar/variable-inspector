@@ -6,6 +6,8 @@ import {
 
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IStateDB } from '@jupyterlab/statedb';
+import { ITranslator } from '@jupyterlab/translation';
+
 
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
@@ -20,20 +22,23 @@ const leftTab: JupyterFrontEndPlugin<void> = {
   id: VARIABLE_INSPECTOR_ID,
   description: 'A JupyterLab extension to easy manage variables.',
   autoStart: true,
-  requires: [ILabShell, ISettingRegistry, IStateDB],
+  requires: [ILabShell, ISettingRegistry, IStateDB, ITranslator],
   activate: async (
     app: JupyterFrontEnd,
     labShell: ILabShell,
     settingregistry: ISettingRegistry | null,
-    stateDB: IStateDB
+    stateDB: IStateDB,
+    translator: ITranslator
   ) => {
+    const trans = translator.load('variable-inspector');
     const notebookWatcher = new NotebookWatcher(app.shell);
     const widget = createVariableInspectorSidebar(
       notebookWatcher,
       app.commands,
       labShell,
       settingregistry,
-      stateDB
+      stateDB,
+      trans
     );
     // initialize variables list
     stateDB.save('mljarVariablesStatus', 'loaded');
