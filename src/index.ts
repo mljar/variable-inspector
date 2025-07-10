@@ -7,6 +7,7 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IStateDB } from '@jupyterlab/statedb';
 import { ITranslator } from '@jupyterlab/translation';
+import { translator as t2} from './translator';
 
 
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
@@ -30,15 +31,16 @@ const leftTab: JupyterFrontEndPlugin<void> = {
     stateDB: IStateDB,
     translator: ITranslator
   ) => {
-    const trans = translator.load('variable-inspector');
+    const lang = translator.languageCode;
+    console.log(lang);
+    if (lang === "pl-PL") t2.setLanguage('pl');
     const notebookWatcher = new NotebookWatcher(app.shell);
     const widget = createVariableInspectorSidebar(
       notebookWatcher,
       app.commands,
       labShell,
       settingregistry,
-      stateDB,
-      trans
+      stateDB
     );
     // initialize variables list
     stateDB.save('mljarVariablesStatus', 'loaded');

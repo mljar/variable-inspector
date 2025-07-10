@@ -20,7 +20,8 @@
         "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
         "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
         "src/**/*.{ts,tsx}",
-        "schema/*.json"
+        "schema/*.json",
+        "locales/**/*"
     ],
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -34,8 +35,8 @@
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
         "build:labextension": "jupyter labextension build .",
         "build:labextension:dev": "jupyter labextension build --development True .",
-        "build:lib": "tsc --sourceMap",
-        "build:lib:prod": "tsc",
+        "build:lib": "tsc --sourceMap && cpx \"locales/**/*\" lib/locales",
+        "build:lib:prod": "tsc && cpx \"locales/**/*\" lib/locales",
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
@@ -73,6 +74,7 @@
         "@types/react-virtualized": "^9.22.0",
         "@typescript-eslint/eslint-plugin": "^6.1.0",
         "@typescript-eslint/parser": "^6.1.0",
+        "cpx": "^1.5.0",
         "css-loader": "^6.7.1",
         "eslint": "^8.36.0",
         "eslint-config-prettier": "^8.8.0",
