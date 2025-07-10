@@ -1,5 +1,6 @@
 import React from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
+import { t } from '../translator';
 
 export const SearchBar: React.FC = () => {
   const { variables, searchTerm, setSearchTerm } = useVariableContext();
@@ -15,7 +16,7 @@ export const SearchBar: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={handleChange}
-            placeholder="Search Variable..."
+            placeholder={t('Search variable...')}
             className="mljar-variable-inspector-search-bar-input"
           />
         </div>

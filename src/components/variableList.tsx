@@ -11,6 +11,7 @@ import {
   showShapeProperty,
   showSizeProperty
 } from '../index';
+import { t } from '../translator';
 
 interface VariableListProps {
   commands: CommandRegistry;
@@ -54,7 +55,7 @@ export const VariableList: React.FC<VariableListProps> = ({
         })
         .catch(reason => {
           console.error(
-            'Failed to load settings for Variable Inspector',
+            'Failed to load settings for Your Variables',
             reason
           );
         });
@@ -69,20 +70,20 @@ export const VariableList: React.FC<VariableListProps> = ({
     <div className="mljar-variable-inspector-list-container">
       {loading ? (
         <div className="mljar-variable-inspector-message">
-          Loading variables...
+          {t('Loading variables...')}
         </div>
       ) : variables.length === 0 ? (
         <div className="mljar-variable-inspector-message">
-          Sorry, no variables available.
+          {t('Sorry, no variables available.')}
         </div>
       ) : (
         <ul className="mljar-variable-inspector-list">
           <li className="mljar-variable-inspector-header-list">
-            <span>Name</span>
-            {showType && <span>Type</span>}
-            {showShape && <span>Shape</span>}
-            {showSize && <span>Size</span>}
-            <span>Value</span>
+            <span>{t('Name')}</span>
+            {showType && <span>{t('Type')}</span>}
+            {showShape && <span>{t('Shape')}</span>}
+            {showSize && <span>{t('Size')}</span>}
+            <span>{t('Value')}</span>
           </li>
           {filteredVariables.map((variable, index) => (
             <VariableItem

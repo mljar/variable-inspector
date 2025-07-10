@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
+import { t } from '../translator';
 
 interface IProps {
   settingRegistry: ISettingRegistry | null;
@@ -27,7 +28,7 @@ export const RefreshButton: React.FC<IProps> = ({ settingRegistry }) => {
         })
         .catch(reason => {
           console.error(
-            'Failed to load settings for Variable Inspector',
+            'Failed to load settings for Your Variables',
             reason
           );
         });
@@ -43,7 +44,7 @@ export const RefreshButton: React.FC<IProps> = ({ settingRegistry }) => {
       className={`mljar-variable-inspector-refresh-button ${autoRefresh ? `` : `manually-refresh`}`}
       onClick={refreshVariables}
       disabled={loading}
-      title="Refresh Variables"
+      title={t('Refresh variables')}
     >
       <refreshIcon.react className="mljar-variable-inspector-refresh-icon" />
     </button>

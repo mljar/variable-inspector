@@ -31,7 +31,7 @@
     "language": {
       "type": "string",
       "title": "Language",
-      "description": "Set the display language for the Variable Inspector.",
+      "description": "Set the display language for the Your Variables.",
       "default": "en"
     }
   },

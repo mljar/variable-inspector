@@ -2,6 +2,7 @@ import { settingsIcon } from '../icons/settingsIcon';
 import { checkIcon } from '../icons/checkIcon';
 import React, { useEffect, useState } from 'react';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { t } from '../translator';
 
 import {
   VARIABLE_INSPECTOR_ID,
@@ -68,7 +69,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
         })
         .catch(reason => {
           console.error(
-            'Failed to load settings for Variable Inspector',
+            'Failed to load settings for Your Variables',
             reason
           );
         });
@@ -84,7 +85,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
       <button
         className={`mljar-variable-inspector-settings-button ${isOpen ? 'active' : ''}`}
         onClick={showSettings}
-        title="Settings"
+        title={t('Settings')}
       >
         <settingsIcon.react className="mljar-variable-inspector-settings-icon" />
       </button>
@@ -124,7 +125,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
               className="mljar-variable-inspector-settings-menu-item"
               onClick={() => savePropertyValue(showTypeProperty, !showType)}
             >
-              Show type
+              {t('Show type')}
               {showType && (
                 <checkIcon.react className="mljar-variable-inspector-settings-icon" />
               )}
@@ -133,7 +134,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
               className="mljar-variable-inspector-settings-menu-item"
               onClick={() => savePropertyValue(showShapeProperty, !showShape)}
             >
-              Show shape
+              {t('Show shape')}
               {showShape && (
                 <checkIcon.react className="mljar-variable-inspector-settings-icon" />
               )}
@@ -142,7 +143,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
               className="mljar-variable-inspector-settings-menu-item last"
               onClick={() => savePropertyValue(showSizeProperty, !showSize)}
             >
-              Show size
+              {t('Show size')}
               {showSize && (
                 <checkIcon.react className="mljar-variable-inspector-settings-icon" />
               )}

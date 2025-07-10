@@ -12,6 +12,7 @@ import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier'
 import { useThemeContext } from '../context/themeContext';
 import { transformMatrixData } from '../utils/utils';
 import { PaginationControls } from './paginationControls';
+import { t } from '../translator';
 
 interface IVariablePanelProps {
   variableName: string;
@@ -333,7 +334,7 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
           color: isDark ? '#ddd' : '#000'
         }}
       >
-        <p>Wrong variable type: {variableType}</p>
+        <p>{t('Wrong variable type:')} {variableType}</p>
       </div>
     );
   }

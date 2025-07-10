@@ -49,7 +49,7 @@ export const CodeExecutionContextProvider: React.FC<
         })
         .catch(reason => {
           console.error(
-            'Failed to load settings for Variable Inspector',
+            'Failed to load settings for Your Variables',
             reason
           );
         });

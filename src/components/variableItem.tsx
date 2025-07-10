@@ -6,6 +6,7 @@ import { useNotebookPanelContext } from '../context/notebookPanelContext';
 import { allowedTypes } from '../utils/allowedTypes';
 import { ILabShell } from '@jupyterlab/application';
 import { createEmptyVariableInspectorPanel } from '../components/variableInspectorPanel';
+import { t } from '../translator';
 
 interface VariableInfo {
   name: string;
@@ -106,7 +107,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
             className="mljar-variable-inspector-show-variable-button"
             onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
             aria-label={`Show details for ${vrb.name}`}
-            title="Show value"
+            title={t('Show value')}
           >
             {loading ? (
               <div className="mljar-variable-spinner-big" />

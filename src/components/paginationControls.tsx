@@ -3,6 +3,7 @@ import { skipLeftIcon } from '../icons/skipLeftIcon';
 import { smallSkipLeftIcon } from '../icons/smallSkipLeftIcon';
 import { smallSkipRightIcon } from '../icons/smallSkipRightIcon';
 import { skipRightIcon } from '../icons/skipRightIcon';
+import { t } from '../translator';
 // import { gridScanIcon } from '../icons/gridScanIcon';
 
 interface PaginationControlsProps {
@@ -52,23 +53,23 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
     <div className="mljar-variable-inspector-pagination-container">
       <div className="mljar-variable-inspector-pagination-item">
         <div className="mljar-variable-inspector-choose-range">
-          <span>Rows from </span>
+          <span>{t('Rows from ')}</span>
           <button
             onClick={e => handlePrevRowPage('first')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display first 100 rows'}
+            title={t('Display first 100 rows')}
           >
             <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <button
             onClick={e => handlePrevRowPage('previous')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display previous 100 rows'}
+            title={t('Display previous 100 rows')}
           >
             <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <input
-            title={'Start with row'}
+            title={t('Start with row')}
             type="number"
             min={0}
             max={rowsCount - 1}
@@ -93,7 +94,7 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
               }
             }}
           />
-          <span>to </span>
+          <span>{t('to ')}</span>
           <span>
             {parseInt(rowInput) + 99 >= rowsCount
               ? rowsCount - 1
@@ -102,39 +103,39 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
           <button
             onClick={e => handleNextRowPage('next')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display next 100 rows'}
+            title={t('Display next 100 rows')}
           >
             <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <button
             onClick={e => handleNextRowPage('last')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display last 100 rows'}
+            title={t('Display last 100 rows')}
           >
             <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <span>
-            Total <span style={{ fontWeight: 600 }}>{rowsCount}</span> rows
+            {t('Total')} <span style={{ fontWeight: 600 }}>{rowsCount}</span> {t('rows')}
           </span>
         </div>
         <div className="mljar-variable-inspector-choose-range">
-          <span>Columns from </span>
+          <span>{t('Columns from ')}</span>
           <button
             onClick={e => handlePrevColumnPage('first')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display first 50 columns'}
+            title={t('Display first 50 columns')}
           >
             <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <button
             onClick={e => handlePrevColumnPage('previous')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display previous 50 columns'}
+            title={t('Display previous 50 columns')}
           >
             <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <input
-            title={'Start with column'}
+            title={t('Start with column')}
             type="number"
             min={0}
             max={colsCount - 1}
@@ -159,7 +160,7 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
               }
             }}
           />
-          <span>to </span>
+          <span>{t('to ')}</span>
           <span>
             {parseInt(columnInput) + 49 >= colsCount
               ? colsCount - 1
@@ -168,19 +169,19 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
           <button
             onClick={e => handleNextColumnPage('next')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display next 50 columns'}
+            title={t('Display next 50 columns')}
           >
             <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <button
             onClick={e => handleNextColumnPage('last')}
             className="mljar-variable-inspector-skip-button"
-            title={'Display last 50 columns'}
+            title={t('Display last 50 columns')}
           >
             <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
           </button>
           <span>
-            Total <span style={{ fontWeight: 600 }}>{colsCount}</span> columns
+            {t('Total')} <span style={{ fontWeight: 600 }}>{colsCount}</span> {t('columns')}
           </span>
         </div>
         {/* Goto Cell section */}

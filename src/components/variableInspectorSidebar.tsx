@@ -18,6 +18,7 @@ import {
 import { ILabShell } from '@jupyterlab/application';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { CodeExecutionContextProvider } from '../context/codeExecutionContext';
+import { t } from '../translator';
 
 export class VariableInspectorSidebarWidget extends ReactWidget {
   private notebookWatcher: NotebookWatcher;
@@ -39,7 +40,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     this.commands = commands;
     this.id = 'mljar-variable-inspector::mljar-left-sidebar';
     this.title.icon = pluginIcon;
-    this.title.caption = 'Variable Inspector';;
+    this.title.caption = t('Your Variables');;
     this.addClass('mljar-variable-inspector-sidebar-widget');
     this.labShell = labShell;
     this.settingRegistry = settingRegistry;

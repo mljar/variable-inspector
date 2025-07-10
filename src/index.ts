@@ -7,7 +7,7 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IStateDB } from '@jupyterlab/statedb';
 import { ITranslator } from '@jupyterlab/translation';
-import { translator as t2} from './translator';
+import { translator as trans} from './translator';
 
 
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
@@ -32,8 +32,7 @@ const leftTab: JupyterFrontEndPlugin<void> = {
     translator: ITranslator
   ) => {
     const lang = translator.languageCode;
-    console.log(lang);
-    if (lang === "pl-PL") t2.setLanguage('pl');
+    if (lang === "pl-PL") trans.setLanguage('pl');
     const notebookWatcher = new NotebookWatcher(app.shell);
     const widget = createVariableInspectorSidebar(
       notebookWatcher,
