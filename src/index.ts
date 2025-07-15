@@ -7,7 +7,7 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IStateDB } from '@jupyterlab/statedb';
 import { ITranslator } from '@jupyterlab/translation';
-import { translator as trans} from './translator';
+import { t, translator as trans} from './translator';
 
 
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
@@ -21,7 +21,7 @@ export const showSizeProperty = 'variableInspectorShowSize';
 
 const leftTab: JupyterFrontEndPlugin<void> = {
   id: VARIABLE_INSPECTOR_ID,
-  description: 'A JupyterLab extension to easy manage variables.',
+  description: t('A JupyterLab extension to easy manage variables.'),
   autoStart: true,
   requires: [ILabShell, ISettingRegistry, IStateDB, ITranslator],
   activate: async (

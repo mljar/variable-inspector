@@ -14,6 +14,7 @@ class Translator {
   private translations: Translations = {
     pl: {
       'Your Variables': 'Twoje Zmienne',
+      'A JupyterLab extension to easy manage variables.': 'Rozszerzenie JupyterLab do łatwego zarządzania zmiennymi.',
       'Settings': 'Ustawienia',
       'Show type': 'Pokaż typ',
       'Show shape': 'Pokaż wymiar',

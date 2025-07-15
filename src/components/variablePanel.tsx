@@ -334,11 +334,12 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
           color: isDark ? '#ddd' : '#000'
         }}
       >
-        <p>{t('Wrong variable type:')} {variableType}</p>
+        <p>
+          {t('Wrong variable type:')} {variableType}
+        </p>
       </div>
     );
   }
-
   return (
     <div
       ref={containerRef}
@@ -349,7 +350,16 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
         color: isDark ? '#ddd' : '#000'
       }}
     >
-      <div style={{ height: '90%' }}>
+      <div
+        style={{
+          height:
+            rowsCount <= maxRowsRange && colsCount <= maxColsRange
+              ? '98%'
+              : rowsCount <= maxRowsRange || colsCount <= maxColsRange
+                ? '94%'
+                : '90%'
+        }}
+      >
         {/* Grid */}
         <AutoSizer key={autoSizerKey}>
           {({ width, height }: { width: number; height: number }) => (
