@@ -42,7 +42,7 @@ def __mljar_variable_inspector_check_imported():
 
 def __mljar_variable_inspector_getshapeof(x):
     def get_list_shape(lst):
-        if isinstance(lst, list):
+        if isinstance(lst, (list, tuple)):
             if not lst:
                 return "0"
             sub_shape = get_list_shape(lst[0])
@@ -71,7 +71,7 @@ def __mljar_variable_inspector_getshapeof(x):
     if __xr and isinstance(x, __xr.DataArray):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "%s" % shape
-    if isinstance(x, list):
+    if isinstance(x, (list, tuple)):
         return get_list_shape(x)
     if isinstance(x, dict):
         return "%s keys" % len(x)
@@ -99,7 +99,7 @@ def __mljar_variable_inspector_get_simple_value(x):
         return "None"
     if __np is not None and __np.isscalar(x) and not isinstance(x, bytes):
         return str(x)
-    if isinstance(x, (int, float, complex, bool, str, set, list, dict)):
+    if isinstance(x, (int, float, complex, bool, str, set, list, dict, tuple)):
         strValue = str(x) #__format_content(x)
         if len(strValue) > 100:
             return strValue[:100] + "..."
