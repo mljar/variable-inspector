@@ -85,7 +85,8 @@
   width: 100%;
   box-sizing: border-box;
   background-color: var(--jp-layout-color0);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
