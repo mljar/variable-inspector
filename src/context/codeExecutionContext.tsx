@@ -48,10 +48,7 @@ export const CodeExecutionContextProvider: React.FC<
           settings.changed.connect(updateSettings);
         })
         .catch(reason => {
-          console.error(
-            'Failed to load settings for Your Variables',
-            reason
-          );
+          console.error('Failed to load settings for Your Variables', reason);
         });
     }
   };
@@ -64,10 +61,30 @@ export const CodeExecutionContextProvider: React.FC<
     if (!notebook) {
       return;
     }
+
     const kernel = notebook.sessionContext?.session?.kernel;
     if (!kernel) {
       return;
     }
+
+    const sessionContext = notebook.sessionContext;
+    if (!sessionContext) {
+      return;
+    }
+
+    let waitingForRefresh = false;
+
+    const handleRestart = (sender: any, status: string) => {
+      if (status === 'restarting') {
+        waitingForRefresh = true;
+      }
+      if (waitingForRefresh && status === 'idle') {
+        refreshVariables();
+        waitingForRefresh = false;
+      }
+    };
+    sessionContext.statusChanged.connect(handleRestart);
+
     const handleIOPubMessage = (sender: any, msg: KernelMessage.IMessage) => {
       if (msg.header.msg_type === 'execute_input') {
         const inputMsg = msg as IExecuteInputMsg;
@@ -88,6 +105,7 @@ export const CodeExecutionContextProvider: React.FC<
 
     return () => {
       kernel.iopubMessage.disconnect(handleIOPubMessage);
+      sessionContext.statusChanged.disconnect(handleRestart);
     };
   }, [notebook, notebook?.sessionContext, kernelReady, autoRefresh]);
 

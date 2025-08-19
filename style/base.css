@@ -47,7 +47,7 @@
 
 .mljar-variable-header {
   flex: 4;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--jp-ui-font-color1);
   text-align: left;
@@ -59,7 +59,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   column-gap: 1rem;
   padding: 10px 8px;
   background-color: var(--jp-layout-color0);
@@ -86,7 +86,7 @@
   box-sizing: border-box;
   background-color: var(--jp-layout-color0);
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
