@@ -4,6 +4,22 @@
   font-family: 'Courier New', Courier, monospace;
 }
 
+.mljar-variable-inspector-sidebar-widget:hover {
+  padding-right: 5px;
+}
+.mljar-variable-inspector-sidebar-widget:hover
+  .mljar-variable-search-bar-container {
+  margin-right: 5px;
+}
+.mljar-variable-inspector-sidebar-widget:hover
+  .mljar-variable-header-container {
+  margin-right: 5px;
+}
+.mljar-variable-inspector-sidebar-widget:hover
+  .mljar-variable-inspector-list-container {
+  padding-right: 5px;
+}
+
 .mljar-variable-inspector-sidebar-container {
   display: flex;
   flex-direction: column;
@@ -14,7 +30,7 @@
 .mljar-variable-inspector-list-container {
   flex: 1;
   overflow-y: hidden;
-  /* padding-right: 10px; */
+  padding-right: 10px;
 }
 
 .mljar-variable-inspector-list-container::-webkit-scrollbar {
@@ -40,8 +56,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 8px;
-  /* margin-right: 8px; */
+  margin-bottom: 10px;
+  margin-right: 10px;
   border-bottom: 2px solid #ddd;
 }
 
@@ -122,7 +138,7 @@
 }
 
 .mljar-variable-search-bar-container {
-  margin: 0px 0px 10px 0px;
+  margin: 0px 10px 10px 0px;
 }
 
 .mljar-variable-inspector-search-bar-input {
@@ -326,18 +342,26 @@
   margin-right: 10px;
 }
 
+/* main extension scrollbar */
 .mljar-variable-inspector-sidebar-container::-webkit-scrollbar {
-  width: 9px;
+  width: 0px;
+}
+
+.mljar-variable-inspector-sidebar-widget:hover
+  .mljar-variable-inspector-sidebar-container::-webkit-scrollbar {
+  width: 10px;
   height: 8px;
 }
 
-.mljar-variable-inspector-sidebar-container::-webkit-scrollbar-track {
-  background: var(--jp-layout-color3);
-  border-radius: 8px;
+.mljar-variable-inspector-sidebar-widget:hover
+  .mljar-variable-inspector-sidebar-container::-webkit-scrollbar-track {
+  background: var(--jp-layout-color2);
+  border-radius: 4px;
 }
 
-.mljar-variable-inspector-sidebar-container::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.6);
+.mljar-variable-inspector-sidebar-widget:hover
+  .mljar-variable-inspector-sidebar-container::-webkit-scrollbar-thumb {
+  background: var(--jp-layout-color3);
   border-radius: 8px;
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -410,6 +434,7 @@
   margin: 0;
 }
 
+/* variable panel scrollbar */
 .ReactVirtualized__Grid::-webkit-scrollbar {
   width: 9px;
   height: 8px;
