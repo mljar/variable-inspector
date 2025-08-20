@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
 import { VariableItem } from './variableItem';
 import { CommandRegistry } from '@lumino/commands';
@@ -34,6 +34,9 @@ export const VariableList: React.FC<VariableListProps> = ({
   const [showShape, setShowShape] = useState(false);
   const [showSize, setShowSize] = useState(false);
 
+  const listRef = useRef<HTMLUListElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const loadPropertiesValues = () => {
     if (settingRegistry) {
       settingRegistry
@@ -54,10 +57,7 @@ export const VariableList: React.FC<VariableListProps> = ({
           settings.changed.connect(updateSettings);
         })
         .catch(reason => {
-          console.error(
-            'Failed to load settings for Your Variables',
-            reason
-          );
+          console.error('Failed to load settings for Your Variables', reason);
         });
     }
   };
@@ -66,8 +66,57 @@ export const VariableList: React.FC<VariableListProps> = ({
     loadPropertiesValues();
   }, []);
 
+  // handle scrollbar
+  useEffect(() => {
+    const listEl = listRef.current;
+    const containerEl = containerRef.current;
+    if (!listEl || !containerEl) return;
+
+    // function to check if there is overflow
+    const checkOverflow = () => {
+      const hasOverflowX = listEl.scrollWidth > listEl.clientWidth;
+      const hasOverflowY = listEl.scrollHeight > listEl.clientHeight;
+      const hasOverflow = hasOverflowX || hasOverflowY;
+
+      if (hasOverflow) {
+        listEl.classList.add('has-overflow');
+        containerEl.classList.add('has-overflow');
+      } else {
+        listEl.classList.remove('has-overflow');
+        containerEl.classList.remove('has-overflow');
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+
+    // hover handle
+    const handleMouseEnter = () => {
+      const elements = document.querySelectorAll<HTMLElement>('.has-overflow');
+      elements.forEach(el => {
+        el.style.paddingRight = '5px';
+      });
+    };
+
+    const handleMouseLeave = () => {
+      const elements = document.querySelectorAll<HTMLElement>('.has-overflow');
+      elements.forEach(el => {
+        el.style.paddingRight = '';
+      });
+    };
+
+    listEl.addEventListener('mouseenter', handleMouseEnter);
+    listEl.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+      listEl.removeEventListener('mouseenter', handleMouseEnter);
+      listEl.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [filteredVariables]);
+
   return (
-    <div className="mljar-variable-inspector-list-container">
+    <div className="mljar-variable-inspector-list-container" ref={containerRef}>
       {loading ? (
         <div className="mljar-variable-inspector-message">
           {t('Loading variables...')}
@@ -77,7 +126,7 @@ export const VariableList: React.FC<VariableListProps> = ({
           {t('Sorry, no variables available.')}
         </div>
       ) : (
-        <ul className="mljar-variable-inspector-list">
+        <ul className="mljar-variable-inspector-list" ref={listRef}>
           <li className="mljar-variable-inspector-header-list">
             <span>{t('Name')}</span>
             {showType && <span>{t('Type')}</span>}

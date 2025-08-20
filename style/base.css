@@ -1,55 +1,29 @@
 .mljar-variable-inspector-sidebar-widget {
   background-color: #ffffff;
-  padding: 10px;
+  padding: 10px 0px 10px 10px;
   font-family: 'Courier New', Courier, monospace;
-}
-
-.mljar-variable-inspector-sidebar-widget:hover {
-  padding-right: 5px;
-}
-.mljar-variable-inspector-sidebar-widget:hover
-  .mljar-variable-search-bar-container {
-  margin-right: 5px;
-}
-.mljar-variable-inspector-sidebar-widget:hover
-  .mljar-variable-header-container {
-  margin-right: 5px;
-}
-.mljar-variable-inspector-sidebar-widget:hover
-  .mljar-variable-inspector-list-container {
-  padding-right: 5px;
 }
 
 .mljar-variable-inspector-sidebar-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
 }
 
 .mljar-variable-inspector-list-container {
-  flex: 1;
-  overflow-y: hidden;
-  padding-right: 10px;
+  padding-right: 20px;
+  overflow-y: auto;
 }
 
-.mljar-variable-inspector-list-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.mljar-variable-inspector-list-container::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.mljar-variable-inspector-list-container::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0.05);
+.mljar-variable-inspector-list {
+  overflow: auto;
+  min-height: 0;
+  max-height: 85vh;
 }
 
 .mljar-variable-inspector-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
 }
 
 .mljar-variable-header-container {
@@ -57,7 +31,7 @@
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 10px;
-  margin-right: 10px;
+  margin-right: 20px;
   border-bottom: 2px solid #ddd;
 }
 
@@ -138,7 +112,7 @@
 }
 
 .mljar-variable-search-bar-container {
-  margin: 0px 10px 10px 0px;
+  margin: 0px 20px 10px 0px;
 }
 
 .mljar-variable-inspector-search-bar-input {
@@ -343,24 +317,21 @@
 }
 
 /* main extension scrollbar */
-.mljar-variable-inspector-sidebar-container::-webkit-scrollbar {
+.mljar-variable-inspector-list::-webkit-scrollbar {
   width: 0px;
 }
 
-.mljar-variable-inspector-sidebar-widget:hover
-  .mljar-variable-inspector-sidebar-container::-webkit-scrollbar {
+.mljar-variable-inspector-list:hover::-webkit-scrollbar {
   width: 10px;
   height: 8px;
 }
 
-.mljar-variable-inspector-sidebar-widget:hover
-  .mljar-variable-inspector-sidebar-container::-webkit-scrollbar-track {
+.mljar-variable-inspector-list:hover::-webkit-scrollbar-track {
   background: var(--jp-layout-color2);
   border-radius: 4px;
 }
 
-.mljar-variable-inspector-sidebar-widget:hover
-  .mljar-variable-inspector-sidebar-container::-webkit-scrollbar-thumb {
+.mljar-variable-inspector-list:hover::-webkit-scrollbar-thumb {
   background: var(--jp-layout-color3);
   border-radius: 8px;
   border: 2px solid transparent;
