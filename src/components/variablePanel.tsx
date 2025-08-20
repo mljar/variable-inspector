@@ -354,9 +354,9 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
         style={{
           height:
             rowsCount <= maxRowsRange && colsCount <= maxColsRange
-              ? '98%'
+              ? '96%'
               : rowsCount <= maxRowsRange || colsCount <= maxColsRange
-                ? '94%'
+                ? '92%'
                 : '90%'
         }}
       >

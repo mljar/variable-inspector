@@ -54,143 +54,184 @@ export const PaginationControls: React.FC<PaginationControlsProps> = ({
   return (
     <div className="mljar-variable-inspector-pagination-container">
       <div className="mljar-variable-inspector-pagination-item">
-        {rowsCount > maxRowsRange && (
-          <div className="mljar-variable-inspector-choose-range">
-            <span>{t('Rows from ')}</span>
-            <button
-              onClick={e => handlePrevRowPage('first')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display first 100 rows')}
-            >
-              <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <button
-              onClick={e => handlePrevRowPage('previous')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display previous 100 rows')}
-            >
-              <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <input
-              title={t('Start with row')}
-              type="number"
-              min={0}
-              max={rowsCount - 1}
-              value={rowInput === '' ? (rowInput = '0') : rowInput}
-              className="mljar-variable-inspector-pagination-input"
-              onChange={e => setRowInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  const newPage = parseInt(rowInput, 10);
-                  if (!isNaN(newPage) && newPage >= 0 && newPage <= rowsCount) {
-                    setCurrentRow(newPage);
-                    setRowInput(newPage.toString());
-                  }
-                }
-              }}
-              onBlur={() => {
-                const newPage = parseInt(rowInput, 10);
-                if (isNaN(newPage) || newPage < 0 || newPage > rowsCount) {
-                  setRowInput(currentRow.toString());
-                } else {
-                  setCurrentRow(newPage);
-                }
-              }}
-            />
-            <span>{t('to ')}</span>
-            <span>
-              {parseInt(rowInput) + 99 >= rowsCount
-                ? rowsCount - 1
-                : parseInt(rowInput) + 99}
-            </span>
-            <button
-              onClick={e => handleNextRowPage('next')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display next 100 rows')}
-            >
-              <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <button
-              onClick={e => handleNextRowPage('last')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display last 100 rows')}
-            >
-              <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <span>
-              {t('Total')} <span style={{ fontWeight: 600 }}>{rowsCount}</span>{' '}
-              {t('rows')}
-            </span>
-          </div>
-        )}
-        {colsCount > maxColsRange && (
-          <div className="mljar-variable-inspector-choose-range">
-            <span>{t('Columns from ')}</span>
-            <button
-              onClick={e => handlePrevColumnPage('first')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display first 50 columns')}
-            >
-              <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <button
-              onClick={e => handlePrevColumnPage('previous')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display previous 50 columns')}
-            >
-              <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <input
-              title={t('Start with column')}
-              type="number"
-              min={0}
-              max={colsCount - 1}
-              value={columnInput === '' ? (columnInput = '0') : columnInput}
-              className="mljar-variable-inspector-pagination-input"
-              onChange={e => setColumnInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  const newPage = parseInt(columnInput, 10);
-                  if (!isNaN(newPage) && newPage >= 0 && newPage <= colsCount) {
-                    setCurrentColumn(newPage);
-                    setColumnInput(newPage.toString());
-                  }
-                }
-              }}
-              onBlur={() => {
-                const newPage = parseInt(columnInput, 10);
-                if (isNaN(newPage) || newPage < 0 || newPage > colsCount) {
-                  setColumnInput(currentColumn.toString());
-                } else {
-                  setCurrentColumn(newPage);
-                }
-              }}
-            />
-            <span>{t('to ')}</span>
-            <span>
-              {parseInt(columnInput) + 49 >= colsCount
-                ? colsCount - 1
-                : parseInt(columnInput) + 49}
-            </span>
-            <button
-              onClick={e => handleNextColumnPage('next')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display next 50 columns')}
-            >
-              <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <button
-              onClick={e => handleNextColumnPage('last')}
-              className="mljar-variable-inspector-skip-button"
-              title={t('Display last 50 columns')}
-            >
-              <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
-            </button>
-            <span>
-              {t('Total')} <span style={{ fontWeight: 600 }}>{colsCount}</span>{' '}
-              {t('columns')}
-            </span>
-          </div>
+        {rowsCount > maxRowsRange || colsCount > maxColsRange ? (
+          <>
+            <div className="mljar-variable-inspector-choose-range">
+              {rowsCount > maxRowsRange ? (
+                <>
+                  <span>{t('Rows from ')}</span>
+                  <button
+                    onClick={e => handlePrevRowPage('first')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display first 100 rows')}
+                  >
+                    <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <button
+                    onClick={e => handlePrevRowPage('previous')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display previous 100 rows')}
+                  >
+                    <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <input
+                    title={t('Start with row')}
+                    type="number"
+                    min={0}
+                    max={rowsCount - 1}
+                    value={rowInput === '' ? (rowInput = '0') : rowInput}
+                    className="mljar-variable-inspector-pagination-input"
+                    onChange={e => setRowInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const newPage = parseInt(rowInput, 10);
+                        if (
+                          !isNaN(newPage) &&
+                          newPage >= 0 &&
+                          newPage <= rowsCount
+                        ) {
+                          setCurrentRow(newPage);
+                          setRowInput(newPage.toString());
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      const newPage = parseInt(rowInput, 10);
+                      if (
+                        isNaN(newPage) ||
+                        newPage < 0 ||
+                        newPage > rowsCount
+                      ) {
+                        setRowInput(currentRow.toString());
+                      } else {
+                        setCurrentRow(newPage);
+                      }
+                    }}
+                  />
+                  <span>{t('to ')}</span>
+                  <span>
+                    {parseInt(rowInput) + 99 >= rowsCount
+                      ? rowsCount - 1
+                      : parseInt(rowInput) + 99}
+                  </span>
+                  <button
+                    onClick={e => handleNextRowPage('next')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display next 100 rows')}
+                  >
+                    <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <button
+                    onClick={e => handleNextRowPage('last')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display last 100 rows')}
+                  >
+                    <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <span>
+                    {t('Total')}{' '}
+                    <span style={{ fontWeight: 600 }}>{rowsCount}</span>{' '}
+                    {t('rows')}
+                  </span>
+                </>
+              ) : (
+                <span>
+                  <b>{t('Total rows')}:</b> {rowsCount}
+                </span>
+              )}
+            </div>
+
+            <div className="mljar-variable-inspector-choose-range">
+              {colsCount > maxColsRange ? (
+                <>
+                  <span>{t('Columns from ')}</span>
+                  <button
+                    onClick={e => handlePrevColumnPage('first')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display first 50 columns')}
+                  >
+                    <skipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <button
+                    onClick={e => handlePrevColumnPage('previous')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display previous 50 columns')}
+                  >
+                    <smallSkipLeftIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <input
+                    title={t('Start with column')}
+                    type="number"
+                    min={0}
+                    max={colsCount - 1}
+                    value={
+                      columnInput === '' ? (columnInput = '0') : columnInput
+                    }
+                    className="mljar-variable-inspector-pagination-input"
+                    onChange={e => setColumnInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const newPage = parseInt(columnInput, 10);
+                        if (
+                          !isNaN(newPage) &&
+                          newPage >= 0 &&
+                          newPage <= colsCount
+                        ) {
+                          setCurrentColumn(newPage);
+                          setColumnInput(newPage.toString());
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      const newPage = parseInt(columnInput, 10);
+                      if (
+                        isNaN(newPage) ||
+                        newPage < 0 ||
+                        newPage > colsCount
+                      ) {
+                        setColumnInput(currentColumn.toString());
+                      } else {
+                        setCurrentColumn(newPage);
+                      }
+                    }}
+                  />
+                  <span>{t('to ')}</span>
+                  <span>
+                    {parseInt(columnInput) + 49 >= colsCount
+                      ? colsCount - 1
+                      : parseInt(columnInput) + 49}
+                  </span>
+                  <button
+                    onClick={e => handleNextColumnPage('next')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display next 50 columns')}
+                  >
+                    <smallSkipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <button
+                    onClick={e => handleNextColumnPage('last')}
+                    className="mljar-variable-inspector-skip-button"
+                    title={t('Display last 50 columns')}
+                  >
+                    <skipRightIcon.react className="mljar-variable-inspector-skip-icon" />
+                  </button>
+                  <span>
+                    {t('Total')}{' '}
+                    <span style={{ fontWeight: 600 }}>{colsCount}</span>{' '}
+                    {t('columns')}
+                  </span>
+                </>
+              ) : (
+                <span>
+                  <b>{t('Total columns')}:</b> {colsCount}
+                </span>
+              )}
+            </div>
+          </>
+        ) : (
+          <span style={{ fontSize: '14px' }}>
+            <b>Rows:</b> {rowsCount} <b>Columns:</b> {colsCount}
+          </span>
         )}
         {/* Goto Cell section */}
         {/* <div className="mljar-variable-inspector-choose-range">
