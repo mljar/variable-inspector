@@ -74,16 +74,14 @@ export const VariableList: React.FC<VariableListProps> = ({
 
     // function to check if there is overflow
     const checkOverflow = () => {
-      const hasOverflowX = listEl.scrollWidth > listEl.clientWidth;
       const hasOverflowY = listEl.scrollHeight > listEl.clientHeight;
-      const hasOverflow = hasOverflowX || hasOverflowY;
 
-      if (hasOverflow) {
-        listEl.classList.add('has-overflow');
-        containerEl.classList.add('has-overflow');
+      if (hasOverflowY) {
+        listEl.classList.add('variable-inspector-has-overflow');
+        containerEl.classList.add('variable-inspector-has-overflow');
       } else {
-        listEl.classList.remove('has-overflow');
-        containerEl.classList.remove('has-overflow');
+        listEl.classList.remove('variable-inspector-has-overflow');
+        containerEl.classList.remove('variable-inspector-has-overflow');
       }
     };
 
@@ -92,14 +90,14 @@ export const VariableList: React.FC<VariableListProps> = ({
 
     // hover handle
     const handleMouseEnter = () => {
-      const elements = document.querySelectorAll<HTMLElement>('.has-overflow');
+      const elements = document.querySelectorAll<HTMLElement>('.variable-inspector-has-overflow');
       elements.forEach(el => {
         el.style.paddingRight = '5px';
       });
     };
 
     const handleMouseLeave = () => {
-      const elements = document.querySelectorAll<HTMLElement>('.has-overflow');
+      const elements = document.querySelectorAll<HTMLElement>('.variable-inspector-has-overflow');
       elements.forEach(el => {
         el.style.paddingRight = '';
       });

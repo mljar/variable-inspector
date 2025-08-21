@@ -8,7 +8,6 @@ import { SettingsButton } from './variableSettingsButton';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { t } from '../translator';
 
-
 interface IVariableListComponentProps {
   commands: CommandRegistry;
   labShell: ILabShell;
@@ -21,7 +20,8 @@ export const VariableListComponent: React.FC<IVariableListComponentProps> = ({
   settingRegistry
 }) => {
   return (
-    <div className="mljar-variable-inspector-container">
+    // <div className="mljar-variable-inspector-container">
+    <>
       <div className="mljar-variable-header-container">
         <h3 className="mljar-variable-header">{t('Your Variables')}</h3>
         <RefreshButton settingRegistry={settingRegistry} />
@@ -35,6 +35,7 @@ export const VariableListComponent: React.FC<IVariableListComponentProps> = ({
           settingRegistry={settingRegistry}
         />
       </div>
-    </div>
+    </>
+    // </div>
   );
 };

@@ -5,34 +5,42 @@
 }
 
 .mljar-variable-inspector-sidebar-container {
-  display: flex;
-  flex-direction: column;
+  height: 99vh;
+}
+.mljar-variable-inspector-sidebar-container::-webkit-scrollbar {
+  display: none;
 }
 
 .mljar-variable-inspector-list-container {
   padding-right: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   overflow-y: auto;
+  position: relative;
 }
 
 .mljar-variable-inspector-list {
-  overflow: auto;
+  overflow-y: auto;
   min-height: 0;
   max-height: 85vh;
-}
-
-.mljar-variable-inspector-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .mljar-variable-header-container {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 10px;
-  margin-right: 20px;
   border-bottom: 2px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--jp-layout-color1);
+  margin-bottom: 0px;
+  margin-right: 0px;
+  padding-right: 20px;
 }
 
 .mljar-variable-header {
@@ -105,14 +113,16 @@
   cursor: not-allowed;
 }
 
-.mljar-variable-inspector-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
 .mljar-variable-search-bar-container {
-  margin: 0px 20px 10px 0px;
+  margin-bottom: 10px;
+  margin-right: 0px;
+  padding-right: 20px;
+  padding-top: 15px;
+  padding-bottom: 5px;
+  position: sticky;
+  top: 38px;
+  z-index: 10;
+  background: var(--jp-layout-color1);
 }
 
 .mljar-variable-inspector-search-bar-input {
