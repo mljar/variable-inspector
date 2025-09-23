@@ -11,7 +11,7 @@
     "bugs": {
         "url": "https://github.com/mljar/variable-inspector.git/issues"
     },
-    "license": "SEE LICENSE IN LICENSE",
+    "license": "AGPL-3.0-or-later",
     "author": {
         "name": "MLJAR Sp z o.o.",
         "email": "contact@mljar.com"
