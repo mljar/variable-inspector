@@ -1,7 +1,7 @@
 {
     "name": "variable-inspector",
     "version": "1.1.0",
-    "description": "Variable inspector for jupyter lab.",
+    "description": "Variable explorer for Jupyter Lab.",
     "keywords": [
         "jupyter",
         "jupyterlab",
@@ -13,7 +13,7 @@
     },
     "license": "SEE LICENSE IN LICENSE",
     "author": {
-        "name": "MLJAR",
+        "name": "MLJAR Sp z o.o.",
         "email": "contact@mljar.com"
     },
     "files": [
