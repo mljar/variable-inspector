@@ -1,6 +1,6 @@
 import { settingsIcon } from '../icons/settingsIcon';
 import { checkIcon } from '../icons/checkIcon';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { t } from '../translator';
 
@@ -20,6 +20,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
   settingRegistry
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   // const [autoRefresh, setAutoRefresh] = useState(true);
   const [showType, setShowType] = useState(false);
   const [showShape, setShowShape] = useState(false);
@@ -77,11 +78,32 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
   };
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+  
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+  
+  useEffect(() => {
     loadPropertiesValues();
   }, []);
 
   return (
-    <div className="mljar-variable-inspector-settings-container">
+    <div className="mljar-variable-inspector-settings-container" ref={menuRef}>
       <button
         className={`mljar-variable-inspector-settings-button ${isOpen ? 'active' : ''}`}
         onClick={showSettings}
