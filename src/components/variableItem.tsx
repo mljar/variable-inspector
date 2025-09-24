@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { detailIcon } from '../icons/detailIcon';
-import { CommandRegistry } from '@lumino/commands';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useNotebookPanelContext } from '../context/notebookPanelContext';
 import { allowedTypes } from '../utils/allowedTypes';
@@ -19,7 +18,6 @@ interface VariableInfo {
 
 interface VariableItemProps {
   vrb: VariableInfo;
-  commands: CommandRegistry;
   labShell: ILabShell;
   showType: boolean;
   showShape: boolean;
@@ -28,7 +26,6 @@ interface VariableItemProps {
 
 export const VariableItem: React.FC<VariableItemProps> = ({
   vrb,
-  commands,
   labShell,
   showType,
   showShape,

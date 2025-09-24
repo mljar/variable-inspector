@@ -143,7 +143,6 @@ export const VariableList: React.FC<VariableListProps> = ({
                 size: variable.size,
                 value: variable.value
               }}
-              commands={commands}
               labShell={labShell}
               showType={showType}
               showShape={showShape}
