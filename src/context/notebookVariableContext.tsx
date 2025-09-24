@@ -3,7 +3,8 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useCallback
+  useCallback,
+  useRef
 } from 'react';
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
@@ -97,6 +98,7 @@ export const VariableContextProvider: React.FC<{
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [refreshCount, setRefreshCount] = useState<number>(0);
   const queue = new DebouncedTaskQueue(250);
+  const retryCountRef = useRef(0);
 
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {
@@ -114,6 +116,7 @@ export const VariableContextProvider: React.FC<{
       //setVariables([]);
       try {
         await notebookPanel.sessionContext?.ready;
+        let runAgain = false;
         const future =
           notebookPanel.sessionContext?.session?.kernel?.requestExecute({
             code: variableDict,
@@ -122,6 +125,16 @@ export const VariableContextProvider: React.FC<{
         if (future) {
           future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
             const msgType = msg.header.msg_type;
+
+            if (msgType === 'error') {
+              runAgain = true;
+              setVariables([]);
+              setLoading(false);
+              setIsRefreshing(false);
+              stateDB.save('mljarVariables', []);
+              stateDB.save('mljarVariablesStatus', 'error');
+            }
+
             if (
               msgType === 'execute_result' ||
               msgType === 'display_data' ||
@@ -131,6 +144,7 @@ export const VariableContextProvider: React.FC<{
               const content = msg.content as any;
               const jsonData = content.data['application/json'];
               const textData = content.data['text/plain'];
+              retryCountRef.current = 0;
               if (jsonData) {
                 setLoading(false);
                 setIsRefreshing(false);
@@ -180,7 +194,23 @@ export const VariableContextProvider: React.FC<{
             }
           };
           await future.done;
-          stateDB.save('mljarVariablesStatus', 'loaded');
+          if (runAgain) {
+            // Clear previous displayhook state that may block next result.
+            notebookPanel.sessionContext?.session?.kernel?.requestExecute({
+              code: 'pass'
+            });
+
+            if (retryCountRef.current < 2) {
+              retryCountRef.current += 1;
+              // small delay before retry (matches Packages’ pattern)
+              setTimeout(() => {
+                queue.add(() => executeCode());
+              }, 100);
+              return;
+            }
+          } else {
+            stateDB.save('mljarVariablesStatus', 'loaded');
+          }
         }
       } catch (err) {
         setError('Unexpected error.');
