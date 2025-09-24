@@ -99,7 +99,7 @@ def __mljar_variable_inspector_get_simple_value(x):
         return "None"
     if __np is not None and __np.isscalar(x) and not isinstance(x, bytes):
         return str(x)
-    if isinstance(x, (int, float, complex, bool, str, set, list, dict, tuple)):
+    if isinstance(x, (int, float, complex, bool, str, set, list, dict, tuple, datetime)):
         strValue = str(x) #__format_content(x)
         if len(strValue) > 100:
             return strValue[:100] + "..."

@@ -27,7 +27,7 @@ def __format_content(item):
         return {k: __format_content(v) for k, v in item.items()}
     elif isinstance(item, str):
         return item[:50] + "..." if len(item) > 50 else item
-    elif isinstance(item, (int, float, bool)) or item is None:
+    elif isinstance(item, (int, float, bool, datetime)) or item is None:
         return item
     else:
         if hasattr(item, "name"):
