@@ -102,8 +102,6 @@ export const VariableContextProvider: React.FC<{
 
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {
-      //setIsRefreshing(true);
-      //setLoading(true);
       stateDB.save('mljarVariablesStatus', 'loading');
       setError(null);
       if (!notebookPanel) {
@@ -113,7 +111,6 @@ export const VariableContextProvider: React.FC<{
         stateDB.save('mljarVariables', []);
         return;
       }
-      //setVariables([]);
       try {
         await notebookPanel.sessionContext?.ready;
         let runAgain = false;
@@ -138,8 +135,7 @@ export const VariableContextProvider: React.FC<{
             if (
               msgType === 'execute_result' ||
               msgType === 'display_data' ||
-              msgType === 'update_display_data' ||
-              msgType === 'error'
+              msgType === 'update_display_data'
             ) {
               const content = msg.content as any;
               const jsonData = content.data['application/json'];
@@ -195,17 +191,14 @@ export const VariableContextProvider: React.FC<{
           };
           await future.done;
           if (runAgain) {
-            // Clear previous displayhook state that may block next result.
-            notebookPanel.sessionContext?.session?.kernel?.requestExecute({
-              code: 'pass'
-            });
-
-            if (retryCountRef.current < 2) {
+            if (retryCountRef.current < 1) {
+              // Clear previous displayhook state that may block next result.
+              // just execute pass in the Python session
+              // variables will be automatically refreshed
+              notebookPanel.sessionContext?.session?.kernel?.requestExecute({
+                code: 'pass'
+              });
               retryCountRef.current += 1;
-              // small delay before retry (matches Packages’ pattern)
-              setTimeout(() => {
-                queue.add(() => executeCode());
-              }, 100);
               return;
             }
           } else {
@@ -223,9 +216,11 @@ export const VariableContextProvider: React.FC<{
   }, [notebookPanel, kernel]);
 
   useEffect(() => {
-    stateDB.save('mljarVariablesStatus', 'loading');
-    queue.add(() => executeCode());
-  }, [executeCode]);
+    if (kernel) {
+      stateDB.save('mljarVariablesStatus', 'loading');
+      queue.add(() => executeCode());
+    }
+  }, [kernel?.id]);
 
   return (
     <VariableContext.Provider

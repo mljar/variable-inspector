@@ -93,6 +93,7 @@ def __format_content(item):
         return type(item).__name__   
 
 def __mljar_variable_inspector_get_simple_value(x):
+    from datetime import datetime
     if isinstance(x, bytes):
         return ""
     if x is None:
