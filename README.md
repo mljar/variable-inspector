@@ -118,6 +118,53 @@ In development mode, you will also need to remove the symlink created by `jupyte
 command. To find its location, you can run `jupyter labextension list` to figure out where the `labextensions`
 folder is located. Then you can remove the symlink named `variable-inspector` within that folder.
 
+
+Here’s a simple `README.md` you can drop into your repo 👇
+
+## Running End-to-End UI Tests
+
+This project uses **Playwright** to run UI tests against JupyterLab with the MLJAR extension.
+
+### Prerequisites
+
+- Node.js / Yarn
+- Playwright installed (`jlpm playwright install`)
+
+### How to Run Tests
+
+You need **two terminals**:
+
+#### 1. Start JupyterLab
+In the first terminal, run:
+
+```bash
+jlpm lab
+```
+
+This will start JupyterLab at `http://localhost:8899/lab`.
+
+#### 2. Run UI Tests
+
+In the second terminal, run:
+
+```bash
+jlpm test:ui:headed
+```
+
+This will:
+
+* Remove any temporary `Untitled*.ipynb` files
+* Launch Playwright in **headed mode** (with a visible browser)
+* Run the end-to-end tests defined in `tests/e2e`
+* Remove leftover `Untitled*.ipynb` files after tests finish
+
+### Notes
+
+* Use `jlpm test:ui` to run the tests in headless mode (without opening a browser).
+* Logs are printed to the console during test execution for easier debugging.
+* If you encounter navigation timeout errors, make sure JupyterLab is fully started before running the tests.
+
+
 ### Packaging the extension
 
 See [RELEASE](RELEASE.md)
