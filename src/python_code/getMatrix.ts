@@ -6,6 +6,7 @@ export const getMatrix = (
   endColumn: number
 ): string => `
 import importlib
+from datetime import datetime
 from IPython.display import JSON
 
 def __get_variable_shape(obj):
