@@ -9,8 +9,6 @@ type Translations = {
 class Translator {
   private static instance: Translator;
   private language: Language = 'en';
-  private languageSet = false;
-
   private translations: Translations = {
     pl: {
       'Your Variables': 'Twoje Zmienne',
@@ -60,11 +58,7 @@ class Translator {
   }
 
   public setLanguage(lang: Language) {
-    if (this.languageSet) {
-      throw new Error('Language can only be set once!');
-    }
     this.language = lang;
-    this.languageSet = true;
   }
 
   public translate(text: string): string {

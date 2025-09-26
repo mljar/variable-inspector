@@ -2,6 +2,7 @@ export const variableDict = `
 import json
 import sys
 import math
+from datetime import datetime
 from importlib import __import__
 from IPython import get_ipython
 from IPython.core.magics.namespace import NamespaceMagics
@@ -93,7 +94,6 @@ def __format_content(item):
         return type(item).__name__   
 
 def __mljar_variable_inspector_get_simple_value(x):
-    from datetime import datetime
     if isinstance(x, bytes):
         return ""
     if x is None:
