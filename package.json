@@ -57,7 +57,7 @@
         "watch:labextension": "jupyter labextension watch .",
         "lab": "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.disable_check_xsrf=True --ServerApp.port=8899",
         "test:e2e": "playwright test",
-        "test:ui:headed": "rm Untitled*ipynb && playwright test --headed"
+        "test:ui:headed": "rm -f Untitled*ipynb && playwright test --headed && rm -f Untitled*ipynb"
     },
     "dependencies": {
         "@jupyterlab/application": "^4.0.0",

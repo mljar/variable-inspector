@@ -1,3 +1,5 @@
+test-results/*
+Untitled*ipynb
 *.bundle.*
 lib/
 node_modules/
