@@ -70,7 +70,6 @@
     },
     "devDependencies": {
         "@jupyterlab/builder": "^4.0.0",
-        "@jupyterlab/galata": "^5.4.7",
         "@playwright/test": "^1.55.1",
         "@types/json-schema": "^7.0.11",
         "@types/react": "^18.0.26",
