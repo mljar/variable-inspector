@@ -1,4 +1,4 @@
-// tests/minimal-mljar.spec.ts
+// tests/preview-dataframe.spec.ts
 import { test, expect } from '@playwright/test';
 import { createNewNotebook, writeCodeInFirstCell } from '../utils/notebook';
 
