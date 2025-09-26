@@ -160,7 +160,6 @@ This will:
 
 ### Notes
 
-* Use `jlpm test:ui` to run the tests in headless mode (without opening a browser).
 * Logs are printed to the console during test execution for easier debugging.
 * If you encounter navigation timeout errors, make sure JupyterLab is fully started before running the tests.
 
