@@ -13,6 +13,7 @@ import { IStateDB } from '@jupyterlab/statedb';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 import { variableDict } from '../python_code/getVariables';
 import { CommandRegistry } from '@lumino/commands';
+import { provideVariableInspectorSubshellKernel } from '../utils/variableInspectorSubshell';
 
 export interface IVariableInfo {
   name: string;
@@ -32,6 +33,7 @@ interface IVariableContextProps {
   refreshVariables: () => void;
   isRefreshing: boolean;
   refreshCount: number;
+  resetVariables: () => void;
 }
 
 const VariableContext = createContext<IVariableContextProps | undefined>(
@@ -100,6 +102,14 @@ export const VariableContextProvider: React.FC<{
   const queue = new DebouncedTaskQueue(250);
   const retryCountRef = useRef(0);
 
+  const resetVariables = () => {
+    setVariables([]);
+    setLoading(false);
+    setError(null);
+    stateDB.save('mljarVariables', []);
+    stateDB.save('mljarVariablesStatus', 'loaded');
+  };
+
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {
       stateDB.save('mljarVariablesStatus', 'loading');
@@ -113,12 +123,28 @@ export const VariableContextProvider: React.FC<{
       }
       try {
         await notebookPanel.sessionContext?.ready;
+
+        // Get the kernel for Variable Inspector.
+        const viKernel = await provideVariableInspectorSubshellKernel(
+          notebookPanel.sessionContext?.session?.kernel
+        );
+
+        if (!viKernel) {
+          setVariables([]);
+          setLoading(false);
+          setIsRefreshing(false);
+          stateDB.save('mljarVariables', []);
+          stateDB.save('mljarVariablesStatus', 'error');
+          return;
+        }
+
         let runAgain = false;
-        const future =
-          notebookPanel.sessionContext?.session?.kernel?.requestExecute({
-            code: variableDict,
-            store_history: false
-          });
+
+        const future = viKernel.requestExecute({
+          code: variableDict,
+          store_history: false
+        });
+
         if (future) {
           future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
             const msgType = msg.header.msg_type;
@@ -149,8 +175,8 @@ export const VariableContextProvider: React.FC<{
                 try {
                   const cleanedData = textData.replace(/^['"]|['"]$/g, '');
                   const doubleQuotedData = cleanedData.replace(/'/g, '"');
-                  const parsedData: IVariableInfo[] =
-                    JSON.parse(doubleQuotedData);
+                  const parsedData = JSON.parse(doubleQuotedData) as any[];
+
                   if (Array.isArray(parsedData)) {
                     const mappedVariables: IVariableInfo[] = parsedData.map(
                       (item: any) => ({
@@ -163,16 +189,12 @@ export const VariableContextProvider: React.FC<{
                       })
                     );
                     setVariables(mappedVariables);
-
-                    stateDB.save(
-                      'mljarVariables',
-                      JSON.parse(doubleQuotedData)
-                    );
+                    stateDB.save('mljarVariables', parsedData as any);
                     stateDB.save('mljarVariablesStatus', 'loaded');
 
                     commands
                       .execute('mljar-piece-of-code:refresh-variables')
-                      .catch(err => {});
+                      .catch(() => {});
                   } else {
                     throw new Error('Error during parsing.');
                   }
@@ -195,9 +217,7 @@ export const VariableContextProvider: React.FC<{
               // Clear previous displayhook state that may block next result.
               // just execute pass in the Python session
               // variables will be automatically refreshed
-              notebookPanel.sessionContext?.session?.kernel?.requestExecute({
-                code: 'pass'
-              });
+              viKernel.requestExecute({ code: 'pass' });
               retryCountRef.current += 1;
               return;
             }
@@ -235,7 +255,8 @@ export const VariableContextProvider: React.FC<{
           queue.add(() => executeCode());
         },
         isRefreshing,
-        refreshCount
+        refreshCount,
+        resetVariables
       }}
     >
       {children}

@@ -5,14 +5,12 @@ import React, {
   useState,
   ReactNode
 } from 'react';
-import { KernelMessage } from '@jupyterlab/services';
-import { IExecuteInputMsg } from '@jupyterlab/services/lib/kernel/messages';
 import { useNotebookPanelContext } from './notebookPanelContext';
-import { useNotebookKernelContext } from './notebookKernelContext';
 import { useVariableContext } from './notebookVariableContext';
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { variableDict } from '../python_code/getVariables';
+import { NotebookActions } from '@jupyterlab/notebook';
+import { resetVariableInspectorSubshell } from '../utils/variableInspectorSubshell';
 
 interface ICodeExecutionContext {}
 
@@ -29,9 +27,7 @@ export const CodeExecutionContextProvider: React.FC<
   ICodeExecutionContextProviderProps
 > = ({ children, settingRegistry }) => {
   const notebook = useNotebookPanelContext();
-  const kernelReady = useNotebookKernelContext();
-  const { refreshVariables } = useVariableContext();
-  const getVariableCode = variableDict;
+  const { refreshVariables, resetVariables } = useVariableContext();
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const loadAutoRefresh = () => {
@@ -62,52 +58,43 @@ export const CodeExecutionContextProvider: React.FC<
       return;
     }
 
-    const kernel = notebook.sessionContext?.session?.kernel;
-    if (!kernel) {
-      return;
-    }
-
     const sessionContext = notebook.sessionContext;
     if (!sessionContext) {
       return;
     }
 
-    let waitingForRefresh = false;
-
-    const handleRestart = (sender: any, status: string) => {
+    const handleRestart = (_sender: any, status: string) => {
       if (status === 'restarting') {
-        waitingForRefresh = true;
-      }
-      if (waitingForRefresh && status === 'idle') {
-        refreshVariables();
-        waitingForRefresh = false;
+        resetVariableInspectorSubshell();
+        resetVariables();
       }
     };
+
     sessionContext.statusChanged.connect(handleRestart);
 
-    const handleIOPubMessage = (sender: any, msg: KernelMessage.IMessage) => {
-      if (msg.header.msg_type === 'execute_input') {
-        const inputMsg = msg as IExecuteInputMsg;
-        const code = inputMsg.content.code;
-        const variableInspectorPrefix = '_jupyterlab_variableinspector';
-        const mljarPrefix = '__mljar';
-        if (
-          code !== getVariableCode &&
-          !code.includes(variableInspectorPrefix) &&
-          !code.includes(mljarPrefix) &&
-          autoRefresh
-        ) {
-          refreshVariables();
-        }
-      }
-    };
-    kernel.iopubMessage.connect(handleIOPubMessage);
-
     return () => {
-      kernel.iopubMessage.disconnect(handleIOPubMessage);
       sessionContext.statusChanged.disconnect(handleRestart);
     };
-  }, [notebook, notebook?.sessionContext, kernelReady, autoRefresh]);
+  }, [notebook, resetVariables]);
+
+  useEffect(() => {
+    if (!notebook || !autoRefresh) {
+      return;
+    }
+
+    const onCellExecuted = (
+      _sender: any,
+      args: { cell: any; notebook: any }
+    ) => {
+      refreshVariables();
+    };
+
+    NotebookActions.executed.connect(onCellExecuted);
+
+    return () => {
+      NotebookActions.executed.disconnect(onCellExecuted);
+    };
+  }, [notebook, refreshVariables, autoRefresh]);
 
   return (
     <CodeExecutionContext.Provider value={{}}>

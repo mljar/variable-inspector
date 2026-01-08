@@ -1,6 +1,7 @@
 import { KernelMessage } from '@jupyterlab/services';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { getMatrix } from '../python_code/getMatrix';
+import { provideVariableInspectorSubshellKernel } from './variableInspectorSubshell';
 
 export const executeMatrixContent = async (
   varName: string,
@@ -21,14 +22,21 @@ export const executeMatrixContent = async (
     varEndColumn
   );
 
+  // Get the kernel for variable inspection.
+  const viKernel = await provideVariableInspectorSubshellKernel(
+    notebookPanel.sessionContext?.session?.kernel
+  );
+  if (!viKernel) {
+    throw new Error('Kernel not available.');
+  }
+
   return new Promise((resolve, reject) => {
     let outputData = '';
     let resultResolved = false;
-    const future =
-      notebookPanel.sessionContext?.session?.kernel?.requestExecute({
-        code,
-        store_history: false
-      });
+    const future = viKernel.requestExecute({
+      code,
+      store_history: false
+    });
 
     if (!future) {
       return reject(new Error('No future returned from kernel execution.'));
