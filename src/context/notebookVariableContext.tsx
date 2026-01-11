@@ -151,10 +151,8 @@ export const VariableContextProvider: React.FC<{
 
             if (msgType === 'error') {
               runAgain = true;
-              setVariables([]);
               setLoading(false);
               setIsRefreshing(false);
-              stateDB.save('mljarVariables', []);
               stateDB.save('mljarVariablesStatus', 'error');
             }
 
