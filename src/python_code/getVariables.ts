@@ -207,10 +207,8 @@ def __mljar_variable_inspector_dict_list():
                 'varColumns': __mljar_variableinspector_getcolumnsof(_ev),
                 'varColumnTypes': __mljar_variableinspector_getcolumntypesof(_ev),
             }]
-    # from IPython.display import JSON
-    # return JSON(vardic)
-    return json.dumps(vardic, ensure_ascii=False)
-
+    from IPython.display import JSON
+    return JSON(vardic)
 
 def __mljar_variable_inspector_get_size_mb(obj):
     return sys.getsizeof(obj)

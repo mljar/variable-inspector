@@ -162,50 +162,36 @@ export const VariableContextProvider: React.FC<{
               msgType === 'update_display_data'
             ) {
               const content = msg.content as any;
-              const jsonData = content.data['application/json'];
-              const textData = content.data['text/plain'];
+              console.log(content.data);
+              const jsonData = content?.data?.['application/json'];
+
               retryCountRef.current = 0;
-              if (jsonData) {
+
+              if (jsonData && Array.isArray(jsonData)) {
+                const parsedData = jsonData as any[];
+
+                const mappedVariables: IVariableInfo[] = parsedData.map(
+                  item => ({
+                    name: item.varName,
+                    type: item.varType,
+                    shape: item.varShape || 'None',
+                    dimension: item.varDimension,
+                    size: item.varSize,
+                    value: item.varSimpleValue
+                  })
+                );
+
+                setVariables(mappedVariables);
+                stateDB.save('mljarVariables', parsedData as any);
+                stateDB.save('mljarVariablesStatus', 'loaded');
+
                 setLoading(false);
                 setIsRefreshing(false);
                 setRefreshCount(prev => prev + 1);
-              } else if (textData) {
-                try {
-                  const cleanedData = textData.replace(/^['"]|['"]$/g, '');
-                  const doubleQuotedData = cleanedData.replace(/'/g, '"');
-                  const parsedData = JSON.parse(doubleQuotedData) as any[];
 
-                  if (Array.isArray(parsedData)) {
-                    const mappedVariables: IVariableInfo[] = parsedData.map(
-                      (item: any) => ({
-                        name: item.varName,
-                        type: item.varType,
-                        shape: item.varShape || 'None',
-                        dimension: item.varDimension,
-                        size: item.varSize,
-                        value: item.varSimpleValue
-                      })
-                    );
-                    setVariables(mappedVariables);
-                    stateDB.save('mljarVariables', parsedData as any);
-                    stateDB.save('mljarVariablesStatus', 'loaded');
-
-                    commands
-                      .execute('mljar-piece-of-code:refresh-variables')
-                      .catch(() => {});
-                  } else {
-                    throw new Error('Error during parsing.');
-                  }
-                  setLoading(false);
-                  setIsRefreshing(false);
-                  setRefreshCount(prev => prev + 1);
-                } catch (err) {
-                  setError('Error during export JSON.');
-                  setVariables([]);
-                  setLoading(false);
-                  setIsRefreshing(false);
-                  stateDB.save('mljarVariablesStatus', 'error');
-                }
+                commands
+                  .execute('mljar-piece-of-code:refresh-variables')
+                  .catch(() => {});
               }
             }
           };
