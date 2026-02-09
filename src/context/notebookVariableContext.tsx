@@ -162,7 +162,6 @@ export const VariableContextProvider: React.FC<{
               msgType === 'update_display_data'
             ) {
               const content = msg.content as any;
-              console.log(content.data);
               const jsonData = content?.data?.['application/json'];
 
               retryCountRef.current = 0;
