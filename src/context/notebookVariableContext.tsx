@@ -122,11 +122,11 @@ export const VariableContextProvider: React.FC<{
         return;
       }
       try {
-        await notebookPanel.sessionContext?.ready;
+        await notebookPanel.context.sessionContext?.ready;
 
         // Get the kernel for Variable Inspector.
         const viKernel = await provideVariableInspectorSubshellKernel(
-          notebookPanel.sessionContext?.session?.kernel
+          notebookPanel.context.sessionContext?.session?.kernel
         );
 
         if (!viKernel) {

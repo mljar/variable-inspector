@@ -1,6 +1,6 @@
-import { NotebookPanel } from '@jupyterlab/notebook';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
+import { NotebookLikeWidget } from '../utils/notebookTypes';
 
 interface VariableRefreshContextValue {
   refreshCount: number;
@@ -12,7 +12,7 @@ const VariableRefreshContext = createContext<VariableRefreshContextValue>({
 
 interface VariableRefreshContextProviderProps {
   children: React.ReactNode;
-  notebookPanel?: NotebookPanel | null;
+  notebookPanel?: NotebookLikeWidget;
 }
 
 export const VariableRefreshContextProvider: React.FC<
@@ -25,7 +25,7 @@ export const VariableRefreshContextProvider: React.FC<
       return;
     }
 
-    const kernel = notebookPanel.sessionContext.session?.kernel;
+    const kernel = notebookPanel.context.sessionContext.session?.kernel;
     if (!kernel) {
       return;
     }

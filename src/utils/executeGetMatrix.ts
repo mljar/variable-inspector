@@ -1,7 +1,7 @@
 import { KernelMessage } from '@jupyterlab/services';
-import { NotebookPanel } from '@jupyterlab/notebook';
 import { getMatrix } from '../python_code/getMatrix';
 import { provideVariableInspectorSubshellKernel } from './variableInspectorSubshell';
+import { NotebookLikeWidget } from './notebookTypes';
 
 export const executeMatrixContent = async (
   varName: string,
@@ -9,7 +9,7 @@ export const executeMatrixContent = async (
   varEndColumn: number,
   varStartRow: number,
   varEndRow: number,
-  notebookPanel: NotebookPanel
+  notebookPanel: NotebookLikeWidget
 ): Promise<any> => {
   if (!notebookPanel) {
     throw new Error('Kernel not available.');
@@ -24,7 +24,7 @@ export const executeMatrixContent = async (
 
   // Get the kernel for variable inspection.
   const viKernel = await provideVariableInspectorSubshellKernel(
-    notebookPanel.sessionContext?.session?.kernel
+    notebookPanel.context.sessionContext?.session?.kernel
   );
   if (!viKernel) {
     throw new Error('Kernel not available.');

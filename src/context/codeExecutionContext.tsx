@@ -58,7 +58,7 @@ export const CodeExecutionContextProvider: React.FC<
       return;
     }
 
-    const sessionContext = notebook.sessionContext;
+    const sessionContext = notebook.context.sessionContext;
     if (!sessionContext) {
       return;
     }

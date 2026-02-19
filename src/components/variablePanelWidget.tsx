@@ -1,15 +1,15 @@
 import { ReactWidget } from '@jupyterlab/apputils';
 import React from 'react';
 import { VariablePanel } from './variablePanel';
-import { NotebookPanel } from '@jupyterlab/notebook';
 import { VariableRefreshContextProvider } from '../context/variableRefershContext';
 import { ThemeContextProvider } from '../context/themeContext';
+import { NotebookLikeWidget } from '../utils/notebookTypes';
 
 export interface VariablePanelWidgetProps {
   variableName: string;
   variableType: string;
   variableShape: string;
-  notebookPanel?: NotebookPanel | null;
+  notebookPanel?: NotebookLikeWidget;
 }
 
 export class VariablePanelWidget extends ReactWidget {

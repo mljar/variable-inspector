@@ -5,7 +5,6 @@ import {
 } from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import { allowedTypes } from '../utils/allowedTypes';
-import { NotebookPanel } from '@jupyterlab/notebook';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useVariableRefeshContext } from '../context/variableRefershContext';
 import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
@@ -13,12 +12,13 @@ import { useThemeContext } from '../context/themeContext';
 import { transformMatrixData } from '../utils/utils';
 import { PaginationControls } from './paginationControls';
 import { t } from '../translator';
+import { NotebookLikeWidget } from '../utils/notebookTypes';
 
 interface IVariablePanelProps {
   variableName: string;
   initVariableType: string;
   initVariableShape: string;
-  notebookPanel?: NotebookPanel | null;
+  notebookPanel?: NotebookLikeWidget;
 }
 
 const AutoSizer = RVAutoSizer as unknown as React.ComponentType<any>;

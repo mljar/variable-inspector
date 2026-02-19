@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { NotebookPanel } from '@jupyterlab/notebook';
 import { NotebookWatcher } from '../watchers/notebookWatcher';
+import { NotebookLikeWidget } from '../utils/notebookTypes';
 
-type NotebookPanelContextType = NotebookPanel | null;
+type NotebookPanelContextType = NotebookLikeWidget;
 
 const NotebookPanelContext = createContext<NotebookPanelContextType>(null);
 
@@ -19,14 +19,14 @@ export function NotebookPanelContextProvider({
   children,
   notebookWatcher
 }: NotebookPanelContextProviderProps) {
-  const [notebookPanel, setNotebookPanel] = useState<NotebookPanel | null>(
+  const [notebookPanel, setNotebookPanel] = useState<NotebookLikeWidget>(
     notebookWatcher.notebookPanel()
   );
 
   useEffect(() => {
     const onNotebookPanelChange = (
       sender: NotebookWatcher,
-      newNotebookPanel: NotebookPanel | null
+      newNotebookPanel: NotebookLikeWidget
     ) => {
       setNotebookPanel(newNotebookPanel);
     };
