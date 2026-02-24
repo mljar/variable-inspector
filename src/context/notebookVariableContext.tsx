@@ -99,16 +99,18 @@ export const VariableContextProvider: React.FC<{
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [refreshCount, setRefreshCount] = useState<number>(0);
-  const queue = new DebouncedTaskQueue(250);
+  const queueRef = useRef(new DebouncedTaskQueue(250));
   const retryCountRef = useRef(0);
+  const notebookIdRef = useRef<string | null>(null);
+  const activeNotebookId = notebookPanel?.id ?? null;
 
-  const resetVariables = () => {
+  const resetVariables = useCallback(() => {
     setVariables([]);
     setLoading(false);
     setError(null);
     stateDB.save('mljarVariables', []);
     stateDB.save('mljarVariablesStatus', 'loaded');
-  };
+  }, [stateDB]);
 
   const executeCode = useCallback(async () => {
     await withIgnoredSidebarKernelUpdates(async () => {
@@ -219,11 +221,22 @@ export const VariableContextProvider: React.FC<{
   }, [notebookPanel, kernel]);
 
   useEffect(() => {
-    if (kernel) {
-      stateDB.save('mljarVariablesStatus', 'loading');
-      queue.add(() => executeCode());
+    const notebookChanged = notebookIdRef.current !== activeNotebookId;
+    notebookIdRef.current = activeNotebookId;
+
+    if (notebookChanged) {
+      retryCountRef.current = 0;
+      resetVariables();
+      setSearchTerm('');
     }
-  }, [kernel?.id]);
+
+    if (!kernel || !activeNotebookId) {
+      return;
+    }
+
+    stateDB.save('mljarVariablesStatus', 'loading');
+    queueRef.current.add(() => executeCode());
+  }, [activeNotebookId, kernel?.id, executeCode, resetVariables, stateDB]);
 
   return (
     <VariableContext.Provider
@@ -235,7 +248,7 @@ export const VariableContextProvider: React.FC<{
         setSearchTerm,
         refreshVariables: () => {
           stateDB.save('mljarVariablesStatus', 'loading');
-          queue.add(() => executeCode());
+          queueRef.current.add(() => executeCode());
         },
         isRefreshing,
         refreshCount,
