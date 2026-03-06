@@ -74,11 +74,44 @@ export const VariableItem: React.FC<VariableItemProps> = ({
     }
   };
 
+  const getTypeDotClass = (type: string) => {
+    const normalizedType = type.toLowerCase();
+
+    if (normalizedType === 'dataframe') {
+      return 'mljar-variable-type-dot td-df';
+    }
+
+    if (normalizedType === 'ndarray' || normalizedType === 'series') {
+      return 'mljar-variable-type-dot td-arr';
+    }
+
+    if (normalizedType === 'dict') {
+      return 'mljar-variable-type-dot td-dict';
+    }
+
+    if (
+      ['int', 'int32', 'int64', 'float', 'float32', 'float64', 'bool'].includes(
+        normalizedType
+      )
+    ) {
+      return 'mljar-variable-type-dot td-num';
+    }
+
+    if (normalizedType === 'str' || normalizedType === 'string') {
+      return 'mljar-variable-type-dot td-str';
+    }
+
+    return 'mljar-variable-type-dot td-model';
+  };
+
   return (
     <li
       className={`mljar-variable-inspector-item ${allowedTypes.includes(vrb.type) && vrb.dimension <= 2 && vrb.type !== 'list' && vrb.dimension !== 1 ? '' : 'small-value'}`}
     >
-      <span className="mljar-variable-inspector-variable-name">{vrb.name}</span>
+      <span className="mljar-variable-inspector-variable-name">
+        <span className={getTypeDotClass(vrb.type)} />
+        {vrb.name}
+      </span>
       {showType && <span className="mljar-variable-type">{vrb.type}</span>}
       {showShape && (
         <span className="mljar-variable-shape">

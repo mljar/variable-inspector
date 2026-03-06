@@ -19,16 +19,49 @@ interface VariableListProps {
   settingRegistry: ISettingRegistry | null;
 }
 
+type TypeFilter = 'all' | 'dataframe' | 'ndarray' | 'number' | 'other';
+
 export const VariableList: React.FC<VariableListProps> = ({
   commands,
   labShell,
   settingRegistry
 }) => {
   const { variables, searchTerm, loading } = useVariableContext();
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
 
-  const filteredVariables = variables.filter(variable =>
-    variable.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVariables = variables
+    .filter(variable =>
+      variable.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter(variable => {
+      const normalizedType = variable.type.toLowerCase();
+
+      if (typeFilter === 'all') {
+        return true;
+      }
+
+      if (typeFilter === 'dataframe') {
+        return normalizedType === 'dataframe';
+      }
+
+      if (typeFilter === 'ndarray') {
+        return normalizedType === 'ndarray';
+      }
+
+      if (typeFilter === 'number') {
+        return [
+          'int',
+          'int32',
+          'int64',
+          'float',
+          'float32',
+          'float64',
+          'bool'
+        ].includes(normalizedType);
+      }
+
+      return !['dataframe', 'ndarray'].includes(normalizedType);
+    });
 
   const [showType, setShowType] = useState(false);
   const [showShape, setShowShape] = useState(false);
@@ -124,32 +157,66 @@ export const VariableList: React.FC<VariableListProps> = ({
           {t('Sorry, no variables available.')}
         </div>
       ) : (
-        <ul className="mljar-variable-inspector-list" ref={listRef}>
-          <li className="mljar-variable-inspector-header-list">
-            <span>{t('Name')}</span>
-            {showType && <span>{t('Type')}</span>}
-            {showShape && <span>{t('Shape')}</span>}
-            {showSize && <span>{t('Size')}</span>}
-            <span>{t('Value')}</span>
-          </li>
-          {filteredVariables.map((variable, index) => (
-            <VariableItem
-              key={index}
-              vrb={{
-                name: variable.name,
-                type: variable.type,
-                shape: variable.shape,
-                dimension: variable.dimension,
-                size: variable.size,
-                value: variable.value
-              }}
-              labShell={labShell}
-              showType={showType}
-              showShape={showShape}
-              showSize={showSize}
-            />
-          ))}
-        </ul>
+        <>
+          <div className="mljar-variable-type-filters">
+            <button
+              className={`mljar-variable-type-chip ${typeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setTypeFilter('all')}
+            >
+              all
+            </button>
+            <button
+              className={`mljar-variable-type-chip ${typeFilter === 'dataframe' ? 'active' : ''}`}
+              onClick={() => setTypeFilter('dataframe')}
+            >
+              DataFrame
+            </button>
+            <button
+              className={`mljar-variable-type-chip ${typeFilter === 'ndarray' ? 'active' : ''}`}
+              onClick={() => setTypeFilter('ndarray')}
+            >
+              ndarray
+            </button>
+            <button
+              className={`mljar-variable-type-chip ${typeFilter === 'number' ? 'active' : ''}`}
+              onClick={() => setTypeFilter('number')}
+            >
+              number
+            </button>
+            <button
+              className={`mljar-variable-type-chip ${typeFilter === 'other' ? 'active' : ''}`}
+              onClick={() => setTypeFilter('other')}
+            >
+              other
+            </button>
+          </div>
+          <ul className="mljar-variable-inspector-list" ref={listRef}>
+            <li className="mljar-variable-inspector-header-list">
+              <span>{t('Name')}</span>
+              {showType && <span>{t('Type')}</span>}
+              {showShape && <span>{t('Shape')}</span>}
+              {showSize && <span>{t('Size')}</span>}
+              <span>{t('Value')}</span>
+            </li>
+            {filteredVariables.map((variable, index) => (
+              <VariableItem
+                key={index}
+                vrb={{
+                  name: variable.name,
+                  type: variable.type,
+                  shape: variable.shape,
+                  dimension: variable.dimension,
+                  size: variable.size,
+                  value: variable.value
+                }}
+                labShell={labShell}
+                showType={showType}
+                showShape={showShape}
+                showSize={showSize}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
