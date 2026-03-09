@@ -95,17 +95,21 @@
   position: sticky;
   top: 44px;
   z-index: 11;
-  padding: 0 8px 12px 0;
+  padding: 0 8px 12px 4px;
   background: transparent;
 }
 
 .mljar-variable-search-bar-container svg {
   position: absolute;
-  top: 50%;
+  top: 18px;
   left: 12px;
   width: 13px;
   height: 13px;
-  fill: var(--muted);
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -113,7 +117,7 @@
 .mljar-variable-inspector-search-bar-input {
   width: 100%;
   height: 36px;
-  padding: 0 12px 0 32px;
+  padding: 0 12px 0 34px;
   border: 1px solid var(--border);
   border-radius: 9px;
   background: var(--surface);
@@ -371,23 +375,23 @@
 
 .mljar-variable-inspector-settings-button,
 .mljar-variable-inspector-refresh-button {
-  display: grid;
+  display: inline-grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  line-height: 1;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .mljar-variable-inspector-settings-button:hover:not(:disabled),
 .mljar-variable-inspector-refresh-button:hover:not(:disabled),
 .mljar-variable-inspector-skip-button:hover:not(:disabled) {
-  border-color: var(--border2);
-  background: var(--surface2);
   color: var(--text);
 }
 
@@ -396,21 +400,25 @@
 }
 
 .mljar-variable-inspector-refresh-button.manually-refresh:hover:not(:disabled) {
-  border-color: #86efac;
-  background: #dcfce7;
   color: #166534;
 }
 
 .mljar-variable-inspector-settings-button.active {
-  border-color: rgb(2 132 199 / 35%);
-  background: var(--blue-dim);
   color: var(--blue);
 }
 
 .mljar-variable-inspector-settings-icon,
 .mljar-variable-inspector-refresh-icon,
 .mljar-variable-inspector-skip-icon {
-  display: flex;
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.mljar-variable-inspector-settings-icon svg,
+.mljar-variable-inspector-refresh-icon svg,
+.mljar-variable-inspector-skip-icon svg {
+  display: block;
   width: 14px;
   height: 14px;
 }
