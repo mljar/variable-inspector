@@ -66,7 +66,8 @@
         "@jupyterlab/translation": "^4.4.4",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-virtualized": "^9.22.6"
+        "react-virtualized": "^9.22.6",
+        "tar": "^7.5.10"
     },
     "devDependencies": {
         "@jupyterlab/builder": "^4.0.0",
@@ -104,6 +105,17 @@
     "styleModule": "style/index.js",
     "publishConfig": {
         "access": "public"
+    },
+    "resolutions": {
+        "@tootallnate/once": "^3.0.1",
+        "serialize-javascript": "^7.0.3",
+        "minimatch": "^10.2.3",
+        "glob": "^11.1.0",
+        "lodash": "^4.17.23",
+        "lodash-es": "^4.17.23",
+        "ajv": "^8.18.0",
+        "js-yaml": "^4.1.1",
+        "webpack": "^5.104.1"
     },
     "jupyterlab": {
         "extension": true,
