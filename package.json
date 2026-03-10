@@ -1,6 +1,6 @@
 {
     "name": "variable-inspector",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "description": "Variable explorer for Jupyter Lab.",
     "keywords": [
         "jupyter",

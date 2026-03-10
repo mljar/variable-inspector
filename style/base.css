@@ -341,22 +341,22 @@
 }
 
 .mljar-variable-inspector-show-variable-button {
-  display: grid;
+  display: inline-grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
   padding: 0;
-  border: 1px solid rgb(2 132 199 / 25%);
-  border-radius: 7px;
-  background: var(--blue-dim);
+  line-height: 1;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   color: var(--blue);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .mljar-variable-inspector-show-variable-button:hover:not(:disabled) {
-  border-color: rgb(2 132 199 / 45%);
-  background: #d0ecff;
+  color: var(--text);
 }
 
 .mljar-variable-inspector-show-variable-button:disabled,
@@ -368,7 +368,13 @@
 }
 
 .mljar-variable-detail-button-icon {
-  display: flex;
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.mljar-variable-detail-button-icon svg {
+  display: block;
   width: 14px;
   height: 14px;
 }
