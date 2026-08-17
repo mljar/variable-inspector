@@ -238,6 +238,11 @@ export const VariableContextProvider: React.FC<{
     queueRef.current.add(() => executeCode());
   }, [activeNotebookId, kernel?.id, executeCode, resetVariables, stateDB]);
 
+  const refreshVariables = useCallback(() => {
+    stateDB.save('mljarVariablesStatus', 'loading');
+    queueRef.current.add(() => executeCode());
+  }, [executeCode, stateDB]);
+
   return (
     <VariableContext.Provider
       value={{
@@ -246,10 +251,7 @@ export const VariableContextProvider: React.FC<{
         error,
         searchTerm,
         setSearchTerm,
-        refreshVariables: () => {
-          stateDB.save('mljarVariablesStatus', 'loading');
-          queueRef.current.add(() => executeCode());
-        },
+        refreshVariables,
         isRefreshing,
         refreshCount,
         resetVariables

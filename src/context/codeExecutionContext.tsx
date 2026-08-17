@@ -1,22 +1,13 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode
-} from 'react';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useVariableContext } from './notebookVariableContext';
-import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
-import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { NotebookActions } from '@jupyterlab/notebook';
 import { resetVariableInspectorSubshell } from '../utils/variableInspectorSubshell';
+import { notebookExecutionRefreshCoordinator } from '../services/notebookExecutionRefreshCoordinator';
 
 interface ICodeExecutionContext {}
 
 interface ICodeExecutionContextProviderProps {
   children: ReactNode;
-  settingRegistry: ISettingRegistry | null;
 }
 
 const CodeExecutionContext = createContext<ICodeExecutionContext | undefined>(
@@ -25,33 +16,9 @@ const CodeExecutionContext = createContext<ICodeExecutionContext | undefined>(
 
 export const CodeExecutionContextProvider: React.FC<
   ICodeExecutionContextProviderProps
-> = ({ children, settingRegistry }) => {
+> = ({ children }) => {
   const notebook = useNotebookPanelContext();
   const { refreshVariables, resetVariables } = useVariableContext();
-  const [autoRefresh, setAutoRefresh] = useState(true);
-
-  const loadAutoRefresh = () => {
-    if (settingRegistry) {
-      settingRegistry
-        .load(VARIABLE_INSPECTOR_ID)
-        .then(settings => {
-          const updateSettings = (): void => {
-            const loadAutoRefresh = settings.get(autoRefreshProperty)
-              .composite as boolean;
-            setAutoRefresh(loadAutoRefresh);
-          };
-          updateSettings();
-          settings.changed.connect(updateSettings);
-        })
-        .catch(reason => {
-          console.error('Failed to load settings for Your Variables', reason);
-        });
-    }
-  };
-
-  useEffect(() => {
-    loadAutoRefresh();
-  }, []);
 
   useEffect(() => {
     if (!notebook) {
@@ -78,23 +45,14 @@ export const CodeExecutionContextProvider: React.FC<
   }, [notebook, resetVariables]);
 
   useEffect(() => {
-    if (!notebook || !autoRefresh) {
+    if (!notebook) {
       return;
     }
-
-    const onCellExecuted = (
-      _sender: any,
-      args: { cell: any; notebook: any }
-    ) => {
-      refreshVariables();
-    };
-
-    NotebookActions.executed.connect(onCellExecuted);
-
-    return () => {
-      NotebookActions.executed.disconnect(onCellExecuted);
-    };
-  }, [notebook, refreshVariables, autoRefresh]);
+    return notebookExecutionRefreshCoordinator.subscribe(
+      notebook,
+      refreshVariables
+    );
+  }, [notebook, refreshVariables]);
 
   return (
     <CodeExecutionContext.Provider value={{}}>

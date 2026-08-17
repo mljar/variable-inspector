@@ -39,7 +39,6 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
   const { refreshCount } = useVariableRefeshContext();
   const [currentRow, setCurrentRow] = useState(0);
   const [currentColumn, setCurrentColumn] = useState(0);
-  const [returnedSize, setReturnedSize] = useState<any[]>([]);
   const [rowInput, setRowInput] = useState(currentRow.toString());
   const [columnInput, setColumnInput] = useState(currentColumn.toString());
   const [rowsCount, setRowsCount] = useState(parseDimensions(variableShape)[0]);
@@ -56,8 +55,13 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
     row: number;
     column: number;
   } | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const requestGenerationRef = useRef(0);
 
   const fetchMatrixData = useCallback(async () => {
+    const requestGeneration = ++requestGenerationRef.current;
+    setIsRefreshing(true);
     try {
       if (!notebookPanel) {
         return;
@@ -67,23 +71,52 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
         executeMatrixContent(
           variableName,
           currentColumn,
-          currentColumn + maxColsRange > colsCount
-            ? colsCount
-            : currentColumn + maxColsRange,
+          currentColumn + maxColsRange,
           currentRow,
-          currentRow + maxRowsRange > rowsCount
-            ? rowsCount
-            : currentRow + maxRowsRange,
+          currentRow + maxRowsRange,
 
           notebookPanel
         )
       );
+      if (requestGeneration !== requestGenerationRef.current) {
+        return;
+      }
+
+      const [nextRowsCount, nextColsCount] = parseDimensions(
+        result.variableShape
+      );
+      const nextRow = Math.min(
+        currentRow,
+        Math.max(0, nextRowsCount - maxRowsRange)
+      );
+      const nextColumn = Math.min(
+        currentColumn,
+        Math.max(0, nextColsCount - maxColsRange)
+      );
+
       setVariableShape(result.variableShape);
       setVariableType(result.variableType);
-      setReturnedSize(result.returnedSize);
-      setMatrixData(result.content);
+      setRowsCount(nextRowsCount);
+      setColsCount(nextColsCount);
+      setRefreshError(null);
+
+      if (nextRow !== currentRow || nextColumn !== currentColumn) {
+        setCurrentRow(nextRow);
+        setCurrentColumn(nextColumn);
+      } else {
+        setMatrixData(result.content);
+      }
     } catch (error) {
-      console.error('Error fetching matrix content:', error);
+      if (requestGeneration !== requestGenerationRef.current) {
+        return;
+      }
+      setRefreshError(
+        error instanceof Error ? error.message : 'Unable to refresh variable.'
+      );
+    } finally {
+      if (requestGeneration === requestGenerationRef.current) {
+        setIsRefreshing(false);
+      }
     }
   }, [
     notebookPanel,
@@ -91,15 +124,7 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
     currentColumn,
     currentRow,
     maxColsRange,
-    maxRowsRange,
-    withIgnoredPanelKernelUpdates,
-    executeMatrixContent,
-    setVariableShape,
-    setVariableType,
-    setReturnedSize,
-    setMatrixData,
-    variableType,
-    returnedSize
+    maxRowsRange
   ]);
 
   useEffect(() => {
@@ -111,15 +136,14 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
   }, [currentColumn]);
 
   useEffect(() => {
-    fetchMatrixData();
-    const [rows, cols] = parseDimensions(variableShape);
-    setRowsCount(rows);
-    setColsCount(cols);
-  }, [refreshCount]);
+    void fetchMatrixData();
+  }, [fetchMatrixData, refreshCount]);
 
   useEffect(() => {
-    fetchMatrixData();
-  }, [currentRow, currentColumn]);
+    return () => {
+      requestGenerationRef.current += 1;
+    };
+  }, []);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -340,6 +364,19 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
       </div>
     );
   }
+  if (refreshError) {
+    return (
+      <div
+        className="mljar-variable-inspector-preview-message"
+        style={{
+          background: isDark ? '#222' : '#fff',
+          color: isDark ? '#ddd' : '#000'
+        }}
+      >
+        <p>{refreshError}</p>
+      </div>
+    );
+  }
   return (
     <div
       ref={containerRef}
@@ -350,6 +387,11 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
         color: isDark ? '#ddd' : '#000'
       }}
     >
+      {isRefreshing && (
+        <div className="mljar-variable-inspector-preview-refreshing">
+          {t('Refreshing...')}
+        </div>
+      )}
       <div
         style={{
           height:

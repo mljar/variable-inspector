@@ -8,4 +8,3 @@ export const pluginIcon = new LabIcon({
   name: 'variable-plugin-icon',
   svgstr: svgStr,
 });
-

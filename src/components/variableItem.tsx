@@ -4,7 +4,10 @@ import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useNotebookPanelContext } from '../context/notebookPanelContext';
 import { allowedTypes } from '../utils/allowedTypes';
 import { ILabShell } from '@jupyterlab/application';
-import { createEmptyVariableInspectorPanel } from '../components/variableInspectorPanel';
+import {
+  createEmptyVariableInspectorPanel,
+  variablePanelId
+} from '../components/variableInspectorPanel';
 import { t } from '../translator';
 
 interface VariableInfo {
@@ -51,9 +54,11 @@ export const VariableItem: React.FC<VariableItemProps> = ({
         );
         const variableData = result.content;
         let isOpen = false;
+        const panelId = variablePanelId(variableName, notebookPanel);
         for (const widget of labShell.widgets('main')) {
-          if (widget.id === `${variableType}-${variableName}`) {
+          if (widget.id === panelId) {
             isOpen = true;
+            labShell.activateById(widget.id);
           }
         }
         if (variableData && !isOpen) {

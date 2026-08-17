@@ -7,11 +7,11 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IStateDB } from '@jupyterlab/statedb';
 import { ITranslator } from '@jupyterlab/translation';
-import { t, translator as trans} from './translator';
-
+import { t, translator as trans } from './translator';
 
 import { createVariableInspectorSidebar } from './components/variableInspectorSidebar';
 import { NotebookWatcher } from './watchers/notebookWatcher';
+import { notebookExecutionRefreshCoordinator } from './services/notebookExecutionRefreshCoordinator';
 
 export const VARIABLE_INSPECTOR_ID = 'variable-inspector:plugin';
 export const autoRefreshProperty = 'variableInspectorAutoRefresh';
@@ -32,7 +32,14 @@ const leftTab: JupyterFrontEndPlugin<void> = {
     translator: ITranslator
   ) => {
     const lang = translator.languageCode;
-    if (lang === "pl-PL") trans.setLanguage('pl');
+    if (lang === 'pl-PL') {
+      trans.setLanguage('pl');
+    }
+    await notebookExecutionRefreshCoordinator.initialize(
+      settingregistry,
+      VARIABLE_INSPECTOR_ID,
+      autoRefreshProperty
+    );
     const notebookWatcher = new NotebookWatcher(app.shell);
     const widget = createVariableInspectorSidebar(
       notebookWatcher,

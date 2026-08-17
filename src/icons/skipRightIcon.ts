@@ -8,4 +8,3 @@ export const skipRightIcon = new LabIcon({
   name: 'my-variable-skip-right-icon',
   svgstr: svgStr
 });
-

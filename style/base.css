@@ -527,11 +527,32 @@
 }
 
 .mljar-variable-inspector-pagination-container {
+  position: relative;
   margin: auto;
   padding: 10px;
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
+}
+
+.mljar-variable-inspector-preview-refreshing {
+  position: absolute;
+  z-index: 5;
+  top: 8px;
+  right: 12px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--jp-layout-color2);
+  color: var(--jp-ui-font-color1);
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.mljar-variable-inspector-preview-message {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 16px;
+  font-size: 14px;
 }
 
 .mljar-variable-inspector-pagination-item {

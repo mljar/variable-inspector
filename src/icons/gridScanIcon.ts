@@ -8,4 +8,3 @@ export const gridScanIcon = new LabIcon({
   name: 'grid-scan-icon',
   svgstr: svgStr,
 });
-

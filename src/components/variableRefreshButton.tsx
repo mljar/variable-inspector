@@ -4,6 +4,8 @@ import { useVariableContext } from '../context/notebookVariableContext';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { VARIABLE_INSPECTOR_ID, autoRefreshProperty } from '../index';
 import { t } from '../translator';
+import { useNotebookPanelContext } from '../context/notebookPanelContext';
+import { notebookExecutionRefreshCoordinator } from '../services/notebookExecutionRefreshCoordinator';
 
 interface IProps {
   settingRegistry: ISettingRegistry | null;
@@ -11,6 +13,7 @@ interface IProps {
 
 export const RefreshButton: React.FC<IProps> = ({ settingRegistry }) => {
   const { refreshVariables, loading } = useVariableContext();
+  const notebookPanel = useNotebookPanelContext();
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const loadAutoRefresh = () => {
@@ -27,10 +30,7 @@ export const RefreshButton: React.FC<IProps> = ({ settingRegistry }) => {
           settings.changed.connect(updateSettings);
         })
         .catch(reason => {
-          console.error(
-            'Failed to load settings for Your Variables',
-            reason
-          );
+          console.error('Failed to load settings for Your Variables', reason);
         });
     }
   };
@@ -39,10 +39,16 @@ export const RefreshButton: React.FC<IProps> = ({ settingRegistry }) => {
     loadAutoRefresh();
   }, []);
 
+  const handleRefresh = (): void => {
+    if (!notebookExecutionRefreshCoordinator.refresh(notebookPanel)) {
+      refreshVariables();
+    }
+  };
+
   return (
     <button
-      className={`mljar-variable-inspector-refresh-button ${autoRefresh ? `` : `manually-refresh`}`}
-      onClick={refreshVariables}
+      className={`mljar-variable-inspector-refresh-button ${autoRefresh ? '' : 'manually-refresh'}`}
+      onClick={handleRefresh}
       disabled={loading}
       title={t('Refresh variables')}
     >

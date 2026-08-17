@@ -33,14 +33,14 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
     commands: CommandRegistry,
     labShell: ILabShell,
     settingRegistry: ISettingRegistry | null,
-    stateDB: IStateDB,
+    stateDB: IStateDB
   ) {
     super();
     this.notebookWatcher = notebookWatcher;
     this.commands = commands;
     this.id = 'mljar-variable-inspector::mljar-left-sidebar';
     this.title.icon = pluginIcon;
-    this.title.caption = t('Your Variables');;
+    this.title.caption = t('Your Variables');
     this.addClass('mljar-variable-inspector-sidebar-widget');
     this.labShell = labShell;
     this.settingRegistry = settingRegistry;
@@ -79,9 +79,7 @@ export class VariableInspectorSidebarWidget extends ReactWidget {
                 stateDB={this._stateDB}
                 commands={this.commands}
               >
-                <CodeExecutionContextProvider
-                  settingRegistry={this.settingRegistry}
-                >
+                <CodeExecutionContextProvider>
                   <VariableListComponent
                     commands={this.commands}
                     labShell={this.labShell}
@@ -102,7 +100,7 @@ export function createVariableInspectorSidebar(
   commands: CommandRegistry,
   labShell: ILabShell,
   settingRegistry: ISettingRegistry | null,
-  stateDB: IStateDB,
+  stateDB: IStateDB
 ): VariableInspectorSidebarWidget {
   return new VariableInspectorSidebarWidget(
     notebookWatcher,

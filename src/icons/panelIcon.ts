@@ -8,4 +8,3 @@ export const panelIcon = new LabIcon({
   name: 'inspector-panel-icon',
   svgstr: svgStr,
 });
-

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
 import { NotebookLikeWidget } from '../utils/notebookTypes';
+import { notebookExecutionRefreshCoordinator } from '../services/notebookExecutionRefreshCoordinator';
 
 interface VariableRefreshContextValue {
   refreshCount: number;
@@ -25,26 +25,9 @@ export const VariableRefreshContextProvider: React.FC<
       return;
     }
 
-    const kernel = notebookPanel.context.sessionContext.session?.kernel;
-    if (!kernel) {
-      return;
-    }
-
-    const onSidebarStatusChange = (_sender: any, inProgress: boolean) => {
-      if (inProgress === true) {
-        setRefreshCount(prev => prev + 1);
-      }
-    };
-
-    kernelOperationNotifier.sidebarOperationChanged.connect(
-      onSidebarStatusChange
-    );
-
-    return () => {
-      kernelOperationNotifier.sidebarOperationChanged.disconnect(
-        onSidebarStatusChange
-      );
-    };
+    return notebookExecutionRefreshCoordinator.subscribe(notebookPanel, () => {
+      setRefreshCount(prev => prev + 1);
+    });
   }, [notebookPanel]);
 
   return (

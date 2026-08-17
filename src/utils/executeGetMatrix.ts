@@ -3,6 +3,15 @@ import { getMatrix } from '../python_code/getMatrix';
 import { provideVariableInspectorSubshellKernel } from './variableInspectorSubshell';
 import { NotebookLikeWidget } from './notebookTypes';
 
+export interface IMatrixContentResult {
+  variable: string;
+  variableType: string;
+  variableShape: string;
+  returnedSize: number[];
+  content: any[][];
+  error?: string;
+}
+
 export const executeMatrixContent = async (
   varName: string,
   varStartColumn: number,
@@ -10,7 +19,7 @@ export const executeMatrixContent = async (
   varStartRow: number,
   varEndRow: number,
   notebookPanel: NotebookLikeWidget
-): Promise<any> => {
+): Promise<IMatrixContentResult> => {
   if (!notebookPanel) {
     throw new Error('Kernel not available.');
   }
@@ -49,7 +58,14 @@ export const executeMatrixContent = async (
         const content = msg.content as any;
         if (content.data && content.data['application/json']) {
           resultResolved = true;
-          resolve(content.data['application/json']);
+          const result = content.data[
+            'application/json'
+          ] as IMatrixContentResult;
+          if (result.error) {
+            reject(new Error(result.error));
+          } else {
+            resolve(result);
+          }
         } else if (content.data && content.data['text/plain']) {
           outputData += content.data['text/plain'];
         }
@@ -66,7 +82,11 @@ export const executeMatrixContent = async (
         try {
           const cleanedData = outputData.trim();
           const parsed = JSON.parse(cleanedData);
-          resolve(parsed);
+          if (parsed.error) {
+            reject(new Error(parsed.error));
+          } else {
+            resolve(parsed as IMatrixContentResult);
+          }
         } catch (err) {
           reject(new Error('Failed to parse output from Python.'));
         }

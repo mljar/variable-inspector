@@ -8,4 +8,3 @@ export const settingsIcon = new LabIcon({
   name: 'my-variable-settings-icon',
   svgstr: svgStr
 });
-
