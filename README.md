@@ -5,9 +5,9 @@
 
 # Jupyter Variable Inspector
 
-The Variable Inspector is a Jupyter Lab extension designed to help you manage and track variables within your notebook. It displays all your variables in one convenient location, allowing you to see their names, values, types, shapes, and sizes in real-time. This feature makes it easier to work without the need to manually print or check your variables. **It is for Python only.**.
+The Variable Inspector is a JupyterLab extension designed to help you manage and track variables within your notebook. It displays all your variables in one convenient location, allowing you to see their names, values, types, shapes, and sizes in real-time. This feature makes it easier to work without the need to manually print or check your variables. **It is for Python only.**
 
-Install the extension using `pip` by following the instructions below. It’s also available in our desktop app, [MLJAR Studio](https://mljar.com), which is designed to make Python easier for beginners. 
+Install the extension using `pip` by following the instructions below. Variable Inspector is also included with [MLJAR Studio](https://platform.mljar.com).
 
 ## Features
 
@@ -49,6 +49,16 @@ The list of variables will automatically update whenever you execute a cell. How
 If you prefer a darker look, a Dark Theme is also available!
 
 ![image](https://github.com/user-attachments/assets/e9b4356a-68dc-4ee9-84bf-de4944466301)
+
+## Variable Inspector in MLJAR Studio
+
+Variable Inspector is included with MLJAR Studio, a desktop environment for Python and data analysis built on JupyterLab.
+
+In Studio, you can keep a variable or DataFrame preview open beside a classic notebook or an AI Data Analyst conversational notebook. Open previews automatically update when your Python code changes the data.
+
+No separate extension installation is required.
+
+[Download MLJAR Studio](https://platform.mljar.com)
 
 ## Variable Inspector requirements
 
@@ -119,9 +129,7 @@ command. To find its location, you can run `jupyter labextension list` to figure
 folder is located. Then you can remove the symlink named `variable-inspector` within that folder.
 
 
-Here’s a simple `README.md` you can drop into your repo 👇
-
-## Running End-to-End UI Tests
+## Running end-to-end UI tests
 
 This project uses **Playwright** to run UI tests against JupyterLab with the MLJAR extension.
 
