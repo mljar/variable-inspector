@@ -5,7 +5,7 @@ import {
 } from '@jupyterlab/application';
 
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { IStateDB } from '@jupyterlab/statedb';
+import { IKernelData } from '@mljar/kernel-data';
 import { ITranslator } from '@jupyterlab/translation';
 import { t, translator as trans } from './translator';
 
@@ -23,12 +23,12 @@ const leftTab: JupyterFrontEndPlugin<void> = {
   id: VARIABLE_INSPECTOR_ID,
   description: t('A JupyterLab extension to easy manage variables.'),
   autoStart: true,
-  requires: [ILabShell, ISettingRegistry, IStateDB, ITranslator],
+  requires: [ILabShell, ISettingRegistry, IKernelData, ITranslator],
   activate: async (
     app: JupyterFrontEnd,
     labShell: ILabShell,
     settingregistry: ISettingRegistry | null,
-    stateDB: IStateDB,
+    kernelData: IKernelData,
     translator: ITranslator
   ) => {
     const lang = translator.languageCode;
@@ -46,11 +46,8 @@ const leftTab: JupyterFrontEndPlugin<void> = {
       app.commands,
       labShell,
       settingregistry,
-      stateDB
+      kernelData
     );
-    // initialize variables list
-    stateDB.save('mljarVariablesStatus', 'loaded');
-    stateDB.save('mljarVariables', []);
 
     app.shell.add(widget, 'left', { rank: 1998 });
   }

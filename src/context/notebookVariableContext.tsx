@@ -9,10 +9,9 @@ import React, {
 import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
 import { KernelMessage } from '@jupyterlab/services';
-import { IStateDB } from '@jupyterlab/statedb';
+import { IKernelData } from '@mljar/kernel-data';
 import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 import { variableDict } from '../python_code/getVariables';
-import { CommandRegistry } from '@lumino/commands';
 import { provideVariableInspectorSubshellKernel } from '../utils/variableInspectorSubshell';
 
 export interface IVariableInfo {
@@ -60,6 +59,14 @@ class DebouncedTaskQueue {
    * Adds a new task to the queue. Only the last task added within the delay period will be executed.
    * @param task A function representing the task.
    */
+  cancel(): void {
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.timer = null;
+    this.lastTask = null;
+  }
+
   add(task: Task): void {
     // Save (or overwrite) the latest task.
     this.lastTask = task;
@@ -88,9 +95,8 @@ class DebouncedTaskQueue {
 
 export const VariableContextProvider: React.FC<{
   children: React.ReactNode;
-  stateDB: IStateDB;
-  commands: CommandRegistry;
-}> = ({ children, stateDB, commands }) => {
+  kernelData: IKernelData;
+}> = ({ children, kernelData }) => {
   const notebookPanel = useNotebookPanelContext();
   const kernel = useNotebookKernelContext();
   const [variables, setVariables] = useState<IVariableInfo[]>([]);
@@ -100,148 +106,133 @@ export const VariableContextProvider: React.FC<{
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [refreshCount, setRefreshCount] = useState<number>(0);
   const queueRef = useRef(new DebouncedTaskQueue(250));
-  const retryCountRef = useRef(0);
-  const notebookIdRef = useRef<string | null>(null);
-  const activeNotebookId = notebookPanel?.id ?? null;
 
+  const activeRef = useRef(notebookPanel);
+  activeRef.current = notebookPanel;
   const resetVariables = useCallback(() => {
     setVariables([]);
     setLoading(false);
+    setIsRefreshing(false);
     setError(null);
-    stateDB.save('mljarVariables', []);
-    stateDB.save('mljarVariablesStatus', 'loaded');
-  }, [stateDB]);
+  }, []);
 
   const executeCode = useCallback(async () => {
+    if (!notebookPanel || activeRef.current !== notebookPanel) {
+      return;
+    }
+    const session = notebookPanel.context.sessionContext;
+    kernelData.track(session);
+    await session.ready;
+    const sourceKernel = session.session?.kernel;
+    if (!sourceKernel) {
+      resetVariables();
+      return;
+    }
+    const request = kernelData.begin(sourceKernel.id, 'variables');
+    const current = () =>
+      activeRef.current === notebookPanel &&
+      session.session?.kernel?.id === sourceKernel.id &&
+      kernelData.current(request);
+    setLoading(true);
+    setError(null);
     await withIgnoredSidebarKernelUpdates(async () => {
-      stateDB.save('mljarVariablesStatus', 'loading');
-      setError(null);
-      if (!notebookPanel) {
-        setVariables([]);
-        setLoading(false);
-        setIsRefreshing(false);
-        stateDB.save('mljarVariables', []);
-        return;
-      }
       try {
-        await notebookPanel.context.sessionContext?.ready;
-
-        // Get the kernel for Variable Inspector.
         const viKernel = await provideVariableInspectorSubshellKernel(
-          notebookPanel.context.sessionContext?.session?.kernel
+          sourceKernel
         );
-
-        if (!viKernel) {
-          setVariables([]);
-          setLoading(false);
-          setIsRefreshing(false);
-          stateDB.save('mljarVariables', []);
-          stateDB.save('mljarVariablesStatus', 'error');
+        if (!current()) {
           return;
         }
-
-        let runAgain = false;
-
+        if (!viKernel) {
+          throw new Error('No kernel available');
+        }
+        let received = false;
         const future = viKernel.requestExecute({
           code: variableDict,
           store_history: false
         });
-
-        if (future) {
-          future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
-            const msgType = msg.header.msg_type;
-
-            if (msgType === 'error') {
-              runAgain = true;
-              setLoading(false);
-              setIsRefreshing(false);
-              stateDB.save('mljarVariablesStatus', 'error');
-            }
-
-            if (
-              msgType === 'execute_result' ||
-              msgType === 'display_data' ||
-              msgType === 'update_display_data'
-            ) {
-              const content = msg.content as any;
-              const jsonData = content?.data?.['application/json'];
-
-              retryCountRef.current = 0;
-
-              if (jsonData && Array.isArray(jsonData)) {
-                const parsedData = jsonData as any[];
-
-                const mappedVariables: IVariableInfo[] = parsedData.map(
-                  item => ({
-                    name: item.varName,
-                    type: item.varType,
-                    shape: item.varShape || 'None',
-                    dimension: item.varDimension,
-                    size: item.varSize,
-                    value: item.varSimpleValue
-                  })
-                );
-
-                setVariables(mappedVariables);
-                stateDB.save('mljarVariables', parsedData as any);
-                stateDB.save('mljarVariablesStatus', 'loaded');
-
-                setLoading(false);
-                setIsRefreshing(false);
-                setRefreshCount(prev => prev + 1);
-
-                commands
-                  .execute('mljar-piece-of-code:refresh-variables')
-                  .catch(() => {});
-              }
-            }
-          };
-          await future.done;
-          if (runAgain) {
-            if (retryCountRef.current < 1) {
-              // Clear previous displayhook state that may block next result.
-              // just execute pass in the Python session
-              // variables will be automatically refreshed
-              viKernel.requestExecute({ code: 'pass' });
-              retryCountRef.current += 1;
+        future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
+          if (!current()) {
+            return;
+          }
+          if (msg.header.msg_type === 'error') {
+            kernelData.fail(request, 'Variable inspection failed');
+            setError('Variable inspection failed');
+            return;
+          }
+          if (
+            ['execute_result', 'display_data', 'update_display_data'].includes(
+              msg.header.msg_type
+            )
+          ) {
+            const items = (msg.content as any)?.data?.['application/json'];
+            if (!Array.isArray(items)) {
               return;
             }
-          } else {
-            stateDB.save('mljarVariablesStatus', 'loaded');
+            received = true;
+            kernelData.publish(request, items);
+            setVariables(
+              items.map(item => ({
+                name: item.varName,
+                type: item.varType,
+                shape: item.varShape || 'None',
+                dimension: item.varDimension,
+                size: item.varSize,
+                value: item.varSimpleValue
+              }))
+            );
+            setRefreshCount(prev => prev + 1);
           }
+        };
+        await future.done;
+        if (current() && !received) {
+          throw new Error('Kernel returned no variable snapshot');
         }
       } catch (err) {
-        setError('Unexpected error.');
-        setLoading(false);
-        setIsRefreshing(false);
-        stateDB.save('mljarVariablesStatus', 'error');
+        if (current()) {
+          kernelData.fail(request, String(err));
+          setError('Variable inspection failed');
+        }
+      } finally {
+        if (current()) {
+          setLoading(false);
+          setIsRefreshing(false);
+        }
       }
     });
-    return;
-  }, [notebookPanel, kernel]);
+  }, [notebookPanel, kernel?.id, kernelData, resetVariables]);
 
   useEffect(() => {
-    const notebookChanged = notebookIdRef.current !== activeNotebookId;
-    notebookIdRef.current = activeNotebookId;
-
-    if (notebookChanged) {
-      retryCountRef.current = 0;
-      resetVariables();
-      setSearchTerm('');
-    }
-
-    if (!kernel || !activeNotebookId) {
+    resetVariables();
+    setSearchTerm('');
+    if (!notebookPanel) {
       return;
     }
-
-    stateDB.save('mljarVariablesStatus', 'loading');
-    queueRef.current.add(() => executeCode());
-  }, [activeNotebookId, kernel?.id, executeCode, resetVariables, stateDB]);
+    const session = notebookPanel.context.sessionContext;
+    kernelData.track(session);
+    const statusChanged = (_: unknown, status: string) => {
+      if (
+        ['restarting', 'autorestarting', 'dead', 'terminating'].includes(status)
+      ) {
+        resetVariables();
+      } else if (
+        status === 'idle' &&
+        kernelData.variables(session.session?.kernel?.id).status === 'unknown'
+      ) {
+        queueRef.current.add(executeCode);
+      }
+    };
+    session.statusChanged.connect(statusChanged);
+    queueRef.current.add(executeCode);
+    return () => {
+      session.statusChanged.disconnect(statusChanged);
+      queueRef.current.cancel();
+    };
+  }, [notebookPanel, executeCode, kernelData, resetVariables]);
 
   const refreshVariables = useCallback(() => {
-    stateDB.save('mljarVariablesStatus', 'loading');
-    queueRef.current.add(() => executeCode());
-  }, [executeCode, stateDB]);
+    queueRef.current.add(executeCode);
+  }, [executeCode]);
 
   return (
     <VariableContext.Provider

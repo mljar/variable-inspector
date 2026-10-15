@@ -1,6 +1,6 @@
 {
     "name": "variable-inspector",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Variable explorer for Jupyter Lab.",
     "keywords": [
         "jupyter",
@@ -64,6 +64,7 @@
         "@jupyterlab/notebook": "^4.0.0",
         "@jupyterlab/settingregistry": "^4.0.0",
         "@jupyterlab/translation": "^4.4.4",
+        "@mljar/kernel-data": "file:../ai-data-scientist/packages/kernel-data",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-virtualized": "^9.22.6",
@@ -116,12 +117,19 @@
         "js-yaml": "^4.1.1",
         "sanitize-html": "^2.17.5",
         "fast-uri": "3.1.7",
-        "webpack": "^5.104.1"
+        "webpack": "^5.104.1",
+        "@lumino/coreutils": "2.2.3"
     },
     "jupyterlab": {
         "extension": true,
         "outputDir": "variable_inspector/labextension",
-        "schemaDir": "schema"
+        "schemaDir": "schema",
+        "sharedPackages": {
+            "@mljar/kernel-data": {
+                "singleton": true,
+                "strictVersion": true
+            }
+        }
     },
     "eslintIgnore": [
         "node_modules",
