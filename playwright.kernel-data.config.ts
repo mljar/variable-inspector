@@ -2,7 +2,10 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  testMatch: 'kernel-data.spec.ts',
+  testMatch:
+    process.env.KERNEL_DATA_WITHOUT_PROVIDER === '1'
+      ? 'kernel-data-optional.spec.ts'
+      : 'kernel-data.spec.ts',
   workers: 1,
   timeout: 180_000,
   expect: { timeout: 20_000 },

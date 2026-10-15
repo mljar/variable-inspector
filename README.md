@@ -177,3 +177,7 @@ This will:
 ### Packaging the extension
 
 See [RELEASE](RELEASE.md)
+
+## Shared kernel data
+
+The in-memory kernel-data service is included in this extension. Other MLJAR extensions can use it without a separate Python dependency.

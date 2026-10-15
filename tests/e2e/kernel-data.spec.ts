@@ -12,7 +12,7 @@ async function setup(page: Page) {
       )
     ]);
     const ids = [
-      '@mljar/kernel-data:plugin',
+      'variable-inspector:kernel-data',
       'variable-inspector:plugin',
       'jupyter-package-manager:plugin',
       'mljar-piece-of-code'
@@ -24,9 +24,14 @@ async function setup(page: Page) {
     const plugins = app.pluginRegistry?._plugins || app._pluginMap;
     const plugin = (id: string) =>
       plugins instanceof Map ? plugins.get(id) : plugins[id];
-    const provider = plugin('@mljar/kernel-data:plugin');
+    const provider = plugin('variable-inspector:kernel-data');
     for (const id of ids.slice(1)) {
-      if (!plugin(id).requires.includes(provider.provides)) {
+      if (
+        ![
+          ...(plugin(id).requires || []),
+          ...(plugin(id).optional || [])
+        ].includes(provider.provides)
+      ) {
         throw new Error(`${id} has a different kernel-data token`);
       }
     }
@@ -34,7 +39,10 @@ async function setup(page: Page) {
       id.includes('ai-data-scientist')
     ) as string[];
     const aiConsumers = ai.filter(id =>
-      plugin(id)?.requires.includes(provider.provides)
+      [
+        ...(plugin(id)?.requires || []),
+        ...(plugin(id)?.optional || [])
+      ].includes(provider.provides)
     );
     if (aiConsumers.length < 2) {
       throw new Error(

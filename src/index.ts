@@ -6,6 +6,7 @@ import {
 
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IKernelData } from '@mljar/kernel-data';
+import kernelDataPlugin from './services/kernelDataPlugin';
 import { ITranslator } from '@jupyterlab/translation';
 import { t, translator as trans } from './translator';
 
@@ -53,4 +54,4 @@ const leftTab: JupyterFrontEndPlugin<void> = {
   }
 };
 
-export default [leftTab];
+export default [kernelDataPlugin, leftTab];

@@ -23,7 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "mljar-kernel-data>=0.1.0,<0.2",
+    "jupyterlab>=4.2,<5",
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
@@ -36,6 +36,16 @@ fields = ["description", "authors", "urls", "keywords"]
 [tool.hatch.build.targets.sdist]
 artifacts = ["variable_inspector/labextension"]
 exclude = [".github", "binder"]
+
+# The workspace symlink in node_modules may be visited before packages/.
+# Explicitly include the shared API so source releases remain self-contained.
+[tool.hatch.build.targets.sdist.force-include]
+"packages/kernel-data/src" = "packages/kernel-data/src"
+"packages/kernel-data/lib" = "packages/kernel-data/lib"
+"packages/kernel-data/package.json" = "packages/kernel-data/package.json"
+"packages/kernel-data/tsconfig.json" = "packages/kernel-data/tsconfig.json"
+"packages/kernel-data/LICENSE" = "packages/kernel-data/LICENSE"
+"packages/kernel-data/README.md" = "packages/kernel-data/README.md"
 
 [tool.hatch.build.targets.wheel.shared-data]
 "variable_inspector/labextension" = "share/jupyter/labextensions/variable-inspector"

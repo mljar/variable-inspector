@@ -1,6 +1,6 @@
 {
     "name": "variable-inspector",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "description": "Variable explorer for Jupyter Lab.",
     "keywords": [
         "jupyter",
@@ -21,7 +21,8 @@
         "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
         "src/**/*.{ts,tsx}",
         "schema/*.json",
-        "locales/**/*"
+        "locales/**/*",
+        "packages/kernel-data/**/*"
     ],
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -35,10 +36,10 @@
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
         "build:labextension": "jupyter labextension build .",
         "build:labextension:dev": "jupyter labextension build --development True .",
-        "build:lib": "tsc --sourceMap && cpx \"locales/**/*\" lib/locales",
-        "build:lib:prod": "tsc && cpx \"locales/**/*\" lib/locales",
+        "build:lib": "jlpm workspace @mljar/kernel-data build:lib && tsc --sourceMap && cpx \"locales/**/*\" lib/locales",
+        "build:lib:prod": "jlpm workspace @mljar/kernel-data build:lib && tsc && cpx \"locales/**/*\" lib/locales",
         "clean": "jlpm clean:lib",
-        "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+        "clean:lib": "rimraf lib tsconfig.tsbuildinfo packages/kernel-data/lib",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
         "clean:labextension": "rimraf variable_inspector/labextension variable_inspector/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
@@ -65,8 +66,9 @@
         "@jupyterlab/application": "^4.0.0",
         "@jupyterlab/notebook": "^4.0.0",
         "@jupyterlab/settingregistry": "^4.0.0",
+        "@jupyterlab/statedb": "^4.0.0",
         "@jupyterlab/translation": "^4.4.4",
-        "@mljar/kernel-data": "file:../ai-data-scientist/packages/kernel-data",
+        "@mljar/kernel-data": "^0.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-virtualized": "^9.22.6",
@@ -134,7 +136,10 @@
                 "singleton": true,
                 "strictVersion": true
             }
-        }
+        },
+        "disabledExtensions": [
+            "@mljar/kernel-data:plugin"
+        ]
     },
     "eslintIgnore": [
         "node_modules",
@@ -229,5 +234,8 @@
     },
     "engines": {
         "node": ">=22.12.0"
-    }
+    },
+    "workspaces": [
+        "packages/kernel-data"
+    ]
 }
