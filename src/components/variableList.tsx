@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useVariableContext } from '../context/notebookVariableContext';
 import { VariableItem } from './variableItem';
 import { CommandRegistry } from '@lumino/commands';
@@ -67,9 +67,6 @@ export const VariableList: React.FC<VariableListProps> = ({
   const [showShape, setShowShape] = useState(false);
   const [showSize, setShowSize] = useState(false);
 
-  const listRef = useRef<HTMLUListElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
   const loadPropertiesValues = () => {
     if (settingRegistry) {
       settingRegistry
@@ -99,123 +96,92 @@ export const VariableList: React.FC<VariableListProps> = ({
     loadPropertiesValues();
   }, []);
 
-  // handle scrollbar
-  useEffect(() => {
-    const listEl = listRef.current;
-    const containerEl = containerRef.current;
-    if (!listEl || !containerEl) return;
-
-    // function to check if there is overflow
-    const checkOverflow = () => {
-      const hasOverflowY = listEl.scrollHeight > listEl.clientHeight;
-
-      if (hasOverflowY) {
-        listEl.classList.add('variable-inspector-has-overflow');
-        containerEl.classList.add('variable-inspector-has-overflow');
-      } else {
-        listEl.classList.remove('variable-inspector-has-overflow');
-        containerEl.classList.remove('variable-inspector-has-overflow');
-      }
-    };
-
-    checkOverflow();
-    window.addEventListener('resize', checkOverflow);
-
-    // hover handle
-    const handleMouseEnter = () => {
-      const elements = document.querySelectorAll<HTMLElement>('.variable-inspector-has-overflow');
-      elements.forEach(el => {
-        el.style.paddingRight = '5px';
-      });
-    };
-
-    const handleMouseLeave = () => {
-      const elements = document.querySelectorAll<HTMLElement>('.variable-inspector-has-overflow');
-      elements.forEach(el => {
-        el.style.paddingRight = '';
-      });
-    };
-
-    listEl.addEventListener('mouseenter', handleMouseEnter);
-    listEl.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      window.removeEventListener('resize', checkOverflow);
-      listEl.removeEventListener('mouseenter', handleMouseEnter);
-      listEl.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [filteredVariables]);
-
   return (
-    <div className="mljar-variable-inspector-list-container" ref={containerRef}>
+    <div className="mljar-variable-inspector-list-container">
       {loading ? (
         <div className="mljar-variable-inspector-message">
           {t('Loading variables...')}
         </div>
       ) : variables.length === 0 ? (
         <div className="mljar-variable-inspector-message">
-          {t('Sorry, no variables available.')}
+          {t('No variables yet. Run a notebook cell to see them here.')}
         </div>
       ) : (
         <>
           <div className="mljar-variable-type-filters">
             <button
-              className={`mljar-variable-type-chip ${typeFilter === 'all' ? 'active' : ''}`}
+              className={`mljar-variable-button mljar-variable-type-chip ${typeFilter === 'all' ? 'active' : ''}`}
+              type="button"
+              aria-pressed={typeFilter === 'all'}
               onClick={() => setTypeFilter('all')}
             >
-              all
+              {t('All')}
             </button>
             <button
-              className={`mljar-variable-type-chip ${typeFilter === 'dataframe' ? 'active' : ''}`}
+              className={`mljar-variable-button mljar-variable-type-chip ${typeFilter === 'dataframe' ? 'active' : ''}`}
+              type="button"
+              aria-pressed={typeFilter === 'dataframe'}
               onClick={() => setTypeFilter('dataframe')}
             >
               DataFrame
             </button>
             <button
-              className={`mljar-variable-type-chip ${typeFilter === 'ndarray' ? 'active' : ''}`}
+              className={`mljar-variable-button mljar-variable-type-chip ${typeFilter === 'ndarray' ? 'active' : ''}`}
+              type="button"
+              aria-pressed={typeFilter === 'ndarray'}
               onClick={() => setTypeFilter('ndarray')}
             >
               ndarray
             </button>
             <button
-              className={`mljar-variable-type-chip ${typeFilter === 'number' ? 'active' : ''}`}
+              className={`mljar-variable-button mljar-variable-type-chip ${typeFilter === 'number' ? 'active' : ''}`}
+              type="button"
+              aria-pressed={typeFilter === 'number'}
               onClick={() => setTypeFilter('number')}
             >
-              number
+              {t('Numbers')}
             </button>
             <button
-              className={`mljar-variable-type-chip ${typeFilter === 'other' ? 'active' : ''}`}
+              className={`mljar-variable-button mljar-variable-type-chip ${typeFilter === 'other' ? 'active' : ''}`}
+              type="button"
+              aria-pressed={typeFilter === 'other'}
               onClick={() => setTypeFilter('other')}
             >
-              other
+              {t('Other')}
             </button>
           </div>
-          <ul className="mljar-variable-inspector-list" ref={listRef}>
-            <li className="mljar-variable-inspector-header-list">
-              <span>{t('Name')}</span>
-              {showType && <span>{t('Type')}</span>}
-              {showShape && <span>{t('Shape')}</span>}
-              {showSize && <span>{t('Size')}</span>}
-              <span>{t('Value')}</span>
-            </li>
-            {filteredVariables.map((variable, index) => (
-              <VariableItem
-                key={index}
-                vrb={{
-                  name: variable.name,
-                  type: variable.type,
-                  shape: variable.shape,
-                  dimension: variable.dimension,
-                  size: variable.size,
-                  value: variable.value
-                }}
-                labShell={labShell}
-                showType={showType}
-                showShape={showShape}
-                showSize={showSize}
-              />
-            ))}
-          </ul>
+          {filteredVariables.length === 0 ? (
+            <div className="mljar-variable-inspector-message" role="status">
+              {t('No variables match your search or filter.')}
+            </div>
+          ) : (
+            <ul className="mljar-variable-inspector-list">
+              <li className="mljar-variable-inspector-header-list">
+                <span>{t('Name')}</span>
+                {showType && <span>{t('Type')}</span>}
+                {showShape && <span>{t('Shape')}</span>}
+                {showSize && <span>{t('Size')}</span>}
+                <span>{t('Value')}</span>
+              </li>
+              {filteredVariables.map((variable, index) => (
+                <VariableItem
+                  key={index}
+                  vrb={{
+                    name: variable.name,
+                    type: variable.type,
+                    shape: variable.shape,
+                    dimension: variable.dimension,
+                    size: variable.size,
+                    value: variable.value
+                  }}
+                  labShell={labShell}
+                  showType={showType}
+                  showShape={showShape}
+                  showSize={showSize}
+                />
+              ))}
+            </ul>
+          )}
         </>
       )}
     </div>

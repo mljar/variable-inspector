@@ -1,6 +1,6 @@
 {
     "name": "variable-inspector",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "Variable explorer for Jupyter Lab.",
     "keywords": [
         "jupyter",
@@ -109,16 +109,18 @@
     },
     "resolutions": {
         "@tootallnate/once": "^3.0.1",
-        "serialize-javascript": "^7.0.3",
+        "serialize-javascript": "^7.0.5",
         "minimatch": "^10.2.3",
         "glob": "^11.1.0",
         "lodash": "^4.17.23",
         "lodash-es": "^4.17.23",
         "js-yaml": "^4.1.1",
-        "sanitize-html": "^2.17.5",
-        "fast-uri": "3.1.7",
-        "webpack": "^5.104.1",
-        "@lumino/coreutils": "2.2.3"
+        "sanitize-html": "^2.17.7",
+        "fast-uri": "^3.1.8",
+        "webpack": ">=5.104.1 <5.107.0",
+        "@lumino/coreutils": "2.2.3",
+        "katex": "0.18.2",
+        "postcss-selector-parser": "^7.1.6"
     },
     "jupyterlab": {
         "extension": true,
@@ -221,5 +223,8 @@
             "selector-no-vendor-prefix": null,
             "value-no-vendor-prefix": null
         }
+    },
+    "engines": {
+        "node": ">=22.12.0"
     }
 }

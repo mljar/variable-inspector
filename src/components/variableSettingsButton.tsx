@@ -69,35 +69,29 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
           settings.changed.connect(updateSettings);
         })
         .catch(reason => {
-          console.error(
-            'Failed to load settings for Your Variables',
-            reason
-          );
+          console.error('Failed to load settings for Your Variables', reason);
         });
     }
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-  
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.removeEventListener('mousedown', handleClickOutside);
     }
-  
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
-  
+
   useEffect(() => {
     loadPropertiesValues();
   }, []);
@@ -105,9 +99,11 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
   return (
     <div className="mljar-variable-inspector-settings-container" ref={menuRef}>
       <button
-        className={`mljar-variable-inspector-settings-button ${isOpen ? 'active' : ''}`}
+        className={`mljar-variable-button mljar-variable-icon-button mljar-variable-inspector-settings-button ${isOpen ? 'active' : ''}`}
         onClick={showSettings}
         title={t('Settings')}
+        aria-label={t('Settings')}
+        aria-expanded={isOpen}
       >
         <settingsIcon.react className="mljar-variable-inspector-settings-icon" />
       </button>
@@ -115,36 +111,9 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
       {isOpen && (
         <div className="mljar-variable-inspector-settings-menu">
           <ul className="mljar-variable-inspector-settings-menu-list">
-            {/* <button
-              className="mljar-variable-inspector-settings-menu-item first"
-              onClick={() => {
-                if (!autoRefresh) {
-                  savePropertyValue(autoRefreshProperty, true);
-                }
-              }}
-            >
-              Automatically refresh
-              {autoRefresh && (
-                <checkIcon.react className="mljar-variable-inspector-settings-icon" />
-              )}
-            </button>
             <button
               className="mljar-variable-inspector-settings-menu-item"
-              onClick={() => {
-                if (autoRefresh) {
-                  savePropertyValue(autoRefreshProperty, false);
-                }
-              }}
-            >
-              Manually refresh
-              {!autoRefresh && (
-                <checkIcon.react className="mljar-variable-inspector-settings-icon" />
-              )}
-            </button>
-            <hr /> */}
-
-            <button
-              className="mljar-variable-inspector-settings-menu-item"
+              aria-pressed={showType}
               onClick={() => savePropertyValue(showTypeProperty, !showType)}
             >
               {t('Show type')}
@@ -154,6 +123,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
             </button>
             <button
               className="mljar-variable-inspector-settings-menu-item"
+              aria-pressed={showShape}
               onClick={() => savePropertyValue(showShapeProperty, !showShape)}
             >
               {t('Show shape')}
@@ -163,6 +133,7 @@ export const SettingsButton: React.FC<ISettingsButtonProps> = ({
             </button>
             <button
               className="mljar-variable-inspector-settings-menu-item last"
+              aria-pressed={showSize}
               onClick={() => savePropertyValue(showSizeProperty, !showSize)}
             >
               {t('Show size')}

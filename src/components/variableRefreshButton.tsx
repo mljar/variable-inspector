@@ -47,10 +47,11 @@ export const RefreshButton: React.FC<IProps> = ({ settingRegistry }) => {
 
   return (
     <button
-      className={`mljar-variable-inspector-refresh-button ${autoRefresh ? '' : 'manually-refresh'}`}
+      className={`mljar-variable-button mljar-variable-icon-button mljar-variable-inspector-refresh-button ${autoRefresh ? '' : 'manually-refresh'}`}
       onClick={handleRefresh}
       disabled={loading}
       title={t('Refresh variables')}
+      aria-label={t('Refresh variables')}
     >
       <refreshIcon.react className="mljar-variable-inspector-refresh-icon" />
     </button>

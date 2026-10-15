@@ -347,3 +347,158 @@ test('Piece of Code selects live DataFrames and executes a recipe', async ({
   await expect(dataFrame).toHaveValue('sales');
   expect(errors).toEqual([]);
 });
+
+test('explorer search, DataFrame preview and package dialog remain keyboard accessible', async ({
+  page
+}) => {
+  test.setTimeout(90_000);
+  await setup(page);
+  await notebook(page, 'explorers');
+  await run(
+    page,
+    'explorers',
+    'import pandas as pd\nstyle_sales = pd.DataFrame({"country": ["Poland", "France", "Germany"], "revenue": [120, 180, 150]})\nstyle_total = 450'
+  );
+
+  await page.getByRole('tab', { name: 'Your Variables', exact: true }).click();
+  const variableSearch = page.getByRole('textbox', {
+    name: 'Search variables',
+    exact: true
+  });
+  await variableSearch.fill('does-not-exist');
+  await expect(page.getByRole('status')).toHaveText(
+    'No variables match your search or filter.'
+  );
+  await variableSearch.fill('style_');
+  await page
+    .getByRole('button', { name: 'Numbers', exact: true })
+    .press('Enter');
+  await expect(page.locator('.mljar-variable-inspector-item')).toHaveCount(1);
+  await expect(page.locator('.mljar-variable-inspector-item')).toContainText(
+    'style_total'
+  );
+  await page
+    .getByRole('button', { name: 'DataFrame', exact: true })
+    .press('Enter');
+  await page
+    .getByRole('button', { name: 'Show details for style_sales', exact: true })
+    .press('Enter');
+  const preview = page.locator(
+    '[id$=":style_sales"] .mljar-variable-inspector-preview-widget'
+  );
+  await expect(preview).toContainText('Rows: 3');
+  await expect(preview).toContainText('Columns: 2');
+
+  await activate(page, 'explorers');
+  await page.getByRole('tab', { name: 'Package Manager', exact: true }).click();
+  const packageSearch = page.getByRole('textbox', {
+    name: 'Search packages',
+    exact: true
+  });
+  await expect(
+    page.getByRole('button', { name: 'Refresh Packages', exact: true })
+  ).toBeEnabled();
+  await packageSearch.fill('does-not-exist');
+  await expect(page.getByRole('status')).toHaveText(
+    'No packages match your search.'
+  );
+  await packageSearch.fill('pandas');
+  const remove = page.getByRole('button', {
+    name: 'Uninstall pandas',
+    exact: true
+  });
+  await packageSearch.press('Tab');
+  await expect(remove).toBeFocused();
+  // Exercise the confirmation UI without changing the test or developer environment.
+  page.once('dialog', dialog => dialog.dismiss());
+  await remove.press('Enter');
+  await expect(remove).toBeVisible();
+
+  const install = page.getByRole('button', {
+    name: 'Install Packages',
+    exact: true
+  });
+  await install.press('Enter');
+  const dialog = page.getByRole('dialog', {
+    name: 'Install package',
+    exact: true
+  });
+  const name = dialog.getByRole('textbox', {
+    name: 'Package name',
+    exact: true
+  });
+  await expect(name).toBeFocused();
+  await expect(
+    dialog.getByRole('button', { name: 'Install', exact: true })
+  ).toBeDisabled();
+  await name.fill('pandas');
+  await name.press('Tab');
+  await expect(
+    dialog.getByRole('button', { name: 'Install', exact: true })
+  ).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(
+    dialog.getByRole('button', { name: 'Close dialog', exact: true })
+  ).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(
+    dialog.getByRole('button', { name: 'Install', exact: true })
+  ).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(install).toBeFocused();
+});
+
+test('variable list uses its full width and scrolls only when needed', async ({
+  page
+}) => {
+  await setup(page);
+  await notebook(page, 'scrolling');
+  await run(page, 'scrolling', 'scroll_000 = 0\nscroll_001 = 1');
+  await page.getByRole('tab', { name: 'Your Variables', exact: true }).click();
+
+  const list = page.locator('.mljar-variable-inspector-list');
+  const rows = list.locator('.mljar-variable-inspector-item');
+  const expectNoUnusedGutter = async () => {
+    await expect
+      .poll(() =>
+        list.evaluate(element => {
+          const style = getComputedStyle(element);
+          return (
+            element.getBoundingClientRect().width -
+            element.clientWidth -
+            parseFloat(style.borderLeftWidth) -
+            parseFloat(style.borderRightWidth)
+          );
+        })
+      )
+      .toBeLessThan(1);
+    await expect
+      .poll(() => list.evaluate(el => el.scrollHeight - el.clientHeight))
+      .toBe(0);
+  };
+
+  await expect(rows).toHaveCount(2);
+  await expectNoUnusedGutter();
+
+  await run(
+    page,
+    'scrolling',
+    'globals().update({f"scroll_{i:03d}": i for i in range(2, 100)})'
+  );
+  await expect(rows).toHaveCount(100);
+  await expect
+    .poll(() => list.evaluate(el => el.scrollHeight - el.clientHeight))
+    .toBeGreaterThan(0);
+  await expect(rows.last()).not.toBeInViewport();
+  await list.hover();
+  await page.mouse.wheel(0, 10000);
+  await expect(rows.last()).toBeInViewport();
+
+  await page
+    .getByRole('textbox', { name: 'Search variables' })
+    .fill('scroll_000');
+  await expect(rows).toHaveCount(1);
+  await expect(rows.first()).toBeInViewport();
+  await expectNoUnusedGutter();
+});

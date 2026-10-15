@@ -11,6 +11,15 @@ class Translator {
   private language: Language = 'en';
   private translations: Translations = {
     pl: {
+      'Search variables': 'Szukaj zmiennych',
+      All: 'Wszystkie',
+      Numbers: 'Liczby',
+      Other: 'Inne',
+      'No variables yet. Run a notebook cell to see them here.':
+        'Brak zmiennych. Uruchom komórkę notatnika, aby je tutaj zobaczyć.',
+      'No variables match your search or filter.':
+        'Żadna zmienna nie pasuje do wyszukiwania lub filtra.',
+
       'Your Variables': 'Twoje Zmienne',
       'A JupyterLab extension to easy manage variables.': 'Rozszerzenie JupyterLab do łatwego zarządzania zmiennymi.',
       'Settings': 'Ustawienia',

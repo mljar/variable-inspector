@@ -1,28 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-.mljar-variable-inspector-sidebar-widget {
-  --bg: #f5f7fa;
+.mljar-variable-inspector-sidebar-widget,
+.mljar-variable-inspector-preview-widget {
+  --bg: var(--jp-layout-color1, #fff);
   --surface: #fff;
-  --surface2: #f0f4f8;
-  --border: #e2e8f0;
-  --border2: #cbd5e1;
-  --text: #0f172a;
-  --muted: #64748b;
-  --blue: #0284c7;
-  --blue-dim: #e0f2fe;
-  --blue-glow: rgb(2 132 199 / 15%);
+  --surface2: #f8f9fc;
+  --border: #e2e7f0;
+  --border2: #6b7280;
+  --text: #334155;
+  --muted: #5a6585;
+  --blue: #1976d2;
+  --blue-dim: #eaf3fc;
+  --blue-glow: rgb(25 118 210 / 30%);
   --green: #16a34a;
   --amber: #d97706;
   --purple: #7c3aed;
   --rose: #e11d48;
   --orange: #ea580c;
-  --mono: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
-  --sans: 'Geist', -apple-system, blinkmacsystemfont, 'Segoe UI', sans-serif;
+  --mono: var(--jp-code-font-family, monospace);
+  --sans: var(--jp-ui-font-family, system-ui, sans-serif);
 
-  background: radial-gradient(circle at 8% 0%, #ecfeff 0%, var(--bg) 40%);
+  background: var(--bg);
   color: var(--text);
-  padding: 14px 10px;
+  box-sizing: border-box;
   font-family: var(--sans);
+}
+
+.mljar-variable-inspector-sidebar-widget {
+  padding: 12px;
 }
 
 .mljar-variable-inspector-sidebar-container {
@@ -37,7 +40,7 @@
 .mljar-variable-inspector-panel {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 28px);
+  height: 100%;
 }
 
 .mljar-variable-body {
@@ -48,6 +51,7 @@
 }
 
 .mljar-variable-header-container {
+  flex-wrap: wrap;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -55,7 +59,6 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  margin-right: 8px;
   margin-bottom: 8px;
   padding: 0 0 12px;
   background: transparent;
@@ -82,8 +85,8 @@
   border-radius: 999px;
   background: var(--surface2);
   color: var(--muted);
-  font-family: var(--mono);
-  font-size: 10px;
+  font-family: var(--sans);
+  font-size: 12px;
 }
 
 .mljar-variable-actions-container {
@@ -93,9 +96,9 @@
 
 .mljar-variable-search-bar-container {
   position: sticky;
-  top: 44px;
+  top: 0;
   z-index: 11;
-  padding: 0 8px 12px 4px;
+  padding: 0 0 12px;
   background: transparent;
 }
 
@@ -103,11 +106,11 @@
   position: absolute;
   top: 18px;
   left: 12px;
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   fill: none;
   stroke: var(--muted);
-  stroke-width: 1.8;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
   transform: translateY(-50%);
@@ -115,59 +118,36 @@
 }
 
 .mljar-variable-inspector-search-bar-input {
+  box-sizing: border-box;
   width: 100%;
   height: 36px;
   padding: 0 12px 0 34px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--surface);
   color: var(--text);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
 }
 
 .mljar-variable-inspector-search-bar-input::placeholder {
   color: var(--muted);
+  opacity: 1;
 }
 
 .mljar-variable-inspector-search-bar-input:focus {
-  outline: none;
-  border-color: rgb(2 132 199 / 40%);
-  box-shadow: 0 0 0 3px var(--blue-glow);
+  outline: 2px solid var(--blue-glow);
+  outline-offset: 1px;
+  border-color: #1976d2;
 }
 
 .mljar-variable-type-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin-right: 8px;
   margin-bottom: 10px;
-}
-
-.mljar-variable-type-chip {
-  padding: 4px 9px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--muted);
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  line-height: 1.2;
-  transition: all 0.15s ease;
-}
-
-.mljar-variable-type-chip:hover {
-  border-color: var(--border2);
-  color: var(--text);
-}
-
-.mljar-variable-type-chip.active {
-  border-color: rgb(2 132 199 / 35%);
-  background: var(--blue-dim);
-  color: var(--blue);
 }
 
 .mljar-variable-inspector-list-container {
@@ -180,7 +160,6 @@
 
 .mljar-variable-inspector-list {
   margin: 0;
-  margin-right: 8px;
   padding: 0;
   list-style: none;
   overflow-y: auto;
@@ -198,11 +177,9 @@
   border-bottom: 1px solid var(--border);
   background: var(--surface2);
   color: var(--muted);
-  font-family: var(--mono);
-  font-size: 10px;
+  font-family: var(--sans);
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
 }
 
 .mljar-variable-inspector-item {
@@ -215,8 +192,6 @@
   column-gap: 12px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
-  animation: fadein-row 0.22s ease both;
-  cursor: pointer;
 }
 
 .mljar-variable-inspector-item:last-child {
@@ -250,8 +225,8 @@
 
 .mljar-variable-inspector-item.active,
 .mljar-varable-item.active {
-  background-color: var(--jp-brand-color1);
-  color: var(--jp-ui-inverse-font-color1);
+  background-color: var(--blue-dim);
+  color: var(--blue);
 }
 
 .mljar-variable-inspector-variable-name,
@@ -322,7 +297,7 @@
 
 .mljar-variable-inspector-variable-value,
 .mljar-variable-inspector-variable-preview {
-  color: #475569;
+  color: var(--text);
 }
 
 .mljar-variable-inspector-variable-preview {
@@ -335,36 +310,17 @@
   text-align: left;
 }
 
+.mljar-variable-inspector-preview {
+  overflow: hidden;
+  color: var(--blue);
+  cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .mljar-variable-inspector-variable-preview:hover,
 .mljar-variable-inspector-preview:hover {
   text-decoration: underline;
-}
-
-.mljar-variable-inspector-show-variable-button {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  line-height: 1;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  color: var(--blue);
-  cursor: pointer;
-  transition: color 0.15s ease;
-}
-
-.mljar-variable-inspector-show-variable-button:hover:not(:disabled) {
-  color: var(--text);
-}
-
-.mljar-variable-inspector-show-variable-button:disabled,
-.mljar-variable-inspector-skip-button:disabled,
-.mljar-variable-inspector-settings-button:disabled,
-.mljar-variable-inspector-refresh-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .mljar-variable-detail-button-icon {
@@ -377,40 +333,6 @@
   display: block;
   width: 14px;
   height: 14px;
-}
-
-.mljar-variable-inspector-settings-button,
-.mljar-variable-inspector-refresh-button {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  line-height: 1;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-  transition: color 0.15s ease;
-}
-
-.mljar-variable-inspector-settings-button:hover:not(:disabled),
-.mljar-variable-inspector-refresh-button:hover:not(:disabled),
-.mljar-variable-inspector-skip-button:hover:not(:disabled) {
-  color: var(--text);
-}
-
-.mljar-variable-inspector-refresh-button.manually-refresh {
-  color: var(--green);
-}
-
-.mljar-variable-inspector-refresh-button.manually-refresh:hover:not(:disabled) {
-  color: #166534;
-}
-
-.mljar-variable-inspector-settings-button.active {
-  color: var(--blue);
 }
 
 .mljar-variable-inspector-settings-icon,
@@ -450,11 +372,11 @@
 .mljar-variable-inspector-message {
   margin: 8px 8px 0 0;
   padding: 12px;
-  border: 1px dashed var(--border2);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgb(255 255 255 / 60%);
+  background: var(--surface2);
   color: var(--muted);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
 }
 
@@ -499,18 +421,6 @@
 
 .mljar-variable-inspector-settings-menu-item:hover {
   background: var(--surface2);
-}
-
-.mljar-variable-inspector-skip-button {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background-color: transparent;
-  color: var(--muted);
-  cursor: pointer;
 }
 
 .mljar-variable-inspector-list::-webkit-scrollbar {
@@ -565,8 +475,9 @@
 .mljar-variable-inspector-choose-range {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 12px;
 }
 
@@ -575,16 +486,17 @@
   padding: 5px;
   border: 1px solid var(--border2);
   border-radius: 6px;
-  background-color: var(--surface2);
-  font-family: var(--mono);
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: var(--sans);
   font-size: 12px;
   text-align: center;
 }
 
 .mljar-variable-inspector-pagination-input:focus {
-  outline: none;
-  border-color: rgb(2 132 199 / 40%);
-  box-shadow: 0 0 0 2px var(--blue-glow);
+  outline: 2px solid var(--blue-glow);
+  outline-offset: 1px;
+  border-color: #1976d2;
 }
 
 .mljar-variable-inspector-pagination-input::-webkit-outer-spin-button,
@@ -594,17 +506,20 @@
 }
 
 /* stylelint-disable selector-class-pattern */
-.ReactVirtualized__Grid::-webkit-scrollbar {
+.mljar-variable-inspector-preview-widget
+  .ReactVirtualized__Grid::-webkit-scrollbar {
   width: 9px;
   height: 8px;
 }
 
-.ReactVirtualized__Grid::-webkit-scrollbar-track {
+.mljar-variable-inspector-preview-widget
+  .ReactVirtualized__Grid::-webkit-scrollbar-track {
   border-radius: 8px;
   background: #334155;
 }
 
-.ReactVirtualized__Grid::-webkit-scrollbar-thumb {
+.mljar-variable-inspector-preview-widget
+  .ReactVirtualized__Grid::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 8px;
   background-color: #94a3b8;
@@ -612,28 +527,68 @@
 }
 /* stylelint-enable selector-class-pattern */
 
-.mljar-variable-inspector-preview {
-  overflow: hidden;
-  color: var(--blue);
-  cursor: pointer;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-@keyframes fadein-row {
-  from {
-    opacity: 0;
-    transform: translateX(-4px);
-  }
+[data-jp-theme-light='false'] .mljar-variable-inspector-sidebar-widget,
+[data-jp-theme-light='false'] .mljar-variable-inspector-preview-widget {
+  --surface: var(--jp-layout-color1, #1f2937);
+  --surface2: #293548;
+  --border: #475569;
+  --border2: #94a3b8;
+  --text: #e2e8f0;
+  --muted: #cbd5e1;
+  --blue-dim: #193653;
+}
 
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* Scoped selectors override Jupyter's themed button reset. */
+.mljar-variable-inspector-sidebar-widget .mljar-variable-button,
+.mljar-variable-inspector-preview-widget .mljar-variable-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--muted);
+  font: 500 12px / 18px var(--sans);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.mljar-variable-button.mljar-variable-icon-button {
+  width: 30px;
+  padding: 5px;
+}
+
+.mljar-variable-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mljar-variable-button:hover:not(:disabled) {
+  border-color: var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.mljar-variable-button.active {
+  background: var(--blue-dim);
+  border-color: #1976d2;
+  color: var(--text);
+}
+
+.mljar-variable-inspector-sidebar-widget button:focus-visible,
+.mljar-variable-inspector-preview-widget button:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
 }

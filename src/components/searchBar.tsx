@@ -13,13 +13,14 @@ export const SearchBar: React.FC = () => {
       {variables.length !== 0 ? (
         <div className="mljar-variable-search-bar-container">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <line x1="16.65" y1="16.65" x2="20" y2="20" />
+            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+            <path d="M21 21l-6 -6" />
           </svg>
           <input
             type="text"
             value={searchTerm}
             onChange={handleChange}
+            aria-label={t('Search variables')}
             placeholder={t('Search variable...')}
             className="mljar-variable-inspector-search-bar-input"
           />

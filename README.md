@@ -84,7 +84,8 @@ pip uninstall variable_inspector
 
 ### Development install
 
-Note: You will need NodeJS to build the extension package.
+Note: Building from source requires Node.js 22.12.0 or newer for the patched
+build dependencies. Installing a prebuilt Python wheel does not require Node.js.
 
 The `jlpm` command is JupyterLab's pinned version of
 [yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use

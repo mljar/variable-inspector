@@ -20,17 +20,20 @@ export class VariablePanelWidget extends ReactWidget {
 
   protected render(): JSX.Element {
     return (
-      <div style={{ height: '100%', width: '100%' }}>
+      <div
+        className="mljar-variable-inspector-preview-widget"
+        style={{ height: '100%', width: '100%' }}
+      >
         <VariableRefreshContextProvider
           notebookPanel={this.props.notebookPanel}
         >
-        <ThemeContextProvider>
-          <VariablePanel
-            variableName={this.props.variableName}
-            initVariableType={this.props.variableType}
-            initVariableShape={this.props.variableShape}
-            notebookPanel={this.props.notebookPanel}
-          />
+          <ThemeContextProvider>
+            <VariablePanel
+              variableName={this.props.variableName}
+              initVariableType={this.props.variableType}
+              initVariableShape={this.props.variableShape}
+              notebookPanel={this.props.notebookPanel}
+            />
           </ThemeContextProvider>
         </VariableRefreshContextProvider>
       </div>

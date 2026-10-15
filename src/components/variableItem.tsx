@@ -139,7 +139,7 @@ export const VariableItem: React.FC<VariableItemProps> = ({
           </button>
         ) : (
           <button
-            className="mljar-variable-inspector-show-variable-button"
+            className="mljar-variable-button mljar-variable-icon-button mljar-variable-inspector-show-variable-button"
             onClick={() => handleButtonClick(vrb.name, vrb.type, vrb.shape)}
             aria-label={`Show details for ${vrb.name}`}
             title={t('Show value')}
