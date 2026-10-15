@@ -62,7 +62,8 @@ No separate extension installation is required.
 
 ## Variable Inspector requirements
 
-- JupyterLab >= 4.0.0
+- Python >= 3.9
+- JupyterLab >= 4.2.0
 
 ## Install extension
 
