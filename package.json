@@ -57,7 +57,8 @@
         "watch:labextension": "jupyter labextension watch .",
         "lab": "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.disable_check_xsrf=True --ServerApp.port=8899",
         "test:e2e": "playwright test",
-        "test:ui:headed": "rm -f \"Untitled*.ipynb\" && playwright test --headed && rm -f \"Untitled*.ipynb\""
+        "test:ui:headed": "rm -f \"Untitled*.ipynb\" && playwright test --headed && rm -f \"Untitled*.ipynb\"",
+        "test:security": "node --test scripts/security_dependencies.test.js"
     },
     "dependencies": {
         "@jupyterlab/application": "^4.0.0",
@@ -120,7 +121,8 @@
         "webpack": ">=5.104.1 <5.107.0",
         "@lumino/coreutils": "2.2.3",
         "katex": "0.18.2",
-        "postcss-selector-parser": "^7.1.6"
+        "postcss-selector-parser": "^7.1.6",
+        "braces@^3.0.3": "patch:braces@npm%3A3.0.3#./.yarn/patches/braces-npm-3.0.3-582c14023c.patch"
     },
     "jupyterlab": {
         "extension": true,

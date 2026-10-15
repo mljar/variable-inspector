@@ -27,11 +27,14 @@ jobs:
     - name: Install dependencies
       run: python -m pip install -U "jupyterlab>=4.0.0,<5"
 
+    - name: Install extension dependencies
+      run: jlpm --immutable
+
+    - name: Verify dependency security patches
+      run: jlpm test:security
+
     - name: Lint the extension
-      run: |
-        set -eux
-        jlpm
-        jlpm run lint:check
+      run: jlpm run lint:check
 
     - name: Build the extension
       run: |

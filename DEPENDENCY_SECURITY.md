@@ -18,7 +18,7 @@ Recheck all dependencies, including development tooling:
 jlpm npm audit --all --recursive
 ```
 
-## Remaining upstream advisory
+## Locally mitigated upstream advisory
 
 [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
 affects `braces` <=3.0.3. No patched release is available as of this review.
@@ -27,5 +27,15 @@ The dependency paths here are glob matching in build/lint/test tools, including
 JupyterLab's transitive Jest dependencies. Application searches do not pass their
 input to `braces`.
 
-This finding remains visible in audits; it is not suppressed. Revisit it when
-upstream publishes a fix or the parent tools remove the dependency.
+A committed Yarn patch limits nesting in parsing and AST processing to 256 levels
+and replaces recursive array flattening with an iterative traversal. Yarn applies
+the patch during installation, including immutable installs. Regression tests
+cover hostile patterns, direct AST input, and ordinary expansion:
+
+```sh
+jlpm test:security
+```
+
+The package version remains 3.0.3, so this finding remains visible to Dependabot
+and version-based audits. It is not suppressed. Remove the local patch only when
+an upstream fix is available and the regression tests pass without it.

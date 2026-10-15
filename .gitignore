@@ -121,5 +121,6 @@ dmypy.json
 # OSX files
 .DS_Store
 
-# Yarn cache
-.yarn/
+# Yarn cache (commit reproducible dependency patches)
+.yarn/*
+!.yarn/patches/
