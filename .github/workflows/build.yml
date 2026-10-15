@@ -33,6 +33,9 @@ jobs:
     - name: Verify dependency security patches
       run: jlpm test:security
 
+    - name: Verify notebook execution refreshes
+      run: jlpm test:refresh
+
     - name: Lint the extension
       run: jlpm run lint:check
 

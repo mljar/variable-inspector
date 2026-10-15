@@ -1,6 +1,5 @@
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { Kernel, KernelMessage } from '@jupyterlab/services';
-import { kernelOperationNotifier } from '../utils/kernelOperationNotifier';
 import { NotebookLikeWidget } from '../utils/notebookTypes';
 
 type RefreshListener = () => void;
@@ -151,10 +150,9 @@ export class NotebookExecutionRefreshCoordinator {
       args.direction === 'send' &&
       message.header.msg_type === 'execute_request'
     ) {
-      if (
-        kernelOperationNotifier.inProgressSidebar ||
-        kernelOperationNotifier.inProgressPanel
-      ) {
+      // Ignore only our own request. A user can execute a cell while an
+      // inspection or preview is still running, including on another kernel.
+      if (message.metadata?.mljar_variable_inspector === true) {
         return;
       }
       entry.executionIds.add(message.header.msg_id);

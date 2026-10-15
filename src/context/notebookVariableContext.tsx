@@ -10,9 +10,9 @@ import { useNotebookPanelContext } from './notebookPanelContext';
 import { useNotebookKernelContext } from './notebookKernelContext';
 import { KernelMessage } from '@jupyterlab/services';
 import { IKernelData } from '@mljar/kernel-data';
-import { withIgnoredSidebarKernelUpdates } from '../utils/kernelOperationNotifier';
 import { variableDict } from '../python_code/getVariables';
 import { provideVariableInspectorSubshellKernel } from '../utils/variableInspectorSubshell';
+import { DebouncedTaskQueue } from '../utils/debouncedTaskQueue';
 
 export interface IVariableInfo {
   name: string;
@@ -38,60 +38,6 @@ interface IVariableContextProps {
 const VariableContext = createContext<IVariableContextProps | undefined>(
   undefined
 );
-
-type Task = () => Promise<void> | void;
-
-class DebouncedTaskQueue {
-  // Holds the timer handle.
-  private timer: ReturnType<typeof setTimeout> | null = null;
-  // Holds the most recently added task.
-  private lastTask: Task | null = null;
-  private delay: number;
-
-  /**
-   * @param delay Time in milliseconds to wait before executing the last task.
-   */
-  constructor(delay: number = 500) {
-    this.delay = delay;
-  }
-
-  /**
-   * Adds a new task to the queue. Only the last task added within the delay period will be executed.
-   * @param task A function representing the task.
-   */
-  cancel(): void {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-    this.timer = null;
-    this.lastTask = null;
-  }
-
-  add(task: Task): void {
-    // Save (or overwrite) the latest task.
-    this.lastTask = task;
-
-    // If there’s already a pending timer, clear it.
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-
-    // Start (or restart) the timer.
-    this.timer = setTimeout(async () => {
-      if (this.lastTask) {
-        try {
-          // Execute the latest task.
-          await this.lastTask();
-        } catch (error) {
-          console.error('Task execution failed:', error);
-        }
-      }
-      // After execution, clear the stored task and timer.
-      this.lastTask = null;
-      this.timer = null;
-    }, this.delay);
-  }
-}
 
 export const VariableContextProvider: React.FC<{
   children: React.ReactNode;
@@ -135,71 +81,69 @@ export const VariableContextProvider: React.FC<{
       kernelData.current(request);
     setLoading(true);
     setError(null);
-    await withIgnoredSidebarKernelUpdates(async () => {
-      try {
-        const viKernel = await provideVariableInspectorSubshellKernel(
-          sourceKernel
-        );
+    try {
+      const viKernel =
+        await provideVariableInspectorSubshellKernel(sourceKernel);
+      if (!current()) {
+        return;
+      }
+      if (!viKernel) {
+        throw new Error('No kernel available');
+      }
+      let received = false;
+      const future = viKernel.requestExecute(
+        { code: variableDict, store_history: false },
+        true,
+        { mljar_variable_inspector: true }
+      );
+      future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
         if (!current()) {
           return;
         }
-        if (!viKernel) {
-          throw new Error('No kernel available');
-        }
-        let received = false;
-        const future = viKernel.requestExecute({
-          code: variableDict,
-          store_history: false
-        });
-        future.onIOPub = (msg: KernelMessage.IIOPubMessage) => {
-          if (!current()) {
-            return;
-          }
-          if (msg.header.msg_type === 'error') {
-            kernelData.fail(request, 'Variable inspection failed');
-            setError('Variable inspection failed');
-            return;
-          }
-          if (
-            ['execute_result', 'display_data', 'update_display_data'].includes(
-              msg.header.msg_type
-            )
-          ) {
-            const items = (msg.content as any)?.data?.['application/json'];
-            if (!Array.isArray(items)) {
-              return;
-            }
-            received = true;
-            kernelData.publish(request, items);
-            setVariables(
-              items.map(item => ({
-                name: item.varName,
-                type: item.varType,
-                shape: item.varShape || 'None',
-                dimension: item.varDimension,
-                size: item.varSize,
-                value: item.varSimpleValue
-              }))
-            );
-            setRefreshCount(prev => prev + 1);
-          }
-        };
-        await future.done;
-        if (current() && !received) {
-          throw new Error('Kernel returned no variable snapshot');
-        }
-      } catch (err) {
-        if (current()) {
-          kernelData.fail(request, String(err));
+        if (msg.header.msg_type === 'error') {
+          kernelData.fail(request, 'Variable inspection failed');
           setError('Variable inspection failed');
+          return;
         }
-      } finally {
-        if (current()) {
-          setLoading(false);
-          setIsRefreshing(false);
+        if (
+          ['execute_result', 'display_data', 'update_display_data'].includes(
+            msg.header.msg_type
+          )
+        ) {
+          const items = (msg.content as any)?.data?.['application/json'];
+          if (!Array.isArray(items)) {
+            return;
+          }
+          received = true;
+          kernelData.publish(request, items);
+          setVariables(
+            items.map(item => ({
+              name: item.varName,
+              type: item.varType,
+              shape: item.varShape || 'None',
+              dimension: item.varDimension,
+              size: item.varSize,
+              value: item.varSimpleValue
+            }))
+          );
+          setRefreshCount(prev => prev + 1);
         }
+      };
+      await future.done;
+      if (current() && !received) {
+        throw new Error('Kernel returned no variable snapshot');
       }
-    });
+    } catch (err) {
+      if (current()) {
+        kernelData.fail(request, String(err));
+        setError('Variable inspection failed');
+      }
+    } finally {
+      if (current()) {
+        setLoading(false);
+        setIsRefreshing(false);
+      }
+    }
   }, [notebookPanel, kernel?.id, kernelData, resetVariables]);
 
   useEffect(() => {

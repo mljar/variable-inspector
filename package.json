@@ -1,6 +1,6 @@
 {
     "name": "variable-inspector",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "description": "Variable explorer for Jupyter Lab.",
     "keywords": [
         "jupyter",
@@ -58,7 +58,8 @@
         "lab": "jupyter lab --no-browser --IdentityProvider.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.disable_check_xsrf=True --ServerApp.port=8899",
         "test:e2e": "playwright test",
         "test:ui:headed": "rm -f \"Untitled*.ipynb\" && playwright test --headed && rm -f \"Untitled*.ipynb\"",
-        "test:security": "node --test scripts/security_dependencies.test.js"
+        "test:security": "node --test scripts/security_dependencies.test.js",
+        "test:refresh": "node --test scripts/execution_refresh.test.js"
     },
     "dependencies": {
         "@jupyterlab/application": "^4.0.0",

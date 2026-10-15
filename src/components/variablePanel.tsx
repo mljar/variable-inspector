@@ -7,7 +7,6 @@ import 'react-virtualized/styles.css';
 import { allowedTypes } from '../utils/allowedTypes';
 import { executeMatrixContent } from '../utils/executeGetMatrix';
 import { useVariableRefeshContext } from '../context/variableRefershContext';
-import { withIgnoredPanelKernelUpdates } from '../utils/kernelOperationNotifier';
 import { useThemeContext } from '../context/themeContext';
 import { transformMatrixData } from '../utils/utils';
 import { PaginationControls } from './paginationControls';
@@ -67,16 +66,14 @@ export const VariablePanel: React.FC<IVariablePanelProps> = ({
         return;
       }
 
-      const result = await withIgnoredPanelKernelUpdates(() =>
-        executeMatrixContent(
-          variableName,
-          currentColumn,
-          currentColumn + maxColsRange,
-          currentRow,
-          currentRow + maxRowsRange,
+      const result = await executeMatrixContent(
+        variableName,
+        currentColumn,
+        currentColumn + maxColsRange,
+        currentRow,
+        currentRow + maxRowsRange,
 
-          notebookPanel
-        )
+        notebookPanel
       );
       if (requestGeneration !== requestGenerationRef.current) {
         return;

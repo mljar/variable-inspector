@@ -42,10 +42,11 @@ export const executeMatrixContent = async (
   return new Promise((resolve, reject) => {
     let outputData = '';
     let resultResolved = false;
-    const future = viKernel.requestExecute({
-      code,
-      store_history: false
-    });
+    const future = viKernel.requestExecute(
+      { code, store_history: false },
+      true,
+      { mljar_variable_inspector: true }
+    );
 
     if (!future) {
       return reject(new Error('No future returned from kernel execution.'));
